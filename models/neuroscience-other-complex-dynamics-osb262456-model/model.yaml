@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model262456262456Model'
+description: 'Complex dynamics: reproducing Golgi cell electroresponsiveness (Geminiani
+  et al 2018, 2019ab)'
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:262456
+  source_db: opensourcebrain
+  source_id: '262456'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/262456
+  download_url: https://github.com/OpenSourceBrain/262456.git
+  license: ''
+bsim:
+  entrypoint: src.model_262456_262456_model:Model262456262456Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

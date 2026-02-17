@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CognitiveAndMotorCorticoBasalGangliaIntera195731Model'
+description: '{"value": "This is a re-implementation of Guthrie et al 2013 by Topalidou
+  and Rougier 2015. The original study investigated how multiple level action selection\r\ncould
+  be performed by the basal gangl'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:195731
+  source_db: modeldb
+  source_id: '195731'
+  standard: other
+  original_url: https://modeldb.science/195731
+  download_url: https://modeldb.science/download/195731
+  license: ''
+bsim:
+  entrypoint: src.cognitive_and_motor_cortico_basal_ganglia_intera_195731_model:CognitiveAndMotorCorticoBasalGangliaIntera195731Model
+  init_kwargs:
+    model_path: data/195731.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

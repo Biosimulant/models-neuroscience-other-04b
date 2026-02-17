@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model145800145800Model'
+description: Circadian clock model based on protein sequestration (simple version)
+  (Kim & Forger 2012)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:145800
+  source_db: opensourcebrain
+  source_id: '145800'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/145800
+  download_url: https://github.com/OpenSourceBrain/145800.git
+  license: ''
+bsim:
+  entrypoint: src.model_145800_145800_model:Model145800145800Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

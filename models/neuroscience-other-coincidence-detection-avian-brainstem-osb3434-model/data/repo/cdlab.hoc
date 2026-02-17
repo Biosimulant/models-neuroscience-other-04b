@@ -1,0 +1,4475 @@
+/* CDlab: a coincidence detector laboratory */
+/* NEURON program modeling an avian brainstem auditory coincidence detector. */
+/* by Jonathan Z. Simon */
+/* originally based on his project from the Woods Hole MBL course */
+/* "Methods in Computational Neuroscience".  */
+/* cdlab.hoc version 3.0dx (requires special mod files, cvode ready) */
+/* formerly known as multicoincidence.hoc */
+strdef versionStr
+versionStr = "CD Lab v. 3.0d14"
+
+/* copyright 1999-2000 Jonathan Z. Simon and University of Maryland */
+ 
+/* We simulate cells, each with soma, an axon and some
+ * number of pairs of dendrites. The stimulation is from
+ * synapses on the dendrites. Each synapse fires with
+ * time-dependent Poisson statistics, with probability proportional
+ * to a periodic stimulus. The stimuli from each ear are identical,
+ * except (in general) the phase. */
+
+firstrun = (name_declared("cdlabVersion") != 2)
+if (firstrun) { // running for first time
+ cdlabVersion = 3.0 
+ useGraphics = 1 // if 0, can be run on unix terminal remotely without X
+ load_file("nrngui.hoc")
+
+// M. Hines The following is done automatically when launching from
+// a working directory containing the nrnmech.dll or nrnmac.dll file
+
+// // load dll if necessary (mac or pc)
+// specialdll = (name_declared("usedll") == 4)
+// if (specialdll) nrn_load_dll(usedll) //4 means strdef
+// {load_file("noload.hoc")} // Loads the standard run library functions.
+} else { // reloading
+ forall delete_section() 
+}
+
+proc userpostrun() {} // executed after runs; user can override
+
+/**************** 
+ * Declarations * 
+ ****************/
+ 
+objref gu					// global constants & utilities
+objref gpi					// global parameter info
+objref gp					// global parameters
+objref gr					// global run variables & procedures
+objref go					// global output
+objref cvode			    // allows use of NetCons and variable time step
+objref timeGraphList		// protect graphs from garbage collection
+strdef stimProcName         // changeable stimulus function (e.g. bin/monaural)
+
+strdef tmpStr // for temporarily holding a string
+objref tmpObj // for temporarily holding an object
+objref null   // null object
+
+/********************* 
+ * Global Parameters * 
+ *********************/
+ 
+// default temperature, a true NEURON global 
+celsius = 35 // celsius //	// temperature of environment
+
+// default time step , a true NEURON global 
+dtReq = 0.0125 // ms //	// requested timestep of numerical integration
+// time step, a true NEURON global, which may be modified by cvode below
+dt = dtReq
+
+proc requestdt() {
+ dt = dtReq
+ setdt()
+} 
+
+// standard NEURON globals 
+steps_per_ms = 1/(8*dtReq) 		// points plotted per ms
+v_init = -60 // or -55 or -64  // mV //		// initial potential
+tstop = 115 // ms //		// time run the simulation 
+global_ra = 200 // ohm cm //	// axial resistivity 
+
+// Integration method: 
+// if secondorder = 2, Modified Crank-Nicholson
+// this is *slightly* slower than the first-order backward Euler
+// method for the same dt, but with O(dt^2) accuracy instead of O(dt).
+// There are some stability worries at large dt, but if ours is kept
+// small compared to the relevant time scales (~1 ms for a spike, ~0.3 ms
+// for the synaptic input; dt ~ .01
+secondorder = 2			// i.e. use Modified Crank-Nicholson
+
+i = -1e12 // For debugging only. Common loop variable name, but should only
+     // be used locally. Will change from -1e12 if used non-locally.
+
+
+/****************************** 
+ * Global Constants & Utilties* 
+ ******************************/
+
+/*******************************/
+
+begintemplate globConstsUtils
+
+/*******************************/
+
+// A constant should be here if it should not (or cannot) be changed
+// from run to run, but still deserves an illuminating name
+// (e.g. "numStim" is more enlightening than "2" when trying to read
+// the code). Utilties are put here to make importing them to an
+// object more easy.
+
+ public u, numStim, \
+  numStimTypes, stimBinaural, stimMonaural, stimBinauralILD, stimProcNames, \
+  numAnimalTypes, noAnimal, chick, owl, caiman, \
+  noneStr, numClocks, \
+  white, black, red, blue, green, orange, brown, magenta, yellow, gray, \
+  solidThin2,  solidThin,  solidMed,  solidThick,  solidThick2, \
+  dashedThin2, dashedThin, dashedMed, dashedThick, patchThin2, \
+  patchThin2,  patchThin,  patchMed,  patchThick,  patchThick2, \
+  max, min, sgn, indexOfObject, \
+  isNoneStr, isNotNoneStr, existsFile, \
+  getMachineName, printMachineName, \
+  cable_g_changed, cable_diameter_changed,  \
+  cable_rA_changed, cable_lambda_changed, \
+  stimFreqToStimVS, stimFreqTolDen
+
+ // This is the only use of the "access" command in the program. 
+ // The user interface for graphs also uses it as a default.
+ // It's a good spot to insert utility functions implemented in .mod files.
+ create u
+ access u
+
+ objref stimProcNames[2]
+ strdef noneStr
+ objref sf
+
+ tmpNum = -1e12   // for temporarily holding a number
+ strdef tmpStr // for temporarily holding a string
+ objref tmpObj // for temporarily holding an object
+ objref null   // null object
+
+ proc /* globConstsUtils */ init() {
+  numAnimalTypes = 4    // # of Animal models (for VS as functin of freq)
+  noAnimal = 0 			// vs is independent of frequency
+  chick = 1 			// chick constant
+  owl = 2				// owl constant 
+  caiman = 3			// caiman constant 
+
+  numStim = 2           // # of separate stimuli (Ipsi & Contra)
+  numClocks = 2         // # of independent clocks (rising & falling each dt)
+
+  numStimTypes = 3      // # of stimulus types (Binaural & Monaural, so far)
+  objref stimProcNames[numStimTypes]    // names of stimProcs 
+  stimBinaural = 0 		// Binaural constant
+  stimProcNames[stimBinaural] = new String("PoissonBinauralVM")
+  stimMonaural = 1		// Monaural constant 
+  stimProcNames[stimMonaural] = new String("PoissonMonauralVM")
+  stimBinauralILD = 2		// Binaural with ILD constant 
+  stimProcNames[stimBinauralILD] = new String("PoissonBinauralILDVM")
+
+  noneStr = "--none--"  // use in menus for when no specifice parameter choice
+
+  white = 0             // colors as implemented by standard graph objects
+  black = 1
+  red = 2
+  blue = 3
+  green = 4
+  orange = 5
+  brown = 6
+  magenta = 7
+  yellow = 8
+  gray = 9
+
+  solidThin2   = 0     // brushes as implemented by standard graph objects
+  solidThin    = 1
+  solidMed     = 2
+  solidThick  = 3
+  solidThick2  = 4
+  dashedThin2  = 5 
+  dashedThin   = 6
+  dashedMed    = 7
+  dashedThick  = 8
+  dashedThick2 = 9
+  patchThin2   = 10 
+  patchThin    = 11
+  patchMed     = 12
+  patchThick   = 13
+  patchThick2  = 14
+
+  sf = new StringFunctions() 
+ }
+
+ /*********************
+  * General Utilities * 
+  *********************/
+
+ func /* globConstsUtils */ max() {  // max(a,b) returns the larger of a and b
+  if ($1 > $2) return $1 else return $2
+ }
+
+ func  /* globConstsUtils */ min() { // min(a,b) returns the smaller of a and b
+  if ($1 > $2) return $2 else return $1
+ }
+
+ func  /* globConstsUtils */ sgn() { // sgn(a) returns the sign of a
+  if ($1 > 0) {
+   return 1
+  } else {
+   if ($1 < 0) {
+    return -1
+   } else {
+    return 0
+   }
+  }
+ }
+
+ func /* globConstsUtils */ indexOfObject() {// returns the object's index
+  sprint(tmpStr, "%s", $o1)
+  sscanf(tmpStr, "%*[^[][%d]", &tmpNum)
+  return tmpNum
+ }
+
+ func /* globConstsUtils */ isNotNoneStr() {
+  return (strcmp($s1,noneStr))
+ }
+
+ func /* globConstsUtils */ isNoneStr() {
+  return (!(strcmp($s1,noneStr)))
+ }
+
+  strdef testfile
+ func /* globConstsUtils */ existsFile() {
+  testfile = $s1
+  fileexists = ropen(testfile)
+  if (fileexists) {
+   ropen() // close file
+   return 1
+  } else {
+   return 0
+  }
+ }
+
+  strdef mach_name_str
+ proc /* globConstsUtils */ getMachineName() {
+  machine_name(mach_name_str)
+ }
+ 
+ proc /* globConstsUtils */ printMachineName() {
+  getMachineName()
+  if (strcmp(mach_name_str,"")) {
+   fprint("Machine Name: %s\n",mach_name_str)
+  }
+ }
+
+/*******************
+ * Cable Utilities * 
+ *******************/
+
+/* Update passive cable parameters when one changes */
+/* Compute new values for cable parameters g, diameter, rA, & lambda. */
+/* All these procedures pass references to all varibles that might change
+   and a value for the variable that won't. 
+   An aribitrary choice has been made among the 4 parameters that changing
+   any one except lambda will change lambda and keep the remaining 2 fixed.
+   Furthermore, if lambda is changed, then only g will change in response.
+   This somewhat arbitrary choice might change at a later date. */
+/* The input order is always: g, diameter, rA, & lambda  */
+/* g = diameter/(4*(lambda^2)*rA*10^-4)
+   diameter = 4*g*(lambda^2)*rA*10^-4
+   rA = diameter/(4*(lambda^2)*g*10^-4)
+   lambda = sqrt(diameter/(4*g*rA*10^-4)) */
+/* The 10^-4 is because diameter * lambda are in um, while g and rA
+   use cm. */
+
+proc /* globConstsUtils */ cable_g_changed() { local g, diameter, rA, lambda
+ g = $1
+ diameter = $&2
+ rA = $&3
+ /* lambda = */ $&4 = sqrt(diameter/(4*max(g*rA,1e-9)*10^-4))
+}
+
+proc /* globConstsUtils */ cable_diameter_changed() { local g, diameter, rA, lambda
+ diameter = $2
+ g = $&1
+ rA = $&3
+ /* lambda = */ $&4 = sqrt(diameter/(4*max(g*rA,1e-9)*10^-4))
+}
+
+proc /* globConstsUtils */ cable_rA_changed() { local g, diameter, rA, lambda
+ rA = $3
+ g = $&1
+ diameter = $&2
+ /* lambda = */ $&4 = sqrt(diameter/(4*max(g*rA,1e-9)*10^-4))
+}
+
+proc /* globConstsUtils */ cable_lambda_changed() { local g, diameter, rA, lambda
+ lambda = $4
+ diameter = $&2
+ rA = $&3
+ /* g = */ $&1 = diameter/(4*max((lambda^2)*rA,1e-9)*10^-4)
+}
+
+/******************************
+ * Linked Parameter Utilities * 
+ ******************************/
+
+/* let stimVS follow stimFreq with experimentally obtained function */
+/* depending on whether chick, owl or caiman  is used */
+
+func /* globConstsUtils */ stimFreqToStimVS() {local f, species, fvslo, \
+      fvshi, vslo, vshi, vslong, vsConst, vsSlope, slopfactor
+ f = $1
+ species = $2
+ if (species == chick) {
+  vshi = 0.05
+  fvshi = 2500   // Hz
+  vslo = 0.95
+  fvslo = 300    // Hz
+  vslong = min(max((log(f/fvshi))*(vshi-vslo)/log(fvshi/fvslo)+vshi,vshi),vslo)
+  return int(vslong*100)/100
+ } 
+ if (species == owl) {
+  vshi = 0.2
+  fvshi = 10000 // Hz
+  vslo = 0.95
+  fvslo = 300   // Hz
+  vslong = min(max((log(f/fvshi))*(vshi-vslo)/log(fvshi/fvslo)+vshi,vshi),vslo)
+  return int(vslong*100)/100
+ }
+ if (species == caiman) {
+  vshi = 0.2
+  vslo = 0.95
+  vsConst = 1.0077
+  vsSlope = -0.0005 // Hz^-1
+  slopfactor = 0.9
+  vslong = min(max(slopfactor*(vsConst+vsSlope*f),vshi),vslo)
+  return int(vslong*100)/100
+ }
+}
+
+/* let lDen follow stimFreq with experimentally obtained function */
+
+func /* globConstsUtils */ stimFreqTolDen() {local f, maxlDen, minlDen
+ f = $1
+ maxlDen = 400
+ minlDen = 20
+ lDen = min(max(10^(-1.3937*log10(f) + 6.01972),minlDen),maxlDen)
+ return int(lDen)
+}
+
+  
+/*******************************/
+
+endtemplate globConstsUtils
+
+/*******************************/
+
+// M. Hines. This is declared in the stdlib.hoc file
+///*******************************/
+//
+//begintemplate String
+//
+///*******************************/
+//
+// public s
+//
+// strdef s
+//
+// proc init() {
+//  if (numarg()) {
+//  s = $s1
+//  }
+// }
+//
+///*******************************/
+//
+//endtemplate String
+//
+///*******************************/
+
+/************************************ 
+ * Parameter Information * 
+ ************************************/
+
+/*******************************/
+
+begintemplate p1Info
+
+/*******************************/
+
+// This defines the p1Info object which contains information about
+// a single parameter (variable name, parameter units, formatting info) 
+// and procedures (methods) that use the information to construct 
+// commands executable by Neuron.
+
+ public paramName, paramUnits, fprinttype,  categoryName, \
+ getInitCmd, getRoundIntCmd, getWriteCmd, getWriteHocCmd, \
+ getDisplayMenuCmd, getPickMenuCmd, getCopyValCmd
+ 
+ strdef paramName
+ strdef paramValue
+ strdef paramUnits
+ strdef fprinttype
+ strdef categoryName
+ 
+ strdef tmpStr // for temporarily holding a string
+ objref tmpObj // for temporarily holding an object
+ objref this   // refers to self (automatically)
+ objref null   // null pointer
+ 
+ proc /* p1Info */ init() {
+  paramName = $s1
+  paramValue = $s2
+  paramUnits = $s3
+  fprinttype = $s4
+  categoryName = $s5
+ }
+ 
+ /* getInitCmd creates a string which when executed will 
+    initialize the parameter, and returns it in $s1, e.g.
+     {centExSyn = 0.5}                 */
+ proc /* p1Info */ getInitCmd() {
+  sprint(tmpStr, "{%s = %s}", paramName, paramValue)
+  $s1 = tmpStr
+ }
+ 
+ /* getRoundIntCmd creates a string which when executed will
+    round the parameter to the nearest integer, and returns it in $s1, e.g.
+	  {nExSyn = int(nExSyn+.5)}                         */
+ proc /* p1Info */ getRoundIntCmd() {
+  sprint(tmpStr, "{%s = int(%s+.5)}", paramName, paramName)
+  $s1 = tmpStr
+ }
+ 
+ /* getWriteCmd creates a string which when executed will 
+    write the parameter to the open file, and returns it in $s1, e.g.
+     {fprint("centExSyn = %g (0 to 1)\n", centExSyn)}   */
+ proc /* p1Info */ getWriteCmd() {
+  sprint(tmpStr, "{fprint(\"%s = %s %s\\n\", %s)}", \
+   paramName, fprinttype, paramUnits, paramName)
+  $s1 = tmpStr
+ }
+ 
+ /* getWriteHocCmd creates a string which when executed will 
+    write the parameter to the open hoc file, and returns it in $s1, e.g.
+     {fprint(" gp.centExSyn = %g\n", centExSyn)}   */
+ proc /* p1Info */ getWriteHocCmd() {
+  sprint(tmpStr, "{fprint(\" gp.%s = %s\\n\", %s)}", \
+   paramName, fprinttype, paramName)
+  $s1 = tmpStr
+ }
+ 
+ /* getDisplayMenuCmd creates a string which when executed will 
+    append parameter to a display menu, and returns it in $s1, e.g.
+    {sprint(tmpStr, "centExSyn = %g (0 to 1)", centExSyn) xbutton(tmpStr,"")}*/
+ proc /* p1Info */ getDisplayMenuCmd() {
+  sprint(tmpStr, \
+   "{sprint(tmpStr, \"%s = %s %s\", %s) xbutton(tmpStr,\"\")}", \
+   paramName, fprinttype, paramUnits, paramName)
+  $s1 = tmpStr
+ }
+ 
+  
+ /* getPickMenuCmd creates a string which, given pickVarName, when executed 
+    will append the parameter to a picker menu, and returns it in $s1, e.g.
+    xbutton("centExSyn", "execute1(\"pickVarName = \\\"centExSyn\\\"\",gr)")*/
+  strdef pickVarName
+ proc /* p1Info */ getPickMenuCmd() {
+  pickVarName = $s2
+  sprint(tmpStr, \
+   "{xbutton(\"%s\", \"execute1(\\\"%s = \\\\\\\"%s\\\\\\\"\\\",gr)\")}", \
+   paramName, pickVarName, paramName)
+  $s1 = tmpStr
+  
+ }
+ 
+ /* getCopyValCmd creates a string which when executed will 
+    copy the parameter to a new parameters object, and returns it in $s1, e.g.
+     {centExSyn = tmpObj.centExSyn}    */
+ proc /* p1Info */ getCopyValCmd() {
+  sprint(tmpStr, "%s = tmpObj.%s", paramName, paramName)
+  $s1 = tmpStr
+ }
+ 
+/*******************************/
+
+endtemplate p1Info
+
+/*******************************/
+
+
+// This defines an object (pInfo) which contains a list of all the
+// p1Infos and procedures to use it.
+
+/*******************************/
+
+begintemplate pInfo
+
+/*******************************/
+
+public initParams, roundIntParams, writeParams, writeHocParams, \
+  displayMenuParams, pickMenuParams, copyValueParams, pIL
+
+external gu
+
+ objref pIL // a list of all the p1Info objects
+
+ strdef tmpStr // for temporarily holding a string
+ objref tmpObj // for temporarily holding an object
+ objref tmpP // for temporarily holding an paramter
+ strdef tmpPT  // for temporarily holding a paramter type
+ objref o      // for iterating over a list's objects
+ objref this   // refers to self (automatically)
+ objref null   // null pointer
+
+ proc /* pInfo */ init() {
+  pIL = new List()
+
+  /************************************ 
+   * Coincidence Detection parameters * 
+   ************************************/
+
+  pIL.append(new p1Info("stimFreq", "1000", "Hz", "%g", "cd"))
+  pIL.append(new p1Info("stimVS", "0.43", "(0 to 0.999)", "%g", "cd"))
+   /* probability = probRate*stimulus*dt */ // used to be lower by 2*PI
+  pIL.append(new p1Info("probRate", "3.46", "ms^-1", "%g", "cd"))
+  pIL.append(new p1Info("nArray", "2", "arrays", "%d", "cd"))
+  pIL.append(new p1Info("stimPhaseDegI", "0", "deg", "%g", "cd"))
+  pIL.append(new p1Info("stimPhaseDegC", "0", "deg", "%g", "cd"))
+
+  /********************** 
+   * Generic parameters * 
+   **********************/
+
+   /* Can be used for anything (with programming) */
+  pIL.append(new p1Info("genericParam1", "1", "", "%g", "cd"))
+  pIL.append(new p1Info("genericParam2", "1", "", "%g", "cd"))
+  
+  /******************************* 
+   * Default Analysis parameters * 
+   *******************************/
+
+  pIL.append(new p1Info("APthresh", "-35", "mV", "%g", "cd"))  
+  pIL.append(new p1Info("ignoreSpikesBefore", "15", "ms", "%g", "cd"))
+   /*don't count spikes before this time */
+  pIL.append(new p1Info("finalbinsnum", "16", "", "%d", "cd"))
+  /* number of period histogram bins */
+
+  /******************************* 
+   * Default Dendrite parameters * 
+   *******************************/
+
+  pIL.append(new p1Info("nDen", "2", "dendrites", "%d", "de"))
+  pIL.append(new p1Info("lDen", "68", "um", "%g", "de"))
+  pIL.append(new p1Info("dDen", "4", "um", "%g", "de"))
+  pIL.append(new p1Info("gLDen", "0.00028", "S/cm^2", "%g", "de"))
+  pIL.append(new p1Info("gKLvaBarDen", "0.003", "S/cm^2", "%g", "de"))
+  pIL.append(new p1Info("gKHvaBarDen", "0.120", "S/cm^2", "%g", "de"))
+  pIL.append(new p1Info("rADen", "200", "ohm cm", "%g", "de"))
+  pIL.append(new p1Info("nSegDen", "10", "", "%d", "de"))
+
+  /***************************************** 
+   * Default Excitatory Synapse parameters * 
+   *****************************************/
+
+  pIL.append(new p1Info("nExSyn", "30", "syn/dendrite", "%d", "ex"))
+   // number of synapses per dendrite, *not* total, not per side
+  pIL.append(new p1Info("centExSyn", "0.5", "(0 to 1)", "%g", "ex"))
+   /* center of syn. distrib. on dendrite */
+  pIL.append(new p1Info("distrExSyn", "1", "(0 to 1)", "%g", "ex"))
+   /* breadth of distribution on dendrite */
+  pIL.append(new p1Info("tauExSyn", "0.1 ", "ms", "%g", "ex"))
+  pIL.append(new p1Info("gMExSyn", "0.015", "uS", "%g", "ex"))
+  pIL.append(new p1Info("eExSyn", "-10", "mV", "%g", "ex"))
+  pIL.append(new p1Info("durExSyn", "1", "ms", "%g", "ex"))
+   
+  /*************************** 
+   * Default Soma parameters * 
+   ***************************/
+
+  pIL.append(new p1Info("gKLvaBarSoma", "0.003", "S/cm^2", "%g", "so"))
+  pIL.append(new p1Info("gKHvaBarSoma", "0.030", "S/cm^2", "%g", "so"))
+  pIL.append(new p1Info("gLSoma", "0.00028", "S/cm^2", "%g", "so"))
+  pIL.append(new p1Info("gNaBarSoma", "0", "S/cm^2", "%g", "so"))
+  pIL.append(new p1Info("gKHHBarSoma", "0", "S/cm^2", "%g", "so"))
+  pIL.append(new p1Info("lSoma", "15", "um", "%g", "so"))
+  pIL.append(new p1Info("dSoma", "15", "um", "%g", "so"))
+  pIL.append(new p1Info("rASoma", "200", "ohm cm", "%g", "so"))
+  pIL.append(new p1Info("nSegSoma", "5", "", "%d", "so"))
+
+  /*************************** 
+   * Default Axon parameters * 
+   ***************************/
+
+  pIL.append(new p1Info("lAxonHill", "30", "um", "%g", "ah"))
+  pIL.append(new p1Info("dAxonHill", "8", "um", "%g", "ah"))
+  pIL.append(new p1Info("gLAxonHill", "0.00028", "S/cm^2", "%g", "ah"))
+  pIL.append(new p1Info("gNaBarAxonHill", "0.32", "S/cm^2", "%g", "ah"))
+  pIL.append(new p1Info("gKHHBarAxonHill", "0.0", "S/cm^2", "%g", "ah"))
+  pIL.append(new p1Info("gKLvaBarAxonHill", "0.003", "S/cm^2", "%g", "ah"))
+  pIL.append(new p1Info("gKHvaBarAxonHill", "0.030", "S/cm^2", "%g", "ah"))
+  pIL.append(new p1Info("rAAxonHill", "200", "ohm cm", "%g", "ah"))
+  pIL.append(new p1Info("nSegAxonHill", "10", "", "%d", "ah"))
+  pIL.append(new p1Info("lAxonMyel", "100", "um", "%g", "am"))
+  pIL.append(new p1Info("dAxonMyel", "2", "um", "%g", "am"))
+  pIL.append(new p1Info("rAAxonMyel", "200", "ohm cm", "%g", "am"))
+  pIL.append(new p1Info("gLAxonMyel", "0.00028/80", "S/cm^2", "%g", "am"))
+  pIL.append(new p1Info("cmAxonMyel", "1/80", "uF/cm^2", "%g", "am"))
+  pIL.append(new p1Info("nSegAxonMyel", "10", "", "%d", "am"))
+  pIL.append(new p1Info("lAxonNode", "2", "um", "%g", "an"))
+  pIL.append(new p1Info("dAxonNode", "2", "um", "%g", "an"))
+  pIL.append(new p1Info("rAAxonNode", "200", "ohm cm", "%g", "an"))
+  pIL.append(new p1Info("gLAxonNode", "0.00028", "S/cm^2", "%g", "an"))
+  pIL.append(new p1Info("gNaBarAxonNode", "0.32", "S/cm^2", "%g", "an"))
+  pIL.append(new p1Info("gKHHBarAxonNode", "0.32/4", "S/cm^2", "%g", "an"))
+  pIL.append(new p1Info("nSegAxonNode", "1", "", "%d", "an"))
+
+  /*********************************
+   * Default Inhibition parameters * 
+   *********************************/
+
+  pIL.append(new p1Info("inDelay", "0.1", "ms", "%g", "in"))
+   /* neural delay of inibition */
+  pIL.append(new p1Info("inIntegrate", "3", "", "%d", "in"))
+   /* Inhib. integrate & fire factor */
+  pIL.append(new p1Info("tauInSyn", "8", "ms", "%g", "in"))
+  pIL.append(new p1Info("gMInSyn", " 0.03", "uS", "%g", "in"))
+  pIL.append(new p1Info("eInSyn", "-60", "mV", "%g", "in"))
+   
+  /************************ 
+   * Cell-wide parameters * 
+   ************************/
+
+  /* e = electric ionic Nernst potential
+   * Na, K, and L are ions (L for leakage)  */
+  pIL.append(new p1Info("eNa", "40", "mV", "%g", "ce"))
+  pIL.append(new p1Info("eK", "-60", "mV", "%g", "ce"))
+  pIL.append(new p1Info("eL", "-45", "mV", "%g", "ce"))
+  pIL.append(new p1Info("alpha0KHva", "0.11", "ms^-1", "%g", "ce"))
+  pIL.append(new p1Info("alphaVHalfKHva", "-19", "mV", "%g", "ce"))
+  pIL.append(new p1Info("alphaKKHva", "9.10", "mV", "%g", "ce"))
+  pIL.append(new p1Info("beta0KHva", "0.103", "ms^-1", "%g", "ce"))
+  pIL.append(new p1Info("betaVHalfKHva", "-19", "mV", "%g", "ce"))
+  pIL.append(new p1Info("betaKKHva", "20.0", "mV", "%g", "ce"))
+  pIL.append(new p1Info("q10KHva", "2.0", "", "%g", "ce"))
+  pIL.append(new p1Info("T0KHva", "23", "C", "%g", "ce"))
+  pIL.append(new p1Info("alpha0KLva", "0.2", "ms^-1", "%g", "ce"))
+  pIL.append(new p1Info("alphaVHalfKLva", "-50", "mV", "%g", "ce"))
+  pIL.append(new p1Info("alphaKKLva", "10.0", "mV", "%g", "ce"))
+  pIL.append(new p1Info("beta0KLva", "0.17", "ms^-1", "%g", "ce"))
+  pIL.append(new p1Info("betaVHalfKLva", "-50", "mV", "%g", "ce"))
+  pIL.append(new p1Info("betaKKLva", "10.0", "mV", "%g", "ce"))
+  pIL.append(new p1Info("q10KLva", "2.0", "", "%g", "ce"))
+  pIL.append(new p1Info("T0KLva", "23", "C", "%g", "ce"))
+  pIL.append(new p1Info("alphamVHalfNa", "-40+10", "mV", "%g", "ce"))
+  pIL.append(new p1Info("betamVHalfNa", "-65+10", "mV", "%g", "ce"))
+  pIL.append(new p1Info("alphahVHalfNa", "-65+10", "mV", "%g", "ce"))
+  pIL.append(new p1Info("betahVHalfNa", "-35+10", "mV", "%g", "ce"))
+  pIL.append(new p1Info("q10Na", "2.3", "", "%g", "ce"))
+  pIL.append(new p1Info("q10KHH", "2.3", "", "%g", "ce"))
+
+   
+  /******************************** 
+   * Current Injection parameters * 
+   ********************************/
+
+  pIL.append(new p1Info("iAmp", "0.0", "nA", "%g", "ci"))
+   // 0.8 might be a good value
+  pIL.append(new p1Info("iDel", "5", "ms", "%g", "ci"))
+  pIL.append(new p1Info("iDur", "15", "ms", "%g", "ci"))
+   
+  /******************************** 
+   * Voltage Clamp parameters * 
+   ********************************/
+
+  pIL.append(new p1Info("vClampV1", "0.0", "mV", "%g", "vc"))
+  pIL.append(new p1Info("vClampDur1", "0.0", "ms", "%g", "vc"))
+  pIL.append(new p1Info("vClampV2", "0.0", "mV", "%g", "vc"))
+  pIL.append(new p1Info("vClampDur2", "0.0", "ms", "%g", "vc"))
+  pIL.append(new p1Info("vClampV3", "0.0", "mV", "%g", "vc"))
+  pIL.append(new p1Info("vClampDur3", "0.0", "ms", "%g", "vc"))  
+  pIL.append(new p1Info("vClampRes", ".1", "MOhm", "%g", "vc"))
+ }
+
+ proc /* pInfo */ initParams() { local i
+  tmpP = $o1 //cdParam object to be given standard initial values
+  for i=0,pIL.count()-1 {
+   pIL.object(i).getInitCmd(tmpStr)
+   execute1(tmpStr,tmpP)
+  }
+ }
+
+ proc /* pInfo */ roundIntParams() { local i
+  tmpP = $o1 //cdParam object to be rounded if an integer
+  for i=0,pIL.count()-1 {
+   if (!strcmp(pIL.object(i).fprinttype,"%d")) {
+	pIL.object(i).getRoundIntCmd(tmpStr)
+	execute1(tmpStr,tmpP)
+   }
+  }
+ }
+
+ proc /* pInfo */ writeParams() { local i
+  tmpP = $o1 //cdParam object to be written as text
+  for i=0,pIL.count()-1 {
+   pIL.object(i).getWriteCmd(tmpStr)
+   execute1(tmpStr,tmpP)
+  }
+ }
+
+ proc /* pInfo */ writeHocParams() { local i
+  tmpP = $o1 //cdParam object to be written as hoc
+  for i=0,pIL.count()-1 {
+   pIL.object(i).getWriteHocCmd(tmpStr)
+   execute1(tmpStr,tmpP)
+  }
+ }
+ 
+ proc /* pInfo */ displayMenuParams() { local i
+  tmpP = $o1 //cdParam object to be displayed in menu
+  tmpPT = $s2 //only put this parameter type in menu
+  for i=0,pIL.count()-1 {
+   if (!strcmp(pIL.object(i).categoryName,tmpPT)) {
+	pIL.object(i).getDisplayMenuCmd(tmpStr)
+	execute1(tmpStr,tmpP)
+   }
+  }
+ }
+
+  strdef pickVarName
+ proc /* pInfo */ pickMenuParams() { local i
+  tmpP = $o1 //cdParam object to be displayed in menu
+  tmpPT = $s2 //only put this parameter type in menu
+  pickVarName = $s3 //only put this parameter type in menu
+  for i=0,pIL.count()-1 {
+   if (!strcmp(pIL.object(i).categoryName,tmpPT)) {
+	pIL.object(i).getPickMenuCmd(tmpStr,pickVarName)
+	execute1(tmpStr,tmpP)
+   }
+  }
+ }
+
+ proc /* pInfo */ copyValueParams() { local i
+  tmpP = $o1 //cdParam object to be copied
+  for i=0,pIL.count()-1 {
+   pIL.object(i).getCopyValCmd(tmpStr)
+   execute1(tmpStr,tmpP)
+  }
+ }
+
+
+/*******************************/
+
+endtemplate pInfo
+
+/*******************************/
+
+
+/************************************ 
+ * Parameters Template (& Defaults) * 
+ ************************************/
+
+/*******************************/
+
+begintemplate cdParam
+
+/*******************************/
+
+ public \
+  eNa, eK, eL, \
+   alphaVHalfKLva, alphaKKLva, alpha0KLva,\
+   betaVHalfKLva, betaKKLva, beta0KLva, q10KLva, T0KLva, \
+   alphaVHalfKHva, alphaKKHva, alpha0KHva,\
+   betaVHalfKHva, betaKKHva, beta0KHva, q10KHva, T0KHva, \
+   alphamVHalfNa,  betamVHalfNa,  alphahVHalfNa, betahVHalfNa, \
+   q10Na, q10KHH, \
+  nExSyn, nExSynPerSide, centExSyn, distrExSyn, \
+  tauExSyn, gMExSyn, eExSyn, durExSyn, \
+  tauInSyn, gMInSyn, eInSyn, inDelay, inIntegrate, \
+  nDen, lDen, dDen, rADen, gLDen, gKLvaBarDen, gKHvaBarDen, nSegDen, \
+   lambdaDen, \
+  lSoma, dSoma, rASoma, gKLvaBarSoma, gKHvaBarSoma, \
+  gLSoma, gNaBarSoma, gKHHBarSoma, nSegSoma, \
+  lAxonHill, dAxonHill, rAAxonHill, gLAxonHill, nSegAxonHill, \
+  gNaBarAxonHill, gKHHBarAxonHill, gKLvaBarAxonHill, gKHvaBarAxonHill, \
+  lAxonMyel, dAxonMyel, rAAxonMyel, gLAxonMyel, cmAxonMyel, nSegAxonMyel, \
+  lAxonNode, dAxonNode, rAAxonNode, gLAxonNode, \
+  gNaBarAxonNode, gKHHBarAxonNode, nSegAxonNode, \
+  stimFreq, stimPhaseDegI, stimPhaseDegC, stimVS, probRate, \
+  APthresh, genericParam1, genericParam2, \
+  iAmp, iDel, iDur, \
+  vClampV1, vClampV2, vClampV3, \
+  vClampDur1, vClampDur2, vClampDur3, vClampRes, \
+  showMaxDen, showMaxExSyn, \
+  finalbinsnum, nArray, ignoreSpikesBefore, onsetSynapseInit, \
+  write, writeHoc, displayParamMenu, pickParamMenu, copyValues, \
+  CDlabWin, coincidenceParamsWin, inhibitionWin,\
+  cellWideWin, exSynParamsWin, dendParamsWin, axonParamsWin, \
+  somaParamsWin, allParamsWin, currentInjectionWin
+
+
+ external gu, gpi, gr
+   
+ objref allParamsBox
+ objref allParamsBoxSub1
+
+  /**********************
+   * Declare parameters * 
+   **********************/
+
+  stimFreq = -1e12
+  stimVS = -1e12
+  probRate = -1e12
+  nArray = -1e12
+  stimPhaseDegI = -1e12
+  stimPhaseDegC = -1e12
+  genericParam1 = -1e12
+  genericParam2 = -1e12
+  APthresh = -1e12
+  ignoreSpikesBefore = -1e12
+  finalbinsnum = -1e12
+  nDen = -1e12
+  lDen   = -1e12
+  dDen = -1e12
+  gLDen = -1e12
+  gKLvaBarDen = -1e12
+  gKHvaBarDen = -1e12
+  rADen = -1e12
+  lambdaDen = -1e12
+  nSegDen = -1e12
+  nExSyn = -1e12
+  centExSyn   = -1e12
+  distrExSyn  = -1e12
+  tauExSyn   = -1e12
+  gMExSyn  = -1e12
+  eExSyn     = -1e12
+  durExSyn   = -1e12
+  gKLvaBarSoma = -1e12
+  gKHvaBarSoma = -1e12
+  gLSoma     = -1e12
+  gNaBarSoma = -1e12
+  gKHHBarSoma  = -1e12
+  lSoma   = -1e12
+  dSoma = -1e12
+  rASoma = -1e12
+  nSegSoma   = -1e12
+  lAxonHill   = -1e12
+  dAxonHill = -1e12
+  gLAxonHill     = -1e12
+  gNaBarAxonHill = -1e12
+  gKHHBarAxonHill  = -1e12
+  gKLvaBarAxonHill = -1e12
+  gKHvaBarAxonHill = -1e12
+  rAAxonHill = -1e12
+  nSegAxonHill   = -1e12
+  lAxonMyel = -1e12
+  dAxonMyel = -1e12
+  rAAxonMyel = -1e12
+  gLAxonMyel     = -1e12
+  cmAxonMyel  = -1e12
+  nSegAxonMyel   = -1e12
+  lAxonNode = -1e12
+  dAxonNode = -1e12
+  rAAxonNode = -1e12
+  gLAxonNode     = -1e12
+  gNaBarAxonNode = -1e12
+  gKHHBarAxonNode  = -1e12
+  nSegAxonNode   = -1e12
+  inDelay   = -1e12
+  inIntegrate   = -1e12
+  tauInSyn   = -1e12
+  gMInSyn  = -1e12
+  eInSyn     = -1e12
+  eNa     = -1e12
+  eK      = -1e12
+  eL      = -1e12
+  alpha0KHva     = -1e12
+  alphaVHalfKHva = -1e12
+  alphaKKHva     = -1e12
+  beta0KHva      = -1e12
+  betaVHalfKHva  = -1e12
+  betaKKHva      = -1e12
+  q10KHva	     = -1e12
+  T0KHva	     = -1e12
+  alpha0KLva     = -1e12
+  alphaVHalfKLva = -1e12
+  alphaKKLva     = -1e12
+  beta0KLva      = -1e12
+  betaVHalfKLva  = -1e12
+  betaKKLva      = -1e12
+  q10KLva	     = -1e12
+  T0KLva	     = -1e12
+  alphamVHalfNa  = -1e12
+  betamVHalfNa   = -1e12
+  alphahVHalfNa  = -1e12
+  betahVHalfNa   = -1e12
+  q10Na	   		 = -1e12
+  q10KHH	     = -1e12
+  iAmp = -1e12
+  iDel     = -1e12
+  iDur  = -1e12
+  vClampV1         = -1e12
+  vClampV2         = -1e12
+  vClampV3         = -1e12
+  vClampDur1       = -1e12
+  vClampDur2       = -1e12
+  vClampDur3       = -1e12
+  vClampRes        = -1e12
+
+
+  onsetSynapseInit  = -1e12
+  showMaxDen  = -1e12
+  showMaxExSyn  = -1e12
+
+
+
+ strdef tmpStr // for temporarily holding a string
+ objref tmpObj // for temporarily holding an object
+ objref this   // refers to self (automatically)
+ objref null   // null pointer
+ 
+ proc /* cdParam */ init() {
+
+  if (numarg()==0) {
+   gpi.initParams(this)
+   onsetSynapseInit = -1000  /* ms */	/* synaptic time onset
+    				                  keep a negative number until triggered */
+   showMaxDen = 2
+   showMaxExSyn = 4
+   nExSynPerSide = nExSyn * nDen / 2
+   showMaxDen = gu.min(showMaxDen,nDen)
+   showMaxExSyn = gu.min(showMaxExSyn,nExSyn)
+   gu.cable_g_changed(gLDen, &dDen, &rADen, &lambdaDen)
+  } else {
+   copyValues($o1)
+  }
+ }
+
+ /********************************* 
+  * Control and Parameter Windows * 
+  *********************************/
+
+  objref mainPanelBox
+ proc /* cdParam */ CDlabWin() {
+  mainPanelBox = new VBox()
+  mainPanelBox.intercept(1)
+  xpanel("Parameters:", 0)
+   xbutton("Coincidence Detection ...","coincidenceParamsWin()")
+   xbutton("Ex. Synapse ...","exSynParamsWin()")
+   xbutton("Dendrite ...","dendParamsWin()")
+   xbutton("Soma ...","somaParamsWin()")
+   xbutton("Axon...","axonParamsWin()")
+   xbutton("Inhibition ...","inhibitionWin()")
+   xbutton("Cell-Wide ...","cellWideWin()")
+   xbutton("Current Injection ...","currentInjectionWin()")
+   xbutton("Voltage Clamp ...","vClampWin()")
+   xbutton("ALL parameters ...","allParamsWin()")
+  xpanel()
+  mainPanelBox.intercept(0)
+  mainPanelBox.map("CD Lab Parameters Panel", 1, 185-10, 141, 261)
+ }
+
+ proc /* cdParam */ coincidenceParamsWin() {
+  xpanel("Coincidence Detection Parameters", 0)
+  xvalue("Stimulus Frequency (Hz)","stimFreq", 1,"", 0, 1 )
+  xvalue("Stimulus Phase Ipsi (Deg)","stimPhaseDegI", 1,"", 0, 1 )
+  xvalue("Stimulus Phase Contra (Deg)","stimPhaseDegC", 1,"", 0, 1 )
+  xvalue("Stimulus Vector Strength (0,0.999)","stimVS", 1,"", 0, 1 )
+  xvalue("Probability Rate (per ms)","probRate", 1,"", 0, 1 )
+  xvalue("Generic Parameter 1","genericParam1", 1,"", 0, 1 )
+  xvalue("Generic Parameter 2","genericParam2", 1,"", 0, 1 )
+  xvalue("Action Pot. Threshold (mV)","APthresh", 1,"", 0, 1 )
+  xvalue("Period Histogram bins","finalbinsnum", 1,"", 0, 1 )
+  xvalue("Ignore spikes before (ms)","ignoreSpikesBefore", 1,"", 0, 1 )
+  xvalue("Cells per Array","nArray", 1,"", 0, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ exSynParamsWin() {
+  xpanel("Excitatory Synapse Parameters", 0)
+  xvalue("# Ex. Synapses/dendrite","nExSyn", 1,"", 0, 1 )
+  xvalue("Center [Ex Syn] (0,1)","centExSyn", 1,"", 0, 1 )
+  xvalue("Distribution [Ex Syn] (0,1)","distrExSyn", 1,"", 0, 1 )
+  xvalue("tau [Ex Syn] (ms)","tauExSyn", 1,"", 0, 1 )
+  xvalue("gmax[Ex Syn]  (uS)","gMExSyn", 1,"", 0, 1 )
+  xvalue("e [Ex Syn] (mV)","eExSyn", 1,"", 0, 1 )
+  xvalue("Duration [Ex Syn]  (ms)","durExSyn", 1,"", 0, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ dendParamsWin() {
+  xpanel("Dendrite Parameters", 0)
+  xvalue("# dendrites","nDen", 1,"", 0, 1 )
+  xvalue("Length [Den] (um)","lDen", 1,"", 0, 1 )
+  xvalue("Diameter [Den] (um)","dDen", 1, \
+    "gu.cable_diameter_changed(&gLDen, dDen, &rADen, &lambdaDen)", 1, 1 )
+  xvalue("Ax. Resist. [Den] (ohm cm)","rADen", 1, \
+    "gu.cable_rA_changed(&gLDen, &dDen, rADen, &lambdaDen)", 1, 1 )
+  xvalue("gL [Den] (S/cm^2)","gLDen", 1, \
+    "gu.cable_g_changed(gLDen, &dDen, &rADen, &lambdaDen)", 1, 1 )
+  xvalue("gK LVA_m [Den] (S/cm^2)","gKLvaBarDen", 1,"", 0, 1 )
+  xvalue("gK HVA_m [Den] (S/cm^2)","gKHvaBarDen", 1,"", 0, 1 )
+  xvalue("# Compartments [Den]","nSegDen", 1,"", 0, 1 )
+  xvalue("lambda (um)","lambdaDen", 1, \
+    "gu.cable_lambda_changed(&gLDen, &dDen, &rADen, lambdaDen)", 1, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ somaParamsWin() {
+  xpanel("Soma Parameters", 0)
+  xvalue("Length [Soma] (um)","lSoma", 1,"", 0, 1 )
+  xvalue("Diameter [Soma] (um)","dSoma", 1,"", 0, 1 )
+  xvalue("Ax. Resist. [Soma] (ohm cm)","rASoma", 1,"", 0, 1 )
+  xvalue("gK LVA_m [Soma] (S/cm^2)","gKLvaBarSoma", 1,"", 0, 1 )
+  xvalue("gK HVA_m [Soma] (S/cm^2)","gKHvaBarSoma", 1,"", 0, 1 )
+  xvalue("gLeak [Soma] (S/cm^2)","gLSoma", 1,"", 0, 1 )
+  xvalue("gNa_m [Soma] (S/cm^2)","gNaBarSoma", 1,"", 0, 1 )
+  xvalue("gKHH_m [Soma] (S/cm^2)","gKHHBarSoma", 1,"", 0, 1 )
+  xvalue("# Compartments [Soma]","nSegSoma", 1,"", 0, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ axonParamsWin() {
+  xpanel("Axon Parameters", 0)
+  xvalue("Length [Hillock] (um)","lAxonHill", 1,"", 0, 1 )
+  xvalue("Diameter [Hillock] (um)","dAxonHill", 1,"", 0, 1 )
+  xvalue("Ax. Resist. [Hillock] (ohm cm)","rAAxonHill", 1,"", 0, 1 )
+  xvalue("gLeak [Hillock] (S/cm^2)","gLAxonHill", 1,"", 0, 1 )
+  xvalue("gNa_m [Hillock] (S/cm^2)","gNaBarAxonHill", 1,"", 0, 1 )
+  xvalue("gKHH_m [Hillock] (S/cm^2)","gKHHBarAxonHill", 1,"", 0, 1 )
+  xvalue("gK LVA_m [Hillock] (S/cm^2)","gKLvaBarAxonHill", 1,"", 0, 1 )
+  xvalue("gK HVA_m [Hillock] (S/cm^2)","gKHvaBarAxonHill", 1,"", 0, 1 )
+  xvalue("# Compartments [Hillock]","nSegAxonHill", 1,"", 0, 1 )
+
+  xvalue("Length [Myelin] (um)","lAxonMyel", 1,"", 0, 1 )
+  xvalue("Diameter [Myelin] (um)","dAxonMyel", 1,"", 0, 1 )
+  xvalue("Ax. Resist. [Myelin] (ohm cm)","rAAxonMyel", 1,"", 0, 1 )
+  xvalue("gLeak [Myelin] (S/cm^2)","gLAxonMyel", 1,"", 0, 1 )
+  xvalue("C [Myelin] (uF/cm^2)","cmAxonMyel", 1,"", 0, 1 )
+  xvalue("# Compartments [Myelin]","nSegAxonMyel", 1,"", 0, 1 )
+
+  xvalue("Length [Node] (um)","lAxonNode", 1,"", 0, 1 )
+  xvalue("Diameter [Node] (um)","dAxonNode", 1,"", 0, 1 )
+  xvalue("Ax. Resist. [Node] (ohm cm)","rAAxonNode", 1,"", 0, 1 )
+  xvalue("gLeak [Node] (S/cm^2)","gLAxonNode", 1,"", 0, 1 )
+  xvalue("gNa_m [Node] (S/cm^2)","gNaBarAxonNode", 1,"", 0, 1 )
+  xvalue("gKHH_m [Node] (S/cm^2)","gKHHBarAxonNode", 1,"", 0, 1 )
+  xvalue("# Compartments [Node]","nSegAxonNode", 1,"", 0, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ inhibitionWin() {
+  xpanel("Inhibition Parameters", 0)
+  xvalue("Delay (ms)","inDelay", 1,"", 0, 1 )
+  xvalue("Integration factor","inIntegrate", 1,"", 0, 1 )
+  xvalue("tau [In Syn] (ms)","tauInSyn", 1,"", 0, 1 )
+  xvalue("gmax [In Syn] (uS)","gMInSyn", 1,"", 0, 1 )
+  xvalue("e [In Syn] (mV)","eInSyn", 1,"", 0, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ cellWideWin() {
+  xpanel("Cell-wide Parameters", 0)
+  xvalue("eNa (mV)","eNa", 1,"", 0, 1 )
+  xvalue("eK (mV)","eK", 1,"", 0, 1 )
+  xvalue("eLeak (mV)","eL", 1,"", 0, 1 )
+  xvalue("alpha0 HVA (/ms)","alpha0KHva", 1,"", 0, 1 )
+  xvalue("alphaVHalf HVA (mV)","alphaVHalfKHva", 1,"", 0, 1 )
+  xvalue("alphaK HVA (mV)","alphaKKHva", 1,"", 0, 1 )
+  xvalue("beta0 HVA (/ms)","beta0KHva", 1,"", 0, 1 )
+  xvalue("betaVHalf HVA (mV)","betaVHalfKHva", 1,"", 0, 1 )
+  xvalue("betaK HVA (mV)","betaKKHva", 1,"", 0, 1 )
+  xvalue("alpha0 LVA (/ms)","alpha0KLva", 1,"", 0, 1 )
+  xvalue("alphaVHalf LVA (mV)","alphaVHalfKLva", 1,"", 0, 1 )
+  xvalue("alphaK LVA (mV)","alphaKKLva", 1,"", 0, 1 )
+  xvalue("beta0 LVA (/ms)","beta0KLva", 1,"", 0, 1 )
+  xvalue("betaVHalf LVA (mV)","betaVHalfKLva", 1,"", 0, 1 )
+  xvalue("betaK LVA (mV)","betaKKLva", 1,"", 0, 1 )
+  xvalue("q10 HVA","q10KHva", 1,"", 0, 1 )
+  xvalue("T0 HVA (C)","T0KHva", 1,"", 0, 1 )
+  xvalue("q10 LVA","q10KLva", 1,"", 0, 1 )
+  xvalue("T0 LVA (C)","T0KLva", 1,"", 0, 1 )
+  xvalue("alphamVHalf Na (mV)","alphamVHalfNa", 1,"", 0, 1 )
+  xvalue("betamVHalf Na (mV)","betamVHalfNa", 1,"", 0, 1 )
+  xvalue("alphahVHalf Na (mV)","alphahVHalfNa ", 1,"", 0, 1 )
+  xvalue("betahVHalf Na (mV)","betahVHalfNa", 1,"", 0, 1 )
+  xvalue("q10 Na","q10Na", 1,"", 0, 1 )
+  xvalue("q10 KHH","q10KHH", 1,"", 0, 1 )
+  xpanel()
+ }
+
+ proc /* cdParam */ currentInjectionWin() {
+  xpanel("Current Injection Parameters", 0)
+  xvalue("Current amplitude (nA)","iAmp", 1,"", 0, 1 )
+  xvalue("Current Delay (ms)","iDel", 1,"", 0, 1 )
+  xvalue("Current Duration (ms)","iDur", 1,"", 0, 1 )
+  xpanel()
+ }
+ 
+ proc /* cdParam */ vClampWin() {
+  xpanel("Voltage Clamp Parameters", 0)
+  xvalue("Clamp Voltage 1 (mV)","vClampV1", 1,"", 0, 1 )
+  xvalue("Clamp Duration 1 (ms)","vClampDur1", 1,"", 0, 1 )
+  xvalue("Clamp Voltage 2 (mV)","vClampV2", 1,"", 0, 1 )
+  xvalue("Clamp Duration 2 (ms)","vClampDur2", 1,"", 0, 1 )
+  xvalue("Clamp Voltage 3 (mV)","vClampV3", 1,"", 0, 1 )
+  xvalue("Clamp Duration 3 (ms)","vClampDur3", 1,"", 0, 1 )
+  xvalue("Clamp Resistance (MOhm)","vClampRes", 1,"", 0, 1 )
+  xpanel()
+ }
+ 
+ proc /* cdParam */ allParamsWin() {
+  allParamsBox = new HBox()
+  allParamsBox.intercept(1)
+   allParamsBoxSub1 = new VBox()
+   allParamsBoxSub1.intercept(1)
+    coincidenceParamsWin()
+    exSynParamsWin()
+    inhibitionWin()
+   allParamsBoxSub1.intercept(0)
+   allParamsBoxSub1.map()
+   allParamsBoxSub1 = new VBox()
+   allParamsBoxSub1.intercept(1)
+    dendParamsWin()
+    somaParamsWin()
+    vClampWin()
+   allParamsBoxSub1.intercept(0)
+   allParamsBoxSub1.map()
+   allParamsBoxSub1 = new VBox()
+   allParamsBoxSub1.intercept(1)
+    axonParamsWin()
+    currentInjectionWin()
+   allParamsBoxSub1.intercept(0)
+   allParamsBoxSub1.map()
+   allParamsBoxSub1 = new VBox()
+   allParamsBoxSub1.intercept(1)
+    cellWideWin()
+   allParamsBoxSub1.intercept(0)
+   allParamsBoxSub1.map()
+  allParamsBox.intercept(0)  allParamsBox.map("All Parameteters")
+ }
+
+ /******************************* 
+  * Show, Set & Copy Parameters * 
+  *******************************/
+
+ proc /* cdParam */ write() { local tmp, i
+  gpi.writeParams(this)
+  fprint("approx. input rate = %g Spikes/s\n",probRate/3.46*350)
+  fprint("Max. Dendrites shown = %d\n", showMaxDen)
+  fprint("Max. Ex. Syapses shown = %d\n", showMaxExSyn)
+  fprint("denrite lambda = %g um\n",lambdaDen)
+ }
+
+ proc /* cdParam */ writeHoc() { local tmp, i
+  gpi.writeHocParams(this)
+  fprint(" gp.showMaxDen = %d\n", showMaxDen)
+  fprint(" gp.showMaxExSyn = %d\n", showMaxExSyn)
+  fprint(" gp.lambdaDen = %g\n",lambdaDen) 
+ }
+
+  strdef paramType, paramTypeName
+ proc /* cdParam */ displayParamSubmenu() { local i
+  paramType = $s1
+  paramTypeName = $s2
+  sprint(tmpStr, "%s -->", paramTypeName)
+  xmenu(tmpStr)
+  gpi.displayMenuParams(this,paramType)
+  xmenu()
+ }
+
+ proc /* cdParam */ displayParamMenu() { local tmp, i
+  xmenu("Parameters")
+  displayParamSubmenu("cd", "Coincidence Detections")
+  displayParamSubmenu("ex", "Ex. Synapses")
+  displayParamSubmenu("de", "Dendrite")
+  displayParamSubmenu("so", "Soma")
+  displayParamSubmenu("ah", "Axon Hillock")
+  displayParamSubmenu("am", "Axon Myelin")
+  displayParamSubmenu("an", "Axon Node")
+  displayParamSubmenu("ce", "Cell-wide")
+  displayParamSubmenu("in", "Inhibition")
+  displayParamSubmenu("ci", "Current Injection")
+  displayParamSubmenu("vc", "Voltage Clamp")
+  sprint(tmpStr, "lambdaDen = %g um",lambdaDen)
+  xbutton(tmpStr,"")
+  sprint(tmpStr, "approx. input rate = %g Spikes/s",probRate/3.46*350)
+  xbutton(tmpStr,"")
+  xmenu()
+ }
+
+  strdef paramType, paramTypeName
+  strdef pickVarNamePPSM
+ proc /* cdParam */ pickParamSubMenu() { local i
+  paramType = $s1
+  paramTypeName = $s2
+  pickVarNamePPSM = $s3
+  sprint(tmpStr, "%s -->", paramTypeName)
+  xmenu(tmpStr)
+  gpi.pickMenuParams(this, paramType, pickVarNamePPSM)
+  xmenu()
+ }
+
+  strdef menuName
+  strdef pickVarName
+ proc /* cdParam */ pickParamMenu() { local i
+  menuName = $s1
+  pickVarName = $s2
+  xmenu(menuName)
+  sprint(tmpStr,"execute1(\"%s = \\\"%s\\\"\",gr)", pickVarName, gu.noneStr)
+  xbutton(gu.noneStr, tmpStr)
+  pickParamSubMenu("cd", "Coincidence Detections", pickVarName)
+  pickParamSubMenu("in", "Inhibition", pickVarName)
+  pickParamSubMenu("ex", "Ex. Synapses", pickVarName)
+  pickParamSubMenu("de", "Dendrite", pickVarName)
+  pickParamSubMenu("so", "Soma", pickVarName)
+  pickParamSubMenu("ah", "Axon Hillock", pickVarName)
+  pickParamSubMenu("am", "Axon Myelin", pickVarName)
+  pickParamSubMenu("an", "Axon Node", pickVarName)
+  pickParamSubMenu("ce", "Cell-wide", pickVarName)
+  pickParamSubMenu("ci", "Current Injection", pickVarName)
+  pickParamSubMenu("vc", "Voltage Clamp", pickVarName)
+  xmenu()
+ }
+
+ proc /* cdParam */ copyValues() { local i
+  tmpObj = $o1
+  //gpi.copyValueParams(this,tmpObj)
+  for i=0,gpi.pIL.count()-1 {
+   gpi.pIL.object(i).getCopyValCmd(tmpStr)
+   execute1(tmpStr,this)
+  }
+  nExSynPerSide = nDen/2 * nExSyn
+  gu.cable_g_changed(gLDen, &dDen, &rADen, &lambdaDen)
+  showMaxDen = gu.min(tmpObj.showMaxDen,nDen)
+  showMaxExSyn = gu.min(tmpObj.showMaxExSyn,nExSyn)
+  tmpObj = null
+ }
+
+/*******************************/
+
+endtemplate cdParam
+
+/*******************************/
+
+
+/*******************************/
+
+begintemplate SpikeStatsContainer
+
+/*******************************/
+
+ public n, vs, phase, pst, cleanup, s//, pst, sinphs, cosphs
+ n = -1e12
+ vs = -1e12
+ phase = -1e12
+ binsnum = -1e12
+ stimPeriod = -1e12
+ double pst[1]
+ double sinphs[1]
+ double cosphs[1]
+ objref s
+
+ objref null
+ objref this
+
+ proc /* SpikeStatsContainer */ init() {local poissDt, ignoreBefore
+  binsnum = $1
+  stimPeriod = $2
+  poissDt = $3
+  if (numarg()>3) {ignoreBefore = $4} else {ignoreBefore = 0}
+  double pst[binsnum]
+  double sinphs[binsnum]
+  double cosphs[binsnum]
+  s = new SpikeStats(0)
+  s.binsnum = binsnum
+  s.stimPeriod = stimPeriod
+  s.poissDt = poissDt
+  s.ignoreBefore = ignoreBefore
+  setpointer s.n,      n
+  setpointer s.vs,     vs
+  setpointer s.phase,  phase
+  setpointer s.pst,    pst
+  setpointer s.sinphs, sinphs
+  setpointer s.cosphs, cosphs
+ }
+ 
+ proc /* SpikeStatsContainer */ cleanup() {
+  double pst[1]
+  double sinphs[1]
+  double cosphs[1]
+  s = null
+ }
+
+/*******************************/
+
+endtemplate SpikeStatsContainer
+
+/*******************************/
+
+/************************************** 
+ * Coincidence Detector (CD) Template * 
+ **************************************/
+
+/*******************************/
+
+begintemplate CD
+
+/*******************************/
+ public p, axonNode, axonMyel, axonHill, soma, dendrite, \
+ exSynapse, inSynapse, stimuli, currentInjection, vClamp, \
+ APPSTGraph, exSynapseTotalPSTGraph, PSTGraph, exSynapsePSTGraph, \
+ exSynapsePSTGraphs, exSynapseRate, APCountWin, CDInfoStrip,\
+ APStats, APRate, \
+ inform_user, write, writeSingle, cleanup, \
+  preinit, postinit, calcPSTs, prerun, postadvance, \
+ stimFreqUse, lambdaDenUse, \
+ updateGraphOnlyVars, maketimegraph, makeSpacePlots
+  
+ external gu, tstop, set_ra, stimProcName, graphList, flush_list, dtReq, \
+  timeGraphList
+
+ objref p //parameters
+
+ // Array sizes in brackets are typical sizes (they must be declared
+ // with _some_ number. The actual sizes used in each instance are 
+ // the appropriate sizes
+ create axonNode, axonMyel, axonHill, soma, dendrite[2], utilSection
+ objref exSynapse[2][30]
+ objref inSynapse[2]
+ poissDt = -1e12
+ objref stimuli[2]
+ objref stimToStimOnce[2]
+ probIpsi = -1e12
+ probContra = -1e12
+ randseed = -1e12
+ objref stimToExSynapse[2][2][30]
+ objref currentInjection
+ objref vClamp
+ objref APStats
+ objref APToStats
+ objref APPST
+ objref APPSTsmall
+ objref exSynapseStats[2][30]
+ objref exSynapseToStats[2][30]
+ objref exSynapsePST[2][30]
+ objref exSynapsePSTsmall[2][30]
+ exSynapseRate  = -1e12
+ objref dendriteStats[2]
+ objref exSynapseToDendriteStats[2][30]
+ objref dendritePST[30]
+ objref dendritePSTsmall[30]
+ objref exSynapsePSTRawGraph[2][30]
+ objref exSynapsePSTgraph[2][30]
+ objref dendritePSTgraph[2]
+ objref APPSTgraph
+ objref mainPSTbox
+ objref exSynapsePSTbox[2]
+ objref exSynapsePSTboxBoth
+ objref exSynapsePSTRawbox[2]
+ objref CDInfoStripBox
+ 
+ gGraph = -1e12
+ double stimGraph[2]
+ double synIpsiGraph[2][2]
+ double synContraGraph[2][2]
+
+ objref this // refers to self (automatically)
+ objref null   // null pointer
+ objref tmpObj // for temporarily holding an object
+ strdef tmpStr // for temporarily holding a string
+
+ binsnum = -1e12 //  maximum number of bins consistent with stimulus 
+ //           //              frequency and integration timestep 
+ stimPeriod = -1e12     // stim period consistent with integration timestep 
+ stimFreqUse = -1e12 // stimulus freq. consistent with integration timestep
+ APRate = -1e12
+ lambdaDenUse = -1e12
+
+ /**************************
+  * Initialize CD Template * 
+  **************************/
+
+ /* This is called when and only when a new instance of the template 
+    CD is instantiated. */
+ proc /* CD */ init() {
+  p = $o1
+  p.nDen = 2*int(p.nDen/2+0.5)
+  p.nExSynPerSide = p.nDen/2 * p.nExSyn
+  p.showMaxDen = gu.min(p.showMaxDen,p.nDen)
+  p.showMaxExSyn = gu.min(p.showMaxExSyn,p.nExSyn)
+  if (p.nExSyn>0) {
+   objref exSynapse[p.nDen][p.nExSyn] // instances of Ex syn. obj. vars 
+  }
+  objref inSynapse[p.nDen] // instances of In syn. obj. vars 
+  objref stimuli[gu.numClocks] // stimulus generation
+  objref stimToStimOnce[gu.numClocks] // start stimulus clocks
+  if (p.nExSyn>0) {
+   objref stimToExSynapse[gu.numClocks][p.nDen][p.nExSyn] // NetCons
+  }
+
+  poissDt = dtReq
+ 
+  objref CDInfoStripBox
+
+  // Each category of statistics has a SpikeStats object, a NetCon to inform
+  // the SpikeStats object, and a PST & PSTsmall for graphing purposes.
+  objref APStats
+  objref APToStats
+  objref APPST
+  objref APPSTsmall
+  if (p.nExSyn>0) {
+   objref exSynapseStats[p.nDen][p.nExSyn]
+   objref exSynapseToStats[p.nDen][p.nExSyn]
+   objref exSynapsePST[p.nDen][p.nExSyn]
+   objref exSynapsePSTsmall[p.nDen][p.nExSyn]
+   objref exSynapseToDendriteStats[p.nDen] [p.nExSyn]
+  }
+  objref dendriteStats[p.nDen] 
+  objref dendritePST[p.nDen]
+  objref dendritePSTsmall[p.nDen]
+
+  // Instances of graph objects to display the PST analysis 
+  // (there are two types of synaptic PST graphs, raw and combined) 
+  if (p.nExSyn>0) {
+   objref exSynapsePSTRawGraph[p.nDen][p.nExSyn]
+   objref exSynapsePSTgraph[p.nDen][p.nExSyn]
+  }
+  objref dendritePSTgraph[p.nDen]
+  objref APPSTgraph
+
+  // To put several graphs in one window (to avoid even more windows all
+  // over the place), put the graphs into "box" objects 
+  objref mainPSTbox
+  objref exSynapsePSTbox[p.nDen]
+  objref exSynapsePSTboxBoth
+  objref exSynapsePSTRawbox[p.nDen]
+
+  gGraph = -1e12
+  double stimGraph[gu.numStim]
+  if (p.showMaxDen*p.showMaxExSyn) {
+   double synIpsiGraph[p.showMaxDen][p.showMaxExSyn]
+   double synContraGraph[p.showMaxDen][p.showMaxExSyn]
+  }
+ }
+
+ /************************** 
+  * CD Run Initializations * 
+  **************************/
+
+ proc /* CD */ preinit() {
+  init(p) // so can make new amounts of dendrites, synapses, etc.
+  init_cell()
+  init_exSynapses()
+  init_inSynapses()
+  init_dendrites()
+  init_soma(p.dDen)
+  init_axon()
+  init_currentInjection()
+  init_vClamp()
+  init_stimuli()
+  init_stats()
+  init_PSTGraphs()
+  updateGraphOnlyVars()
+ }
+
+ /* Initialize Cell */
+ proc /* CD */ init_cell() { local i, j, distamp
+  create axonNode
+  create axonMyel
+  create axonHill
+  create soma
+  create dendrite[p.nDen]
+  set_ra() //must be overridden for axonMyel
+ 
+  connect axonMyel(1), axonHill(0) 
+  connect axonNode(1), axonMyel(0)
+
+  if (1) {
+   for i = 0, p.nDen-1 dendrite[i] connect dendrite[i](0), soma(i % 2)
+   connect axonHill(1), soma(0.5)
+  } else {
+   for i = 0, p.nDen-1 dendrite[i] connect dendrite[i](0), soma(1)
+   connect axonHill(1), soma(0)
+  }
+
+  for i = 0, p.nDen-1 dendrite[i] {
+   if (p.gLDen != 0) {
+    insert pas
+   }
+   if (p.gKLvaBarDen != 0) {
+    insert klva
+   }
+   if (p.gKHvaBarDen != 0) {
+    insert khva
+   }
+  }
+  soma {
+   if (p.gNaBarSoma != 0) {
+    insert nahh
+   }
+   if (p.gKHHBarSoma != 0) {
+    insert khh
+   }
+   if (p.gLSoma != 0) {
+    insert pas
+   }
+   if (p.gKLvaBarSoma != 0) {
+    insert klva
+   }
+   if (p.gKHvaBarSoma != 0) {
+    insert khva
+   }
+  }
+  axonHill {
+   if (p.gNaBarAxonHill != 0) {
+    insert nahh
+   }
+   if (p.gKHHBarAxonHill != 0) {
+    insert khh
+   }
+   if (p.gKLvaBarAxonHill != 0) {
+    insert klva
+   }
+   if (p.gKHvaBarAxonHill != 0) {
+    insert khva
+   }
+   if (p.gLAxonHill != 0) {
+    insert pas
+   }
+  }
+
+  if (p.nSegAxonMyel*p.nSegAxonNode) {
+   axonNode {
+    if (p.gNaBarAxonNode != 0) {
+     insert nahh
+    }
+    if (p.gKHHBarAxonNode != 0) {
+     insert khh
+    }
+    if (p.gLAxonNode != 0) {
+     insert pas
+    }
+   }
+   axonMyel insert pas
+   axonNode nseg = p.nSegAxonNode
+   axonMyel nseg = p.nSegAxonMyel
+  } else {
+   axonNode nseg = 1
+   axonMyel nseg = 1
+  }
+  axonHill nseg = p.nSegAxonHill	
+  soma nseg = p.nSegSoma
+  for i = 0, p.nDen-1 dendrite[i] nseg = p.nSegDen	
+
+  /* Add the synapses to the dendrites. */
+  distamp = p.distrExSyn*gu.min(p.centExSyn,1-p.centExSyn)
+  for i = 0, p.nDen-1 dendrite[i] {
+   for j = 0, p.nExSyn-1 {
+    exSynapse[i][j]=new PoissonTrigSyn(p.centExSyn+\
+       distamp*(2*j/(gu.max(p.nExSyn-1,1))-1))
+    setpointer exSynapse[i][j].randseed, randseed
+    if (i%2) {
+     setpointer exSynapse[i][j].prob, probContra
+    } else {
+     setpointer exSynapse[i][j].prob, probIpsi
+    }
+   }
+   inSynapse[i]=new TrigSynCD(0*0.5)
+  }
+  if (p.nDen*p.nExSyn) {exSynapse[0][0].initseedCD(0)}
+  create utilSection
+ }
+
+ /* Initialize Ex. Synapse Parameters */
+ proc /* CD */ init_exSynapses() { local i,j
+  for i = 0, p.nDen-1  {
+   for j = 0, p.nExSyn-1 {
+    exSynapse[i][j].tau = p.tauExSyn
+    exSynapse[i][j].gmax = p.gMExSyn
+    exSynapse[i][j].e = p.eExSyn
+    exSynapse[i][j].refraction = p.durExSyn
+   }
+  }
+ }
+
+ /* Initialize In. Synapse Parameters */
+ proc /* CD */ init_inSynapses() { local i
+  for i = 0, p.nDen-1 {
+   inSynapse[i].gmax = p.gMInSyn/p.nDen*2 //inserted per dendrite, in pairs
+   inSynapse[i].tau = p.tauInSyn
+   inSynapse[i].e = p.eInSyn
+  }
+ }
+
+ /* Initialize Dendrite Parameters */
+ proc /* CD */ init_dendrites() { local i
+  gu.cable_g_changed(p.gLDen, &p.dDen, &p.rADen, &p.lambdaDen)
+  lambdaDenUse = p.lambdaDen
+  for i = 0, p.nDen-1 dendrite[i] {
+   if ((p.gKLvaBarDen != 0) || (p.gKHvaBarDen != 0)) {
+    ek = p.eK
+   }
+   if (p.gKLvaBarDen != 0) {
+    alpha0_klva = p.alpha0KLva
+    alphaVHalf_klva = p.alphaVHalfKLva
+    alphaK_klva = p.alphaKKLva
+    beta0_klva = p.beta0KLva
+    betaVHalf_klva = p.betaVHalfKLva
+    betaK_klva = p.betaKKLva
+    q10_klva	= p.q10KLva
+    T0_klva	= p.T0KLva
+    gkbar_klva = p.gKLvaBarDen
+/*
+// only used in monaural tests of contra dendrites acting as current sink
+    if (i%2==1) if (p.genericParam2 > 0) gkbar_klva = \
+                                            gkbar_klva*10^p.genericParam2
+*/
+   }
+   if (p.gKHvaBarDen != 0) {
+    alpha0_khva = p.alpha0KHva
+    alphaVHalf_khva = p.alphaVHalfKHva
+    alphaK_khva = p.alphaKKHva
+    beta0_khva = p.beta0KHva
+    betaVHalf_khva = p.betaVHalfKHva
+    betaK_khva = p.betaKKHva
+    q10_khva	= p.q10KHva
+    T0_khva	= p.T0KHva
+    gkbar_khva = p.gKHvaBarDen
+   }
+   if (p.gLDen != 0) {
+    e_pas = p.eL
+    g_pas = p.gLDen
+   }
+   L = p.lDen
+   if (L==0) L=1e-6
+   diam = p.dDen
+   Ra = p.rADen
+/*
+// only used in monaural tests of contra dendrites acting as current sink
+   if (i%2==1) if (p.genericParam2 < 0) L = 1e-6
+*/
+  }
+ }
+
+ /* Initialize Soma Parameters */
+ proc /* CD */ init_soma() { local x, minDiameter
+  minDiameter = $1
+  soma {
+   if ((p.gKLvaBarSoma != 0) || (p.gKHvaBarSoma != 0) || (p.gKHHBarSoma != 0)) {
+    ek = p.eK
+   }
+   if (p.gNaBarSoma != 0) {
+    ena = p.eNa
+   }
+   if (p.gKLvaBarSoma != 0) {
+    alpha0_klva = p.alpha0KLva
+    alphaVHalf_klva = p.alphaVHalfKLva
+    alphaK_klva = p.alphaKKLva
+    beta0_klva = p.beta0KLva
+    betaVHalf_klva = p.betaVHalfKLva
+    betaK_klva = p.betaKKLva
+    q10_klva	= p.q10KLva
+    T0_klva	= p.T0KLva
+    gkbar_klva = p.gKLvaBarSoma
+   }
+   if (p.gKHvaBarSoma != 0) {
+    alpha0_khva = p.alpha0KHva
+    alphaVHalf_khva = p.alphaVHalfKHva
+    alphaK_khva = p.alphaKKHva
+    beta0_khva = p.beta0KHva
+    betaVHalf_khva = p.betaVHalfKHva
+    betaK_khva = p.betaKKHva
+    q10_khva	= p.q10KHva
+    T0_khva	= p.T0KHva
+    gkbar_khva = p.gKHvaBarSoma
+   }
+   if (p.gNaBarSoma != 0) {
+    gnabar_nahh = p.gNaBarSoma	
+    alphamVHalf_nahh  = p.alphamVHalfNa
+    betamVHalf_nahh   = p.betamVHalfNa
+    alphahVHalf_nahh  = p.alphahVHalfNa
+    betahVHalf_nahh   = p.betahVHalfNa
+    q10_nahh	= p.q10Na
+   }
+   if (p.gKHHBarSoma != 0) {
+    gkbar_khh = p.gKHHBarSoma
+    q10_khh	  = p.q10KHH
+   }
+   if (p.gLSoma != 0) {
+    g_pas = p.gLSoma
+    e_pas = p.eL
+   }
+   L = p.lSoma
+   for (x) diam(x) = (p.dSoma - minDiameter)*sin(PI*x) + minDiameter
+   Ra = p.rASoma
+  }
+ }
+
+ /* Initialize Axon Parameters */
+ proc /* CD */ init_axon() { 
+  axonHill {
+   if (p.gKHHBarAxonHill != 0) {
+    ek = p.eK
+   }
+   if (p.gNaBarAxonHill != 0) {
+    ena = p.eNa
+   }
+   if (p.gNaBarAxonHill != 0) {
+    gnabar_nahh = p.gNaBarAxonHill	
+    alphamVHalf_nahh  = p.alphamVHalfNa
+    betamVHalf_nahh   = p.betamVHalfNa
+    alphahVHalf_nahh  = p.alphahVHalfNa
+    betahVHalf_nahh   = p.betahVHalfNa
+    q10_nahh	= p.q10Na
+   }
+   if (p.gKHHBarAxonHill != 0) {
+    gkbar_khh = p.gKHHBarAxonHill
+    q10_khh		= p.q10KHH
+   }
+   if (p.gKLvaBarAxonHill != 0) {
+    alpha0_klva = p.alpha0KLva
+    alphaVHalf_klva = p.alphaVHalfKLva
+    alphaK_klva = p.alphaKKLva
+    beta0_klva = p.beta0KLva
+    betaVHalf_klva = p.betaVHalfKLva
+    betaK_klva = p.betaKKLva
+    q10_klva	= p.q10KLva
+    T0_klva	= p.T0KLva
+    gkbar_klva = p.gKLvaBarAxonHill
+   }
+   if (p.gKHvaBarAxonHill != 0) {
+    alpha0_khva = p.alpha0KHva
+    alphaVHalf_khva = p.alphaVHalfKHva
+    alphaK_khva = p.alphaKKHva
+    beta0_khva = p.beta0KHva
+    betaVHalf_khva = p.betaVHalfKHva
+    betaK_khva = p.betaKKHva
+    q10_khva	= p.q10KHva
+    T0_khva	= p.T0KHva
+    gkbar_khva = p.gKHvaBarAxonHill
+   }
+   if (p.gLAxonHill != 0) {
+    g_pas = p.gLAxonHill
+    e_pas = p.eL
+   }
+   L = p.lAxonHill
+   diam = p.dAxonHill
+   Ra = p.rAAxonHill
+  }
+  if (p.nSegAxonMyel*p.nSegAxonNode) {
+   axonNode {
+    if (p.gKHHBarAxonNode != 0) {
+     ek = p.eK
+    }
+    if (p.gNaBarAxonNode != 0) {
+     ena = p.eNa
+    }
+    if (p.gNaBarAxonNode != 0) {
+     gnabar_nahh = p.gNaBarAxonNode	
+     alphamVHalf_nahh  = p.alphamVHalfNa
+     betamVHalf_nahh   = p.betamVHalfNa
+     alphahVHalf_nahh  = p.alphahVHalfNa
+     betahVHalf_nahh   = p.betahVHalfNa
+     q10_nahh	= p.q10Na
+    }
+    if (p.gKHHBarAxonNode != 0) {
+     gkbar_khh = p.gKHHBarAxonNode
+     q10_khh		= p.q10KHH
+    }
+    if (p.gLAxonNode != 0) {
+     g_pas = p.gLAxonNode
+     e_pas = p.eL
+    }
+    L = p.lAxonNode
+    diam = p.dAxonNode
+    Ra = p.rAAxonNode
+   }
+   axonMyel {
+    e_pas = p.eL
+    g_pas = p.gLAxonMyel
+    cm = p.cmAxonMyel
+    L = p.lAxonMyel
+    diam = p.dAxonMyel
+    Ra = p.rAAxonMyel
+   }
+  } else {
+   axonNode {
+    L = 0.01
+    diam = p.dAxonHill
+    Ra = p.rAAxonHill
+   }
+   axonMyel {
+    L = 0.01
+    diam = p.dAxonHill
+    Ra = p.rAAxonHill
+   }
+  }
+ }
+
+
+ /* Initialize Current Injections */
+ proc /* CD */ init_currentInjection() {
+  if (p.iAmp != 0) {
+   soma currentInjection = new IClamp(0.5)
+   currentInjection.amp = p.iAmp
+   currentInjection.del = p.iDel
+   currentInjection.dur = p.iDur
+  }
+ }
+ 
+ /* Initialize Voltage Clamp */
+ proc /* CD */ init_vClamp() {
+  if (p.vClampDur1*p.vClampDur2*p.vClampDur3 != 0) {
+   soma vClamp = new SEClamp(0.5)
+   vClamp.amp1 = p.vClampV1
+   vClamp.amp2 = p.vClampV2
+   vClamp.amp3 = p.vClampV3
+   vClamp.dur1 = p.vClampDur1
+   vClamp.dur2 = p.vClampDur2
+   vClamp.dur3 = p.vClampDur3
+   vClamp.rs   = p.vClampRes
+   makeVCTimegraph()
+  }
+ }
+ 
+ 
+ /* Initialize Stimuli Parameters */
+  /* Since all binning for the PST is done on the fly, the maximum
+   * number of bins is calculated and used for the binning.
+   * To ensure the accuracy of the binning, a the stimulus frequency
+   * is rounded to the nearest frequency commensurate with
+   * the integration timestep. */
+ proc /* CD */ init_stimuli() {local i, j, k, newstimFreq
+  stimFreqUse = p.stimFreq
+  // calculate the number of maximum number of bins consistent with the
+  // stimulus frequency and the integration timestep
+  binsnum = int(1000/stimFreqUse/poissDt+.49999999)
+  // calculate the stimulus frequency consistent with timestep 
+  stimPeriod = poissDt*binsnum // in ms, an integer multiple of poissDt
+  newstimFreq = 1000/stimPeriod
+  if (newstimFreq != stimFreqUse) {
+   stimFreqUse = 1000/stimPeriod
+   print "Stimulus Frequency rounded to ",stimFreqUse,"Hz (from ", \
+	 p.stimFreq,"Hz)"
+  }
+   for k=0,gu.numClocks-1 {
+	sprint(tmpStr, "utilSection stimuli[%d] = new %s(0)", k, stimProcName) 
+	// e.g.: utilSection stimuli[k] = new PoissonBinaural(0)
+	execute1(tmpStr,this)
+	stimuli[k].poissDt = poissDt
+	stimuli[k].vs = p.stimVS
+	stimuli[k].stimRate =  p.probRate
+	stimuli[k].freq = stimFreqUse
+	stimuli[k].stimPhaseIpsi   = p.stimPhaseDegI/DEG
+	stimuli[k].stimPhaseContra = p.stimPhaseDegC/DEG
+	stimuli[k].genericParam1 = p.genericParam1
+	stimuli[k].genericParam2 = p.genericParam2
+	setpointer stimuli[k].probIpsi,   probIpsi
+	setpointer stimuli[k].probContra, probContra 
+	if (p.probRate > 0) {
+	 utilSection {
+	  stimToStimOnce[k] = new \
+		NetCon(&stimuli[k].tickOnce, stimuli[k], \
+			   stimuli[k].tickSize/2, k*poissDt, 1)// start clocks out of phase
+	  for i = 0, p.nDen-1  {
+	   for j = 0, p.nExSyn-1 {
+		stimToExSynapse[k][i][j] = new \
+		  NetCon(&stimuli[k].tickVal, \
+				 exSynapse[i][j],stimuli[k].tickSize/2, 0, 1)
+	   }
+	  }
+	 }
+	}
+   }
+ }
+
+ /* Initialize Stats */
+ proc /* CD */ init_stats() { local i,j
+  utilSection {
+   APStats = new \
+	 SpikeStatsContainer(binsnum, stimPeriod, poissDt,p.ignoreSpikesBefore)
+   axonNode APToStats = new NetCon(&v(0), APStats.s, p.APthresh, 0 , 1)
+   for i = 0, p.nDen-1 {
+	dendriteStats[i] = new \
+	  SpikeStatsContainer(binsnum, stimPeriod, poissDt,p.ignoreSpikesBefore)
+	for j = 0, p.nExSyn-1 {
+	 exSynapseStats[i][j] = new \
+	   SpikeStatsContainer(binsnum, stimPeriod, poissDt, p.ignoreSpikesBefore)
+	 if (p.probRate > 0) {
+	  dendrite[i] exSynapseToStats[i][j] = new \
+		NetCon(&exSynapse[i][j].firing, exSynapseStats[i][j].s, 0.5, 0, 1)
+	  dendrite[i] exSynapseToDendriteStats[i][j] = new \
+		NetCon(&exSynapse[i][j].firing, dendriteStats[i].s, 0.5, 0, 1)
+	 }
+	}
+   }
+  }
+ }
+
+
+ /* Initialize box (window of multiple graphs) of PSTs */
+ proc /* CD */ init_PSTGraphs() { local i
+  objref APPSTsmall 
+  objref dendritePSTsmall[p.nDen]
+  objref dendritePSTgraph[p.nDen]
+  if (p.nExSyn>0) {
+   objref exSynapsePSTsmall[p.nDen][p.nExSyn]
+   objref exSynapsePSTgraph[p.nDen][p.nExSyn]
+   objref exSynapsePSTRawGraph[p.nDen][p.nExSyn]
+   objref exSynapsePSTbox[p.nDen]
+   objref exSynapsePSTRawbox[p.nDen]
+  }
+  mainPSTbox = new HBox()
+  for i=0, p.nDen-1 exSynapsePSTbox[i] = new HBox()
+ }
+
+ proc /* CD */ postinit() {
+  //inform_user()
+ }
+
+ /* Inform user of interesting parameters */
+ proc /* CD */ inform_user() { 
+  print ""
+  print "Max number of period histogram bins: ",binsnum
+  print "Dendritic length constant lambda: ", lambdaDenUse, "[um]"
+  print "Electrotonic dendritic length: ", dendrite[0].L/lambdaDenUse
+  //printExSynapseloc()
+ }
+
+ proc /* CD */ printExSynapseloc() { local i, j
+  for i = 0, p.nDen-1 dendrite[i] {
+   for j = 0, p.nExSyn-1 {
+    print_pp_location(exSynapse[i][j])
+   }
+  }
+ }
+
+  strdef pp_sec
+ proc /* CD */ print_pp_location() {local x
+  x = $o1.get_loc()
+  sectionname(pp_sec)
+  printf("%s located at %s(%g)\n", $o1,pp_sec,x)
+  pop_section()
+ }
+
+ proc /* CD */ prerun() {local k
+  for k=0,gu.numClocks-1 {
+   stimuli[k].prerun()
+  }
+ }
+
+ /****************************
+  * CD Clean Up After Itself * 
+  ****************************/
+
+ proc /* CD */ cleanup() { local i, j, l
+  CDInfoStripBox = null
+   for i=0, p.nDen-1 exSynapsePSTbox[i] = null
+   mainPSTbox = null
+   for i = 0, p.nDen-1 {
+	for j = 0, p.nExSyn-1 {
+	 exSynapsePST[i][j] = null
+	 exSynapsePSTsmall[i][j] = null
+	}
+	dendritePST[i] = null
+	dendritePSTsmall[i] = null
+  }
+  APPST = null
+  APPSTsmall = null
+  if (p.probRate > 0) {
+   for i = 0, p.nDen-1 {
+	for j = 0, p.nExSyn-1 {
+	 exSynapseToStats[i][j] = null
+	 exSynapseToDendriteStats[i][j] = null
+	}
+   }
+  }
+  APToStats = null
+  for i = 0, p.nDen-1 {
+   for j = 0, p.nExSyn-1 {
+    if (exSynapseStats[p.nDen-1-i][p.nExSyn-1-j] != null ) {
+	 exSynapseStats[p.nDen-1-i][p.nExSyn-1-j].cleanup()
+    }
+   }
+   if (dendriteStats[p.nDen-1-i] != null ) {
+    dendriteStats[p.nDen-1-i].cleanup()
+   }
+  }
+  APStats.cleanup()
+  for i = 0, p.nDen-1 {
+   for j = 0, p.nExSyn-1 {
+	exSynapseStats[i][j] = null
+   }
+   dendriteStats[i] = null
+  }
+  APStats = null
+   for k = 0, gu.numClocks-1 {
+	if (p.probRate > 0) {
+	 for i = 0, p.nDen-1 {
+	  for j = 0, p.nExSyn-1 {
+	   stimToExSynapse[k][i][j] = null
+	  }
+	 }
+	 stimToStimOnce[k] = null
+	}
+	stimuli[k] = null
+   }
+  if (p.iAmp != 0) {
+   currentInjection = null
+  }
+  if (p.vClampDur1*p.vClampDur2*p.vClampDur3 != 0) {
+   vClamp = null
+  }
+  for i = 0, p.nDen-1 dendrite[i] {
+   inSynapse[i]=null
+	for j = 0, p.nExSyn-1 {
+	 exSynapse[i][j]=null
+   }
+  }
+ }
+
+ /******************** 
+  * CD Main Run Loop * 
+  ********************/
+
+ //
+ // this is executed every timestep, so it should be as fast as possible!
+ //
+
+ proc /* CD */ postadvance() { local tt
+  tt = t-p.ignoreSpikesBefore
+  if (tt>0) {
+   APRate = APStats.n/tt*1000
+  }
+ }
+
+ /**************** 
+  * CD After Loop * 
+  ****************/
+
+ proc /* CD */ postrun() {
+  calcPSTs()
+  PSTGraph()
+  write()
+ }
+
+/******************** 
+ * CD Calculate PST * 
+ ********************/
+
+ proc /* CD */ calcPSTs() { local i, j, k, rebin, exSynapseN
+  rebin = gu.max(int(binsnum/p.finalbinsnum+.5),1)
+  APPST = new Vector(binsnum)
+  APPSTsmall = new Vector(p.finalbinsnum)
+  for k=0,binsnum-1 {
+   APPST.x[k] = APStats.pst[k]
+   APPSTsmall.x[gu.min(int(k/rebin),p.finalbinsnum-1)] = APStats.pst[k]
+  }
+  exSynapseN = 0
+  for i=0,p.nDen-1 {
+   dendritePST[i] = new Vector(binsnum)
+   dendritePSTsmall[i] = new Vector(p.finalbinsnum)
+   for k=0,binsnum-1 {
+    dendritePST[i].x[k] = dendriteStats[i].pst[k]
+    dendritePSTsmall[i].x[gu.min(int(k/rebin),p.finalbinsnum-1)] = \
+     dendriteStats[i].pst[k]
+   }
+   for j=0,p.nExSyn-1 {
+    exSynapsePST[i][j] = new Vector(binsnum)
+    exSynapsePSTsmall[i][j] = new Vector(p.finalbinsnum)
+    for k=0,binsnum-1 {
+     exSynapsePST[i][j].x[k] = exSynapseStats[i][j].pst[k]
+     exSynapsePSTsmall[i][j].x[gu.min(int(k/rebin),p.finalbinsnum-1)] = \
+      exSynapseStats[i][j].pst[k]
+	}
+   }
+   exSynapseN += dendriteStats[i].n
+  }
+  if (exSynapseN > 0) {
+   exSynapseRate = exSynapseN/t*1000/(p.nDen*p.nExSyn)
+  }
+ }
+
+/****************** 
+ * CD Show Values * 
+ ******************/
+
+ proc /* CD */ write() { local i
+  fprint("AP-Count = %d\n",APStats.n)
+  fprint("AP-Rate = %g s^-1\n",APRate)
+  fprint("AP-Vector-Strength = %d %%\n", int(100*APStats.vs+.5))
+  fprint("AP-Vector-Phase = %d %%\n", \
+      int(APStats.phase+.5))
+  for i=0,p.nDen/2-1 {
+   fprint("Ipsi-Synaptic-Input-Rate = %g s^-1/syn\n", \
+     dendriteStats[2*i].n/t*1000/p.nExSyn)
+   fprint("Contra-Synaptic-Input-Rate = %g s^-1/syn\n", \
+     dendriteStats[2*i+1].n/t*1000/p.nExSyn)
+   fprint("Ipsi-Vector-Strength = %d %%\n", \
+    int(100*dendriteStats[2*i].vs+.5))
+   fprint("Ipsi-Vector-Phase = %d deg\n", \
+    int(dendriteStats[2*i].phase+.5))
+   fprint("Contra-Vector-Strength = %d %%\n", \
+    int(100*dendriteStats[2*i+1].vs+.5))
+   fprint("Contra-Vector-Phase = %d deg\n", \
+    int(dendriteStats[2*i+1].phase+.5))
+  }
+  fprint("Excitatory-Synaptic-Input-Rate = %g s^-1/syn\n",exSynapseRate)
+ }
+
+ proc /* CD */ writeSingle() {
+  fprint("%s\n",this)
+  fprint("stimFreqUse = %d Hz\n",stimFreqUse)
+  fprint("lambdaDenUse = %g\n",lambdaDenUse)
+ }
+
+ /************************* 
+  * CD PST Graphs * 
+  *************************/ 
+ proc /* CD */ APPSTGraph() {
+  APPSTgraph = new Graph(0)
+  APPSTgraph.yaxis(3)
+  APPSTgraph.xaxis(3)
+  APPSTgraph.yaxis(0,APPSTsmall.max()+1,0)
+  APPSTgraph.xaxis(0,360,0)
+  APPSTgraph.size(0,360, -1,APPSTsmall.max()+1)
+  APPSTgraph.view(0,0,360,APPSTsmall.max()+1,0,0,150,100)
+  APPSTgraph.label(.2,.8,"Action Potentials")
+  sprint(tmpStr, "VS=%.2f Ph=%d deg",APStats.vs,APStats.phase)
+  APPSTgraph.label(tmpStr)
+  sprint(tmpStr, "N = %d, %d bins",APStats.n,APPSTsmall.size())
+  APPSTgraph.label(tmpStr)
+  tmpObj = APPSTsmall.c.mul(0.5)
+  tmpObj.ploterr(APPSTgraph,tmpObj.c.indgen(360/tmpObj.size), tmpObj,14,2,0)
+  tmpObj = null
+ }
+
+ proc /* CD */ exSynapseTotalPSTGraph() {local i,j
+  i = $1
+  dendritePSTgraph[i] = new Graph(0)
+  dendritePSTgraph[i].yaxis(3)
+  dendritePSTgraph[i].xaxis(3)
+  dendritePSTgraph[i].yaxis(0,dendritePSTsmall[i].max()+1,0)
+  dendritePSTgraph[i].xaxis(0,360,0)
+  dendritePSTgraph[i].size(0,360, -1,dendritePSTsmall[i].max()+1)
+  dendritePSTgraph[i].view(0,0,360,dendritePSTsmall[i].max()+1,0,0,150,100)
+  sprint(tmpStr,"%c Dendrite",73-6*(i % gu.numStim))
+  dendritePSTgraph[i].label(.2,.8,tmpStr)
+  sprint(tmpStr, "VS=%.2f Ph=%d deg",dendriteStats[i].vs,\
+   dendriteStats[i].phase)
+  dendritePSTgraph[i].label(tmpStr)
+  sprint(tmpStr, "N = %d, %d bins",dendriteStats[i].n, \
+   dendritePSTsmall[i].size())
+  dendritePSTgraph[i].label(tmpStr)
+  tmpObj = dendritePSTsmall[i].c.mul(0.5)
+  tmpObj.ploterr(dendritePSTgraph[i], tmpObj.c.indgen(360/tmpObj.size), \
+    tmpObj,14,4+i,0)
+  tmpObj = null
+ }
+
+ proc /* CD */ PSTGraph() {local i
+  calcPSTs()
+  mainPSTbox = new HBox(1)
+  mainPSTbox.intercept(1)
+  APPSTGraph()
+  for i=0,p.nDen-1 {
+   exSynapseTotalPSTGraph(i)
+  }
+  mainPSTbox.intercept(0)
+  mainPSTbox.map("Main Period Histograms",320,520,500,120)
+ }
+
+ proc /* CD */ exSynapsePSTGraph() {local i,j
+  i = $1
+  exSynapsePSTbox[i] = new HBox()
+  exSynapsePSTbox[i].intercept(1)
+  for j=0,p.nExSyn-1 {
+   exSynapsePSTgraph[i][j] = new Graph(0)
+   exSynapsePSTgraph[i][j].yaxis(3)
+   exSynapsePSTgraph[i][j].xaxis(3)
+   exSynapsePSTgraph[i][j].yaxis(0,exSynapsePSTsmall[i][j].max()+1,0)
+   exSynapsePSTgraph[i][j].xaxis(0,360,0)
+   exSynapsePSTgraph[i][j].size(0,360, -1,exSynapsePSTsmall[i][j].max()+1)
+   exSynapsePSTgraph[i][j].view(0,0,360,exSynapsePSTsmall[i][j].max()+1, \
+    0,0,175,100)
+   sprint(tmpStr,"Synapse %d%c",j+1,73-6*(i % gu.numStim))
+   exSynapsePSTgraph[i][j].label(.2,.8,tmpStr)
+   sprint(tmpStr, "VS=%.2f Ph=%d deg",exSynapseStats[i][j].vs, \
+    exSynapseStats[i][j].phase)
+   exSynapsePSTgraph[i][j].label(tmpStr)
+   sprint(tmpStr, "N = %d, %d bins",exSynapseStats[i][j].n, \
+    exSynapsePSTsmall[i][j].size())
+   exSynapsePSTgraph[i][j].label(tmpStr)
+   tmpObj = exSynapsePSTsmall[i][j].c.mul(0.5)
+   tmpObj.ploterr(exSynapsePSTgraph[i][j], tmpObj.c.indgen(360/tmpObj.size), \
+    tmpObj,14,4+i,0)
+  }
+  exSynapsePSTbox[i].intercept(0)
+  sprint(tmpStr,"%c Synapses Period Histograms",73+6-i)
+  exSynapsePSTbox[i].map(tmpStr,10+i*20,570+i*170,500,60)
+  tmpObj = null
+ }
+
+ proc /* CD */ exSynapsePSTGraphs() {local i
+  exSynapsePSTboxBoth = new VBox()
+  exSynapsePSTboxBoth.intercept(1)
+  for i=0,p.nDen -1 exSynapsePSTGraph(i)
+  exSynapsePSTboxBoth.intercept(0)
+  exSynapsePSTboxBoth.map("Individual Synapse PSTHs",10,570,800,120)
+ }
+
+ proc /* CD */ exSynapsePSTRawGraphMake() {local i,j
+  i = $1
+  exSynapsePSTRawbox[i] = new HBox()
+  exSynapsePSTRawbox[i].intercept(1)
+  for j=0,p.nExSyn-1 {
+   exSynapsePSTRawGraph[i][j] = new Graph(0)
+   exSynapsePSTRawGraph[i][j].yaxis(3)
+   exSynapsePSTRawGraph[i][j].xaxis(3)
+   exSynapsePSTRawGraph[i][j].yaxis(0,exSynapsePST[i][j].max()+1,0)
+   exSynapsePSTRawGraph[i][j].xaxis(0,360,0)
+   exSynapsePSTRawGraph[i][j].size(0,360, -1,exSynapsePST[i][j].max()+1)
+   exSynapsePSTRawGraph[i][j].view(0,0,360,exSynapsePST[i][j].max()+1, \
+    0,0,175,100)
+   sprint(tmpStr,"Raw Synapse %d%c",j+1,73-6*(i % gu.numStim))
+   exSynapsePSTRawGraph[i][j].label(.2,.8,tmpStr)
+   sprint(tmpStr, "VS=%.2f Ph=%d deg",exSynapseStats[i][j].vs,\
+     exSynapseStats[i][j].phase)
+   exSynapsePSTRawGraph[i][j].label(tmpStr)
+   sprint(tmpStr, "N = %d, %d bins",exSynapseStats[i][j].n, \
+    exSynapsePST[i][j].size())
+   exSynapsePSTRawGraph[i][j].label(tmpStr)
+   tmpObj = exSynapsePST[i][j].c.mul(0.5)
+   tmpObj.ploterr(exSynapsePSTRawGraph[i][j], \
+    tmpObj.c.indgen(360/tmpObj.size),  tmpObj,14,4+i,0)
+  }
+  exSynapsePSTRawbox[i].intercept(0)
+  sprint(tmpStr,"%c Synapses Raw Period Historgrams", \
+   73-6*(i % gu.numStim))
+  exSynapsePSTRawbox[i].map(tmpStr,10+i*20,570+i*170,500,60)
+  tmpObj = null
+ }
+
+ proc /* CD */ exSynapsePSTRawGraphs() {local i
+  for i=0,p.nDen -1 exSynapsePSTRawGraphMake(i)
+ }
+ 
+ /******************* 
+  * CD Info Windows * 
+  *******************/
+
+ proc /* CD */ CDInfoStrip() { local obIndex
+  obIndex =gu.indexOfObject(this)
+  CDInfoStripBox = new VBox()
+  CDInfoStripBox.intercept(1)
+  sprint(tmpStr,"%s",this)
+  xpanel(tmpStr, 1)
+  xvalue("Spikes (at axon tip)", "APStats.n", 0,"", 0, 1 )
+  xvalue("Spike Rate (at axon tip)", "APRate", 0,"", 0, 1 )
+  xvalue("Vector Strength (at axon tip)", "APStats.vs", 0,"", 0, 1 )
+  xvalue("Vector Phase (at axon tip)", "APStats.phase", 0,"", 0, 1 )
+  xpanel()
+  xpanel(" ", 1)
+  xbutton("Time Plot","maketimegraph()")
+  xbutton("Space Plot","makeSpacePlots()")
+  xbutton("Spike & Dendrite PSTHs","PSTGraph()")
+  xbutton("Synapse PSTHs","exSynapsePSTGraphs()")
+  p.displayParamMenu()
+  xpanel()
+  CDInfoStripBox.intercept(0)
+  sprint(tmpStr,"%s",this)
+  CDInfoStripBox.map(tmpStr,20 + 20*obIndex, 190+40 + 20*obIndex,1,1)
+ }
+
+ proc /* CD */ initSingle() {
+  CDInfoStrip()
+ }
+
+
+ proc /* CD */ updateGraphOnlyVars() {local i, j
+  gGraph = inSynapse[0].g/gu.max(p.gMInSyn*2,float_epsilon)
+  for i = 0, gu.numStim-1 {
+   stimGraph[i] = stimuli[0].stim[i]*(12-24*i)*(exp(-2*p.stimVS))-85
+  }
+  for i = 0, p.showMaxDen/2-1 {
+   for j = 0, p.showMaxExSyn-1 {
+    synIpsiGraph[i][j]=exSynapse[2*i][j].g/exSynapse[2*i][j].gmax \
+     - (90+2*i*p.showMaxExSyn*5+j*5)
+    synContraGraph[i][j]=exSynapse[2*i+1][j].g/exSynapse[2*i+1][j].gmax \
+     - (90+(2*i+1)*p.showMaxExSyn*5+j*5)
+   }
+  }
+ }
+
+ /***************** 
+  * CD Time Graph * 
+  *****************/
+
+  objref timegraph
+ proc /* CD */ maketimegraph() {local i, j, k, showAxonV, \
+                             showAxonSomaV, showDenV, showStim, showInhib
+  if (numarg()==0) {
+   showAxonV = 1
+   showAxonSomaV = 1
+   showDenV = 1
+   showStim = 1
+   showInhib = 1
+  } else {
+   showAxonV = $1
+   showAxonSomaV = $2
+   showDenV = $3
+   showStim = $4
+   showInhib = $5
+  }
+  timegraph = new Graph(0)
+  timegraph.size(0,260,-100,10)
+  timegraph.view(0,-(100+(p.showMaxDen*p.showMaxExSyn-1)*5), \
+   tstop, (100+(p.showMaxDen*p.showMaxExSyn-1)*5), \
+   20, 190, 1048, 160)
+  graphList[0].append(timegraph)
+  timegraph.save_name("graphList[0].") 
+  if (showAxonSomaV) {
+   timegraph.addvar("soma.v(0.5)", gu.red, gu.solidThin, 0.93, 1, 2)
+  }
+  if (showDenV) {
+   timegraph.addvar("dendrite[0].v(0.5)", gu.green, gu.solidThin, 0.93, 1, 2)
+   timegraph.addvar("dendrite[1].v(0.5)", gu.orange, gu.solidThin, 0.93, 1, 2)
+   if (p.showMaxDen>2) {
+    timegraph.addvar("dendrite[2].v(0.5)", gu.brown, gu.solidThin, 0.93, 1, 2)
+    timegraph.addvar("dendrite[3].v(0.5)", gu.black, gu.solidThin, 0.93, 1, 2)
+   }
+    if (p.showMaxDen>4) {
+     for k = 4, p.showMaxDen-1 {
+      sprint(tmpStr,"dendrite[%d].v(0.5)", k)
+      timegraph.addvar(tmpStr, gu.blue, gu.solidThin, 0.93, 1, 2)
+     }
+    }
+  }
+  if (showAxonV) {
+   timegraph.addvar("axonNode.v(0)", gu.magenta, gu.solidThin, 0.93, 1, 2)
+  }
+  if (showInhib) {
+   timegraph.addvar("gGraph", gu.gray, gu.dashedThin2, 0.93, 1, 2)
+  }
+  if (showStim) {
+   for i = 0, gu.numStim-1 {
+    sprint(tmpStr,"stimGraph[%d]", i)
+    timegraph.addvar(tmpStr, gu.green+i, gu.solidThin, 0.93, 1, 2)
+   }
+  }
+  for i = 0, p.showMaxDen/2-1 {
+   for j = 0, p.showMaxExSyn-1 {
+    sprint(tmpStr,"synIpsiGraph[%d][%d]", i, j)
+    timegraph.addvar(tmpStr, gu.green, gu.solidThin, 0.93 + 0.1*j, 1 , 2) 
+    sprint(tmpStr,"synContraGraph[%d][%d]", i, j)
+    timegraph.addvar(tmpStr, gu.green+1, gu.solidThin, 0.93 + 0.1*j, 1 , 2) 
+   }
+  }
+  timegraph.addvar("p.APthresh", gu.black, gu.dashedThin2, 0.93, 1 , 2)
+  timegraph = null
+ }
+
+ /****************** 
+  * CD Space Graph * 
+  ******************/
+
+  objref spacePlotBox
+  objref neuronSectionList
+  objref neuronShapePlot
+  objref gAxonDen, rvpAxonDen
+  objref gDenDen, rvpDenDen
+ proc /* CD */ makeSpacePlots() { local j, vHigh, vLow
+  vHigh = -35
+  vLow = -80
+  spacePlotBox = null
+  if (flush_list.index(gAxonDen)+1) {
+   flush_list.remove(flush_list.index(gAxonDen))
+  }
+  if (flush_list.index(gDenDen)+1) {
+   flush_list.remove(flush_list.index(gDenDen))
+  }
+  spacePlotBox = new HBox(1)
+  spacePlotBox.intercept(1)
+  neuronSectionList = new SectionList()
+  //axonNode neuronSectionList.append()
+  //axonMyel neuronSectionList.append()
+  axonHill neuronSectionList.append()
+  soma neuronSectionList.append()
+  for j = 0,p.nDen-1 {
+   dendrite[j] neuronSectionList.append()
+  }
+ 
+  neuronShapePlot = new PlotShape(neuronSectionList)
+  neuronShapePlot.scale(vLow,vHigh)
+  neuronShapePlot.show(0)
+  neuronShapePlot.exec_menu("Shape Plot")
+  neuronShapePlot.exec_menu("View = plot")
+  neuronShapePlot.flush()
+  neuronShapePlot.save_name("flush_list.")
+  flush_list.append(neuronShapePlot)
+ 
+  axonNode rvpAxonDen = new RangeVarPlot("v")
+  axonNode rvpAxonDen.begin(0)
+  dendrite[0] rvpAxonDen.end(1)
+  gAxonDen = new Graph() 
+  gAxonDen.size(rvpAxonDen.left(),rvpAxonDen.right(),vLow,vHigh)
+  gAxonDen.align(0.8,-1.4)
+  gAxonDen.color(gu.blue)
+  gAxonDen.label("Potential along Axon, Soma, & Dendrite[0]")
+  gAxonDen.align(1,1)
+  gAxonDen.color(gu.black)
+  gAxonDen.addobject(rvpAxonDen)
+  gAxonDen.yaxis()
+  gAxonDen.save_name("flush_list.")
+  flush_list.append(gAxonDen)
+ 
+  for j = 0,p.nDen/2-1 {
+   axonNode rvpDenDen = new RangeVarPlot("v")
+   dendrite[2*j+1] rvpDenDen.begin(1)
+   dendrite[2*j] rvpDenDen.end(1)
+   gDenDen = new Graph()
+   gDenDen.size(rvpDenDen.left(),rvpDenDen.right(),vLow,vHigh)
+   gDenDen.align(0.8,-1.4)
+   gDenDen.color(gu.blue)
+   sprint(tmpStr, "Potential up Dendrite[%d] & down Dendrite[%d]    ", \
+     2*j+1,2*j)
+   gDenDen.label(tmpStr)
+   gDenDen.align(1,1)
+   gDenDen.color(gu.black)
+   gDenDen.addobject(rvpDenDen)
+   gDenDen.yaxis()
+   gDenDen.save_name("flush_list.")
+   flush_list.append(gDenDen)
+  }
+ 
+  spacePlotBox.intercept(0)
+  sprint(tmpStr,"Space Plot for %s",this)
+  spacePlotBox.map(tmpStr,375,700,800,150)
+ 
+  neuronSectionList = null
+  neuronShapePlot = null
+  gAxonDen = null
+  rvpAxonDen = null
+  gDenDen = null
+  rvpDenDen = null
+ }
+
+ /***************** 
+  * vClamp Current Graph * 
+  *****************/
+
+  objref vCTimegraph
+ proc /* CD */ makeVCTimegraph() { local obIndex
+  obIndex = gu.indexOfObject(this)
+  vCTimegraph = new Graph(0)
+  vCTimegraph.size(0,260,-100,10)
+  vCTimegraph.view(0, -5/p.vClampRes, tstop, 10/p.vClampRes, \
+   15 + 10*obIndex, 485 + 10*obIndex, 825, 150)
+  graphList[0].append(vCTimegraph)
+  vCTimegraph.save_name("graphList[0].") 
+  vCTimegraph.addvar("vClamp.i", gu.blue, gu.solidThin, 0.8, 0.9, 2)
+  timeGraphList.append(vCTimegraph)
+  vCTimegraph = null
+ }
+
+/*******************************/
+
+endtemplate CD
+
+/*******************************/
+
+/******************************
+ * Inhibitory Neuron Template * 
+ ******************************/
+
+begintemplate Inhibitor
+
+ public preinit, cleanup
+
+ external gu
+
+ objref p
+ objref pa
+ objref inputCounter
+ objref spikesToCounter
+ objref counterToSelf
+ objref counterToInSynapses[3][2]
+ create inhibSection
+
+ //objref this // refers to self (automatically)
+ objref null   // null pointer
+ //objref tmpObj // for temporarily holding an object
+ //strdef tmpStr // for temporarily holding a string
+
+ /*******************************
+  * Initialize Inihibitory Cell * 
+  *******************************/
+
+ /* This is called when and only when a new instance of the template 
+    Inhibitor  is instantiated. */
+
+ proc /* Inhibitor */ init() {
+  pa = $o1
+  p = pa.p
+ }
+
+ /********************************* 
+  * Inhibitor Run Initializations * 
+  *********************************/
+
+ proc /* Inhibitor */ preinit() {local i, k
+  create inhibSection
+  inhibSection {
+   inputCounter = new Counter(0)
+   inputCounter.count = p.inIntegrate-1 // start primed for firing
+
+   // first count spikes at axon
+   pa.CDs[0].axonNode spikesToCounter = new NetCon(&v(0), \
+    inputCounter, p.APthresh, 0 , 1) //no delay, unit weight
+
+   // then, when enough spikes, trigger inhibitory synapses
+   objref counterToInSynapses[p.nArray][p.nDen]
+   if (p.gMInSyn > 0) {
+	for k=0,p.nArray-1 {
+	 for i = 0, p.nDen-1 {
+	  inhibSection counterToInSynapses[k][i] = new \
+		NetCon(&inputCounter.count,pa.CDs[k].inSynapse[i], \
+      p.inIntegrate-0.5, p.inDelay, pa.CDs[k].inSynapse[i].gmax)
+	 }
+	}
+	// finally, clear counter and start again
+	inhibSection counterToSelf = new NetCon\
+	  (&inputCounter.count, inputCounter, p.inIntegrate-0.5, 0, -p.inIntegrate)
+   }
+  }
+  // pa = null
+ }
+
+ proc /* Inhibitor */ cleanup() {local i, k
+  // undo preinit() and init() in reverse order
+  counterToSelf = null
+  for k=0,p.nArray-1 {
+   for i = 0, p.nDen-1 {
+    counterToInSynapses[k][i] = null
+   }   
+  }
+  spikesToCounter = null
+  inputCounter = null
+ }
+
+/*******************************/
+
+endtemplate Inhibitor
+
+/*******************************/
+
+/*********************************************** 
+ * Coincidence Detector Array (CDArray) Template * 
+ ***********************************************/
+
+begintemplate CDArray
+
+ public p, CDs, CDI, CDO, initArray, cleanup, \
+  postinit, prerun, postadvance, \
+  APCountWinArray,  \
+  APRateRatio, phasediff, \
+  maketimegraphArray
+
+ external gu, timeGraphList
+
+ objref p
+ objref CDs[2]
+ objref arrayInhibitor
+ objref CDI, CDO
+ objref arrayParams[2]
+ objref CDArrayInfoStripBox
+ objref PSTGraphArrayBox
+ objref APCountWinArrayBox
+ objref exSynapsePSTGraphsArrayBox
+ 
+ objref this
+ objref null
+ 
+ strdef tmpStr
+
+ nArray = -1e12
+ APRateRatio = -1e12
+ phasediff = -1e12
+
+ /******************************
+  * Initialize CDArray Template * 
+  ******************************/
+
+ /* This is called when and only when a new instance of the template 
+    CDArray is instantiated. */
+
+ proc /* CDArray */ init() { local i
+  p = $o1
+  p.nDen = 2*int(p.nDen/2+0.5)
+  p.nExSynPerSide = p.nDen/2 * p.nExSyn
+  nArray = p.nArray
+  objref CDs[p.nArray]
+  objref arrayParams[p.nArray]
+  phasediff = 180/ \
+     (gu.max(p.nArray-1,1))*gu.sgn(-0.5+gu.sgn(1+gu.sgn(p.stimPhaseDegC)))
+   // give phasediff sign of + if phaseC >= 0, sign of - if phaseC <0 
+  for i=0,p.nArray-1 {
+   arrayParams[i] = new cdParam(p)
+   arrayParams[i].stimPhaseDegC = p.stimPhaseDegC+i*phasediff
+   CDs[i] = new CD(arrayParams[i])
+  }
+  arrayInhibitor = new Inhibitor(this) 
+  CDI = CDs[0]
+  CDO = CDs[p.nArray-1]
+  APRateRatio = -1e12
+ }
+
+/****************************** 
+ * CDArray Run Initializations * 
+ ******************************/
+
+ proc /* CDArray */ preinit() { local i
+  for i=0,p.nArray-1 {
+   arrayParams[i].copyValues(p)
+   arrayParams[i].stimPhaseDegC = p.stimPhaseDegC+i*phasediff
+   CDs[i].preinit()
+  }
+  arrayInhibitor.preinit()
+  if (p.nArray > 1) {
+   APRateRatio = 1e12
+  }
+ }
+
+ proc /* CDArray */ postinit() {
+  CDs[0].inform_user()
+ }
+
+ proc /* CDArray */ prerun() {local k
+  for i=0,p.nArray-1 {
+   CDs[i].prerun()
+  }
+ }
+
+ /********************************
+  * CDArray Clean Up After Itself * 
+  ********************************/
+
+ proc /* CDArray */ cleanup() { local i
+  // undo preinit() and init() in reverse order
+  if (arrayInhibitor != null) {
+   arrayInhibitor.cleanup()
+  }
+  arrayInhibitor = null
+  for i=0,p.nArray-1 {
+   if (CDs[i] != null) {
+    CDs[i].cleanup()
+   }
+   CDs[i] = null
+   arrayParams[i] = null
+  }
+ }
+
+ /******************** 
+  * CDArray Main Loop * 
+  ********************/
+
+ proc /* CDArray */ postadvance() {local k
+  for i=0,p.nArray-1 {
+   CDs[i].postadvance()
+  }
+  if (p.nArray > 1) {
+   if (CDO.APStats.n > 0) {
+    APRateRatio = CDI.APStats.n/CDO.APStats.n
+   }
+  }
+ }
+
+ /********************* 
+  * CDArray After Loop * 
+  *********************/
+
+ proc /* CDArray */ postrun() { local i
+  for i=0,p.nArray-1 {
+   CDs[i].calcPSTs()
+  }
+  //PSTGraphArray()
+ }
+
+ /********************** 
+  * CDArray Show Values * 
+  **********************/
+
+ proc /* CDArray */ write(){ local i
+  fprint("%s\n", this)
+  p.write()
+  fprint("stimFreqUse = %g Hz\n", CDs[0].stimFreqUse)
+  fprint("lambdaDenUse = %g um\n", CDs[0].lambdaDenUse)
+  for i=0,p.nArray-1 {
+   fprint("%d deg phase difference:\n", \
+   arrayParams[i].stimPhaseDegC-arrayParams[i].stimPhaseDegI)
+   CDs[i].write()
+  }
+  if (p.nArray > 1) {
+   fprint("Spike Rate Ratio (In/Out) = %g \n", APRateRatio)
+  }
+  fprint("\n")
+ }
+
+ /********************* 
+  * CDArray PST Graphs * 
+  *********************/
+
+ proc /* CDArray */ HorizontalPSTGraphArray() {local i, j, obIndex
+  PSTGraphArrayBox = new HBox(1)
+  PSTGraphArrayBox.intercept(1)
+  for i=0,p.nArray-1 {
+   CDs[i].APPSTGraph()
+   for j=0,gu.nDen-1 {
+    CDs[i].ExSynaparrayotalPSTGraph(j)
+   }
+  }
+  PSTGraphArrayBox.intercept(0)
+  obIndex = gu.indexOfObject(this)
+  sprint(tmpStr, "PSTs: left=in-phase, right=out-of-phase(%d)", obIndex)
+  PSTGraphArrayBox.map(tmpStr, 320 + 20*obIndex, 520 + 20*obIndex, 100, 100)
+  print ""
+ }
+
+ proc /* CDArray */ PSTGraphArray() {local i, obIndex
+  PSTGraphArrayBox = new VBox(1)
+  PSTGraphArrayBox.intercept(1)
+  for i=0,p.nArray-1 {
+   CDs[i].PSTGraph()
+  }
+  PSTGraphArrayBox.intercept(0)
+  obIndex = gu.indexOfObject(this)
+  sprint(tmpStr, "PSTs: upper=in-phase, lower=out-of-phase (%d)", obIndex)
+  PSTGraphArrayBox.map(tmpStr, 392 + 20*obIndex, 623 + 20*obIndex, 100, 100)
+ }
+ 
+ proc /* CDArray */ exSynapsePSTGraphArrayMake() {local i, obIndex
+  exSynapsePSTGraphsArrayBox = new VBox(1)
+  exSynapsePSTGraphsArrayBox.intercept(1)
+  for i=0,p.nArray-1 {
+   CDs[i].exSynapsePSTGraphs()
+  }
+  exSynapsePSTGraphsArrayBox.intercept(0)
+  obIndex = gu.indexOfObject(this)
+  sprint(tmpStr, \
+   "Individual Synapse PSTHs: upper=in-phase, lower=out-of-phase (%d)", \
+   obIndex)
+  exSynapsePSTGraphsArrayBox.map(tmpStr, 10+20*obIndex, 570+20*obIndex, \
+   100, 100)
+ }
+
+ /*********************** 
+  * CDArray Info Windows * 
+  ***********************/
+
+ proc /* CDArray */ CDArrayInfoStrip() { local i, obIndex
+  obIndex = gu.indexOfObject(this)
+  CDArrayInfoStripBox = new VBox()
+  CDArrayInfoStripBox.intercept(1)
+  for i=0,p.nArray-1 {
+   CDs[i].CDInfoStrip()
+  }
+  if (p.nArray > 1) {
+   xpanel("Array Info")
+   xvalue("Spike Rate Ratio (at axon tip)", "APRateRatio", 0,"", 0, 1 )
+   xpanel()
+  }
+  CDArrayInfoStripBox.intercept(0)
+  sprint(tmpStr,"%s",this)
+  CDArrayInfoStripBox.map(tmpStr,20 + 20*obIndex, 190+50 + 20*obIndex, \
+						  768+23,157+18)
+ }
+
+ //proc /* CDArray */ APCountWinArray() {local i, obIndex
+ /*
+  APCountWinArrayBox = new VBox()
+  APCountWinArrayBox.intercept(1)
+  for i=0,p.nArray-1 {
+   CDs[i]I.APCountWin()
+  }
+  APCountWinArrayBox.intercept(0)
+  obIndex = gu.indexOfObject(this)
+  sprint(tmpStr, "Action Potential Counters (%d)", obIndex)
+  APCountWinArrayBox.map(tmpStr, 314 + 20*obIndex, 5+ 20*obIndex, 100, 100)
+ }
+ */
+
+ /********************** 
+  * CDArray Time Graph * 
+  **********************/
+
+ objref timegraphArrayBox
+ proc /* CDArray */ maketimegraphArray() { local i, obIndex, \
+                       showAxonV, showAxonSomaV, showDenV, showStim, showInhib
+  if (numarg()==0) {
+   showAxonV = 1
+   showAxonSomaV = 1
+   showDenV = 1
+   showStim = 1
+   showInhib = 1
+  } else {
+   showAxonV = $1
+   showAxonSomaV = $2
+   showDenV = $3
+   showStim = $4
+   showInhib = $5
+  }
+  timegraphArrayBox = new VBox()
+  timegraphArrayBox.intercept(1)
+  for i=0,p.nArray-1 {
+   CDs[i].maketimegraph(showAxonV, showAxonSomaV, showDenV, showStim, \
+    showInhib)
+   CDs[i].CDInfoStrip()
+  }
+  if (p.nArray > 1) {
+   xpanel("Array Info")
+   xvalue("Spike Rate Ratio (at axon tip)", "APRateRatio", 0,"", 0, 1)
+   xpanel()
+  }
+  timegraphArrayBox.intercept(0)
+  obIndex = gu.indexOfObject(this)
+  if (p.nArray > 1) {
+   sprint(tmpStr, \
+		  "Time Course: upper = in-phase lower = out-of-phase (%d)", obIndex)
+  } else {
+   sprint(tmpStr, "Time Course (%d)", obIndex)
+  }
+  timegraphArrayBox.map(tmpStr, 20 + 20*obIndex, 195+40 + 20*obIndex, \
+    825, gu.min(480,nArray*240))
+  timeGraphList.append(timegraphArrayBox)
+  timegraphArrayBox = null
+ }
+
+
+/*******************************/
+
+endtemplate CDArray
+
+/*******************************/
+
+
+
+/*******************************/
+
+begintemplate inputOutputDisplay
+
+/*******************************/
+
+ external gu, useGraphics,  gr, stimProcName, cdlabVersion, \
+  steps_per_ms, v_init, runStopAt, runStopIn, tstop, realtime, useGraphics, \
+  dtReq, using_cvode_
+//	, use_lvardt_		removed from above list for neuron 5.3 compatibility
+//				tmm 11/25/2002
+ 
+ 
+ public doOutputResults, supraRunList, \
+   saveHocFile, openHocFile, filebase, fileroot
+ 
+ strdef tmpStr, tmpStr2
+ 
+ strdef filebase
+ strdef fileroot
+ strdef filetest
+ fileNum = -1 // declaration
+ objref fileDialog
+ strdef saveOpenFile
+ objref supraRunList		// protect objects from garbage collection
+
+ objref this
+ objref null
+
+ proc /* inputOutputDisplay */ init() {
+  fileNum = 0
+  filebase = ""
+  fileroot = ""
+  fileDialog = new File()
+  saveOpenFile = ""
+  supraRunList = new List()
+ }
+ 
+  strdef fileTxt, fileSum, fileM, fileHoc
+ proc /* inputOutputDisplay */ makeFilebase() {
+  fileNum +=1
+  if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+   sprint(filebase,"x%.4d%s%.3d%%s", \
+    t+.5, gr.secondaryLoopStr, fileNum )
+  } else {
+   if (gu.isNotNoneStr(gr.primaryLoopStr)) {
+    sprint(filebase,"x%.4d%s%.3d%%s", \
+     t+.5, gr.primaryLoopStr, fileNum)
+   } else {
+    sprint(filebase,"x%.4d_%.3d%%s", \
+     t+.5, fileNum)
+   }
+  }
+  sprint(fileTxt,filebase,".txt") // check all possible output types
+  sprint(fileSum,filebase,".sum") 
+  sprint(fileM,filebase,".m") 
+  sprint(fileHoc,filebase,".hoc")
+  if (gu.existsFile(fileTxt)||gu.existsFile(fileSum)||gu.existsFile(fileM)||\
+    gu.existsFile(fileHoc)) {
+   makeFilebase() // call recursively to bump up fileNum until good
+  }
+  sprint(fileroot, filebase,".*")
+  sprint(fileroot, "File(s) saved as: %s",fileroot)
+ }
+ 
+ proc /* inputOutputDisplay */ displayResults() {
+  if (strcmp(gr.userComment,"")) {
+   fprint("# %s\n#\n",gr.userComment)
+  }
+  fprint("Arrays: %d\n",gr.CDArrayList.count())
+  gr.forallcdArrays("write()")
+  fprint("Stimulus: %s\n", stimProcName)
+  if (using_cvode_) {fprint("CVode variable time step used\n")}
+//  if (use_lvardt_)  {fprint("CVode local time steps used\n")}	// removed for nrn 5.3 tmm
+  fprint("dtReq = %g ms\n",dtReq)
+  fprint("dt = %g ms\n",dt)
+  fprint("t = %g ms\n",t)
+  fprint("realtime = %g s\n",realtime)
+  gu.printMachineName()
+  fprint("\n")
+ }
+ 
+  strdef filename
+ proc /* inputOutputDisplay */ saveResults() {
+  if (!strcmp(filebase,"")) {
+   makeFilebase()
+  }
+  sprint(filename,filebase,".txt")
+  print "Saving results to: ",filename
+  wopen(filename)
+  fprint("# %s\n#\n",filename)
+  displayResults()
+  wopen()
+  print "Saving Finished"
+ }
+ 
+  strdef simFileName
+ proc /* inputOutputDisplay */ saveHocFile() {local i, doFlag
+  if (numarg() > 0) {
+   simFileName = $s1
+   doFlag = 1
+   if (!strcmp(simFileName,"")) {
+    if (!strcmp(filebase,"")) {
+	 makeFilebase()
+    }
+	sprint(simFileName,filebase,".hoc")
+   }
+  } else {
+   doFlag = saveFileDialog(simFileName)
+  }
+  if (doFlag) {
+   print ""
+   print "Saving hoc file: ",simFileName
+   wopen(simFileName)
+   fprint("{fprint(\"\\n\")}\n")
+   fprint("{load_file(\"cdlab.hoc\",\"cdlabVersion\")}\n")
+   fprint("print \"Loading file: %s\"\n//\n",simFileName)
+   if (strcmp(gr.userComment,"")) {
+	fprint("// %s\n//\n",gr.userComment)
+	fprint("print \"Comment: %s\"\n",gr.userComment)
+   }
+   fprint("cdlabVersionCreatedBy = %g\n",cdlabVersion)
+   fprint("if (cdlabVersion == cdlabVersionCreatedBy) {\n")
+   gr.p.writeHoc()
+   fprint(" // ")
+   gu.printMachineName()
+   fprint(" \n")
+   fprint(" gr.primaryLoopStr = \"%s\"\n", gr.primaryLoopStr)
+   fprint(" gr.numPrimaryLoop = %d\n", gr.numPrimaryLoop)
+   fprint(" gr.primaryLoopFirst = %g\n", gr.primaryLoopFirst)
+   fprint(" gr.primaryLoopLast = %g\n", gr.primaryLoopLast)
+   fprint(" gr.primaryLoopUseLog = %d\n", gr.primaryLoopUseLog)
+   fprint(" gr.slavePrimaryLoopStr = \"%s\"\n", gr.slavePrimaryLoopStr)
+   fprint(" gr.slavePrimaryLoopFirst = %g\n", gr.slavePrimaryLoopFirst)
+   fprint(" gr.slavePrimaryLoopLast = %g\n", gr.slavePrimaryLoopLast)
+   fprint(" gr.slavePrimaryLoopUseLog = %d\n", gr.slavePrimaryLoopUseLog)
+   fprint(" gr.secondaryLoopStr = \"%s\"\n", gr.secondaryLoopStr)
+   fprint(" gr.numSecondaryLoop = %d\n", gr.numSecondaryLoop)
+   fprint(" gr.secondaryLoopFirst = %g\n", gr.secondaryLoopFirst)
+   fprint(" gr.secondaryLoopLast = %g\n", gr.secondaryLoopLast)
+   fprint(" gr.secondaryLoopUseLog = %d\n", gr.secondaryLoopUseLog)
+   fprint(" gr.slaveSecondaryLoopStr = \"%s\"\n", gr.slaveSecondaryLoopStr)
+   fprint(" gr.slaveSecondaryLoopFirst = %g\n", gr.slaveSecondaryLoopFirst)
+   fprint(" gr.slaveSecondaryLoopLast = %g\n", gr.slaveSecondaryLoopLast)
+   fprint(" gr.slaveSecondaryLoopUseLog = %d\n", gr.slaveSecondaryLoopUseLog)
+   fprint(" gr.lDenFollowsStimFreq = %d\n", gr.lDenFollowsStimFreq)
+   fprint(" gr.somagFollowsDendg = %d\n", gr.somagFollowsDendg)
+   //for i=0,gu.numAnimalTypes-1 {
+   // fprint(" gr.vsFollowsStimFreq[%d] = %d\n", i, gr.vsFollowsStimFreq[i])
+   //}
+   //fprint(" gr.setvsFollowsStimFreq()\n")
+   fprint(" {gr.setvsFollowsStimFreq(%d)}\n",gr.getvsFollowsStimFreq())
+   //for i=0,gu.numStimTypes-1 {
+   // fprint(" gr.stimProcType[%d] = %d\n", i, gr.stimProcType[i])
+   //}
+   //fprint(" gr.setStimProcType()\n")
+   fprint(" {gr.setStimProcType(%d)}\n",gr.getStimProcType())
+   fprint(" //stimProcName = \"%s\"\n",stimProcName)
+   fprint(" gr.userComment = \"%s\"\n",gr.userComment)
+   fprint(" gr.autoSpikeChannels = %d\n", gr.autoSpikeChannels)
+   fprint(" gr.showAllTimeGraphs = %d\n", gr.showAllTimeGraphs)
+   fprint(" gr.showAllInfoStrips = %d\n", gr.showAllInfoStrips)
+   fprint(" gr.showAxonV = %d\n", gr.showAxonV)
+   fprint(" gr.showAxonSomaV = %d\n", gr.showAxonSomaV)
+   fprint(" gr.showDenV = %d\n", gr.showDenV)
+   fprint(" gr.showStim = %d\n", gr.showStim)
+   fprint(" gr.showInhib = %d\n", gr.showInhib)
+   fprint(" gr.commentPrompt = %d\n", gr.commentPrompt)
+   fprint(" gr.saveResults = %d\n", gr.saveResults)
+   fprint(" gr.displayResults = %d\n", gr.displayResults)
+   fprint(" gr.summaryResultsWin = %d\n", gr.summaryResultsWin)
+   fprint(" gr.displaySummary = %d\n", gr.displaySummary)
+   fprint(" gr.saveSummary = %d\n", gr.saveSummary)
+   fprint(" gr.saveMFile = %d\n", gr.saveMFile)
+   fprint(" gr.saveHocFile = %d\n", gr.saveHocFile)
+   fprint(" \n")
+   fprint(" celsius = %g\n", celsius)
+   fprint(" using_cvode_ = %d\n", using_cvode_)
+//   fprint(" use_lvardt_ = %d\n", use_lvardt_)
+   fprint(" if (object_id(cvode)) {cvode_active() cvode_local()}\n")
+   fprint(" dtReq = %g\n", dtReq)
+   fprint(" dt = %g\n", dt)
+   fprint(" steps_per_ms = %g\n", steps_per_ms)
+   fprint(" v_init = %g\n", v_init)
+   fprint(" runStopAt = %g\n", runStopAt)
+   fprint(" runStopIn = %g\n", runStopIn)
+   fprint(" tstop = %g\n", tstop)
+   fprint(" realtime = %g\n", realtime)
+   fprint(" useGraphics = %d\n", useGraphics)
+   fprint(" {execute1(\"proc userpostrun() {}\")}\n")
+   fprint(" {doNotify()}\n")
+   fprint("} else {\n")
+   fprint(" fprint(\"Error: Wrong Version:\\n\")\n")
+   fprint(" fprint(\" %s created by cdlab v. %g, but running v. \")\n", \
+	 simFileName, cdlabVersion)
+   fprint(" fprint(\"%%gu.\\n\",cdlabVersion)\n")
+   fprint("}\n")
+   wopen()
+   print "Saving Finished"
+  }
+ }
+
+  strdef simFileName
+ proc /* inputOutputDisplay */ openHocFile() {local doFlag
+  if (numarg() > 0) {
+   simFileName = $s1
+   doFlag = 1
+  } else {
+   doFlag = openFileDialog(simFileName)
+  }
+  if (doFlag) {
+   sprint(tmpStr,"{xopen(\"%s\")}",simFileName)
+   execute1(tmpStr) // want to read in global context, not inside this class
+  }
+ }
+
+ func /* inputOutputDisplay */ saveFileDialog() { local doFlag
+  fileDialog.chooser("w", "Saving Simulation", "*.hoc")
+  doFlag = fileDialog.chooser()
+  if (doFlag) {
+   fileDialog.getname(saveOpenFile)
+  }
+  $s1 = saveOpenFile
+  return doFlag
+ }
+
+ func /* inputOutputDisplay */ openFileDialog() { local doFlag
+  fileDialog.chooser("r", "Opening Simulation", "*.hoc")
+  doFlag = fileDialog.chooser()
+  if (doFlag) {
+   fileDialog.getname(saveOpenFile)
+  }
+  $s1 = saveOpenFile
+  return doFlag
+ }
+
+ objref ratesArr[2]
+ objref ratesI, ratesO, ITDDiscrim
+ objref VSsArr[2]
+ objref VSsI, VSsO
+ objref VSStim
+ objref primaryLoopVars, slavePrimaryLoopVars
+ objref secondaryLoopVars, slaveSecondaryLoopVars
+ primaryMin = -1e12
+ primaryMax = -1e12
+ secondaryMin = -1e12
+ secondaryMax = -1e12
+ 
+ 
+ proc /* inputOutputDisplay */ prepareSummary() {local i, j, k, \
+                        primaryLeft, primaryRight, primaryDelta, \
+                        secondaryLeft, secondaryRight, secondaryDelta \
+  primaryLoopVars = new Vector(gr.numPrimaryLoop)
+  slavePrimaryLoopVars = new Vector(gr.numPrimaryLoop)
+  secondaryLoopVars = new Vector(gr.numSecondaryLoop)
+  slaveSecondaryLoopVars = new Vector(gr.numSecondaryLoop)
+  objref ratesArr[gr.p.nArray]
+  objref VSsArr[gr.p.nArray]
+  for i=0,gr.p.nArray-1 {
+   ratesArr[i] = new Matrix(gr.numPrimaryLoop, gr.numSecondaryLoop)
+   VSsArr[i] = new Matrix(gr.numPrimaryLoop, gr.numSecondaryLoop)
+  }
+  ratesI = ratesArr[0]
+  ratesO = ratesArr[gr.p.nArray-1]
+  ITDDiscrim = new Matrix(gr.numPrimaryLoop, gr.numSecondaryLoop)
+  VSsI = VSsArr[0]
+  VSsO = VSsArr[gr.p.nArray-1]
+  VSStim =  new Matrix(gr.numPrimaryLoop, gr.numSecondaryLoop)
+  for i=0,gr.numPrimaryLoop-1 {
+   for j=0,gr.numSecondaryLoop-1 {
+    if (gu.isNotNoneStr(gr.primaryLoopStr)) {
+     if (gr.primaryLoopUseLog) {
+      sprint(tmpStr, \
+       "primaryLoopVars.x[%d] = %g*%g^(%d/gu.max(gr.numPrimaryLoop-1,1))", \
+       i, gr.primaryLoopFirst, gr.primaryLoopLast/gr.primaryLoopFirst, i)
+     } else {
+      sprint(tmpStr, \
+       "primaryLoopVars.x[%d] = %g + %g*%d/gu.max(gr.numPrimaryLoop-1,1)", \
+       i, gr.primaryLoopFirst, gr.primaryLoopLast-gr.primaryLoopFirst, i)
+     }
+     execute1(tmpStr,this)
+    }
+    if (gu.isNotNoneStr(gr.slavePrimaryLoopStr)) {
+     if (gr.slavePrimaryLoopUseLog) {
+      sprint(tmpStr, \
+       "slavePrimaryLoopVars.x[%d]=%g*%g^(%d/gu.max(gr.numPrimaryLoop-1,1))", \
+       i, gr.slavePrimaryLoopFirst, \
+       gr.slavePrimaryLoopLast/gr.slavePrimaryLoopFirst, i)
+     } else {
+      sprint(tmpStr, \
+       "slavePrimaryLoopVars.x[%d]=%g + %g*%d/gu.max(gr.numPrimaryLoop-1,1)", \
+       i, gr.slavePrimaryLoopFirst, \
+       gr.slavePrimaryLoopLast-gr.slavePrimaryLoopFirst, i)
+     }
+    }
+    if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+     if (gr.secondaryLoopUseLog) {
+      sprint(tmpStr, \
+       "secondaryLoopVars.x[%d]=%g*%g^(%d/gu.max(gr.numSecondaryLoop-1,1))", \
+       j, gr.secondaryLoopFirst, gr.secondaryLoopLast/gr.secondaryLoopFirst, j)
+     } else {
+      sprint(tmpStr, \
+       "secondaryLoopVars.x[%d]=%g + %g*%d/gu.max(gr.numSecondaryLoop-1,1)", \
+       j, gr.secondaryLoopFirst, gr.secondaryLoopLast-gr.secondaryLoopFirst, j)
+     }
+     execute1(tmpStr,this)
+     if (gu.isNotNoneStr(gr.slaveSecondaryLoopStr)) {
+      if (gr.slaveSecondaryLoopUseLog) {
+       sprint(tmpStr, \
+        "slaveSecondaryLoopVars.x[%d]=%g*%g^(%d/gu.max(gr.numSecondaryLoop-1,1))", \
+        j, gr.slaveSecondaryLoopFirst, \
+        gr.slaveSecondaryLoopLast/gr.slaveSecondaryLoopFirst, j)
+      } else {
+       sprint(tmpStr, \
+        "slaveSecondaryLoopVars.x[%d]=%g+%g*%d/gu.max(gr.numSecondaryLoop-1,1)", \
+        j, gr.slaveSecondaryLoopFirst, \
+        gr.slaveSecondaryLoopLast-gr.slaveSecondaryLoopFirst, j)
+      }
+      execute1(tmpStr,this)
+     }
+    }
+    ratesI.x[i][j] = gr.CDArrayloop[i][j].CDI.APRate
+    VSsI.x[i][j] = int(100*gr.CDArrayloop[i][j].CDI.APStats.vs+.5)
+    for k=1,gr.p.nArray-2 {
+     ratesArr[k].x[i][j] = gr.CDArrayloop[i][j].CDs[k].APRate
+     VSsArr[k].x[i][j] = int(100*gr.CDArrayloop[i][j].CDs[k].APStats.vs+.5)
+    }
+    ratesO.x[i][j] = gr.CDArrayloop[i][j].CDO.APRate
+    VSsO.x[i][j] = int(100*gr.CDArrayloop[i][j].CDO.APStats.vs+.5)
+    if (gr.CDArrayloop[i][j].APRateRatio) {
+     ITDDiscrim.x[i][j] = (1-1/gr.CDArrayloop[i][j].APRateRatio)*350
+    } else {
+     ITDDiscrim.x[i][j] = -1e12
+    }
+    VSStim.x[i][j] = int(100*gr.CDArrayloop[i][j].CDI.p.stimVS+.5)
+   }
+  }
+  if (gr.primaryLoopUseLog) {
+   if (gr.numPrimaryLoop > 1) {
+    primaryDelta = sqrt(primaryLoopVars.x[1]/primaryLoopVars.x[0])
+    primaryLeft = primaryLoopVars.x[0]/primaryDelta
+    primaryRight = primaryLoopVars.x[gr.numPrimaryLoop-1]*primaryDelta
+   } else {
+    primaryDelta = 2
+    primaryLeft = primaryLoopVars.x[0]/primaryDelta
+    primaryRight = primaryLoopVars.x[0]*primaryDelta
+   }
+  } else {
+   if (gr.numPrimaryLoop > 1) {
+    primaryDelta =0.5*(primaryLoopVars.x[1]-primaryLoopVars.x[0])
+    primaryLeft = primaryLoopVars.x[0] - primaryDelta
+    primaryRight = primaryLoopVars.x[gr.numPrimaryLoop-1]+primaryDelta
+   } else {
+    primaryDelta = 2
+    primaryLeft = primaryLoopVars.x[0]/primaryDelta
+    primaryRight = primaryLoopVars.x[0]*primaryDelta
+   }
+  }
+  primaryMin = gu.min(gu.min(primaryLeft, primaryRight),0)
+  primaryMax = gu.max(gu.max(primaryLeft, primaryRight),0)
+  if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+   if (gr.secondaryLoopUseLog) {
+    if (gr.numSecondaryLoop > 1) {
+     secondaryDelta = sqrt(secondaryLoopVars.x[1]/secondaryLoopVars.x[0])
+     secondaryLeft = secondaryLoopVars.x[0]/secondaryDelta
+     secondaryRight = secondaryLoopVars.x[gr.numSecondaryLoop-1]*secondaryDelta
+    } else {
+     secondaryDelta = 2
+     secondaryLeft = secondaryLoopVars.x[0]/secondaryDelta
+     secondaryRight = secondaryLoopVars.x[0]*secondaryDelta
+    }
+   } else {
+    if (gr.numSecondaryLoop > 1) {
+     secondaryDelta =0.5*(secondaryLoopVars.x[1]-secondaryLoopVars.x[0])
+     secondaryLeft = secondaryLoopVars.x[0] - secondaryDelta
+     secondaryRight = secondaryLoopVars.x[gr.numSecondaryLoop-1]+secondaryDelta
+    } else {
+     secondaryDelta = 2
+     secondaryLeft = secondaryLoopVars.x[0]/secondaryDelta
+     secondaryRight = secondaryLoopVars.x[0]*secondaryDelta
+    }
+   }
+   secondaryMin = gu.min(gu.min(secondaryLeft, secondaryRight),0)
+   secondaryMax = gu.max(gu.max(secondaryLeft, secondaryRight),0)
+  }
+ }
+ 
+  objref apvGraph, apvVar, apvVars
+  strdef apvLabel
+ proc /* inputOutputDisplay */ addPlotVar() { local apvColor, apvIndex, apvLevel
+  apvGraph = $o1
+  apvVar   = $o2
+  apvLabel = $s3
+  apvColor = $4
+  apvIndex = $5
+  apvVars  = $o6
+  apvLevel = $7
+  apvGraph.color(apvColor) apvGraph.brush(gu.dashedThin)
+  apvGraph.label(apvLabel)
+  if (apvLevel == 1) {
+   apvVar.getcol(apvIndex).line(apvGraph,apvVars)
+  } else {
+   apvVar.getrow(apvIndex).line(apvGraph,apvVars)
+  }
+  objref apvGraph, apvVar, apvVars
+  strdef apvLabel
+ }
+ 
+  objref rwBox
+  objref rwGRate,rwGVS
+  objref rwLoopVars, rwAltVars
+  strdef rwLoopStr, rwAltStr
+ proc /* inputOutputDisplay */ resultsWin() { local j, rwLevel, rwMin, rwMax
+  j = $1
+  rwLevel = $2
+  if (rwLevel == 1) {
+   rwMin = primaryMin
+   rwMax = primaryMax
+   rwLoopStr = gr.primaryLoopStr
+   rwLoopVars = primaryLoopVars
+   rwAltStr = gr.secondaryLoopStr
+   rwAltVars = secondaryLoopVars
+  } else {
+   rwMin = secondaryMin
+   rwMax = secondaryMax
+   rwLoopStr = gr.secondaryLoopStr
+   rwLoopVars = secondaryLoopVars
+   rwAltStr = gr.primaryLoopStr
+   rwAltVars = primaryLoopVars
+  }
+  rwBox = new VBox()
+  rwBox.intercept(1)
+  rwGRate = new Graph(0)
+  rwGRate.size(rwMin, rwMax, 0, 900)
+  rwGRate.align(0.6,-.3)
+  rwGRate.color(gu.magenta)
+  if ((abs(strcmp(rwLoopStr,  "stimFreq"))) && \
+      (abs(strcmp(rwAltStr,"stimFreq")))) {
+   sprint(tmpStr,"%d Hz Stimulus", gr.p.stimFreq)
+   rwGRate.label(tmpStr)
+  }
+  rwGRate.align(0.6,0)
+  rwGRate.color(gu.black)
+  rwGRate.label("Spike Rate (s^-1)")
+  sprint(tmpStr,"vs. %s",rwLoopStr)
+  rwGRate.label(tmpStr)
+  if (gu.isNotNoneStr(rwAltStr)) {
+   sprint(tmpStr,"%s = %g",rwAltStr,rwAltVars.x[j])
+   rwGRate.label(tmpStr)  
+  }
+  addPlotVar(rwGRate, ratesO, "Out-of-Phase", gu.blue, j, rwLoopVars,rwLevel)
+  addPlotVar(rwGRate, ratesI, "In-Phase", gu.red, j, rwLoopVars,rwLevel)
+  addPlotVar(rwGRate, ITDDiscrim, "ITD Discrim. (x350)", gu.magenta, j, rwLoopVars,rwLevel)
+  rwGRate.color(gu.black) rwGRate.brush(gu.solidThin)
+  rwGRate.view(rwMin, 0, rwMax - rwMin , 900, 0, 0, 275, 235)
+  rwGVS = new Graph(0)
+  rwGVS.size(rwMin, rwMax, 0, 100)
+  rwGVS.align(0.6,0)
+  rwGVS.color(gu.black) rwGVS.brush(gu.solidThin)
+  rwGVS.label("Vector Strength (x100)")
+  sprint(tmpStr,"vs. %s",rwLoopStr)
+  rwGVS.label(tmpStr)
+  //addPlotVar(rwGVS, VSsO, "Out-of-Phase", gu.blue, j, rwLoopVars,rwLevel)
+  addPlotVar(rwGVS, VSsI, "In-Phase", gu.red, j, rwLoopVars,rwLevel)
+  addPlotVar(rwGVS, VSStim, "Stimulus", gu.green, j, rwLoopVars,rwLevel)
+  rwGVS.color(gu.black) rwGVS.brush(gu.solidThin)
+  rwGVS.view(rwMin, 0, rwMax - rwMin, 100, 0, 0, 275, 100)
+  rwBox.intercept(0)
+  rwBox.map("Summary Results")
+  supraRunList.append(rwBox)
+  objref rwBox
+  objref rwGRate,rwGVS
+  objref rwLoopVars, rwAltVars
+  strdef rwLoopStr, rwAltStr
+ }
+ 
+  objref resultsBox
+ proc /* inputOutputDisplay */ summaryResultsWin() { local i
+  if (useGraphics) {
+   if (gr.numPrimaryLoop>1) {
+    resultsBox = new HBox()
+    resultsBox.intercept(1)
+    for i=0,gr.numSecondaryLoop-1{
+     resultsWin(i,1)
+    }
+    resultsBox.intercept(0)
+    resultsBox.map("Results vs. Primary Parameter")
+    supraRunList.append(resultsBox)
+   }
+   if (gr.numSecondaryLoop>1) {
+    resultsBox = new HBox()
+    resultsBox.intercept(1)
+    for i=0,gr.numPrimaryLoop-1{
+     resultsWin(i,2)
+    }
+    resultsBox.intercept(0)
+    resultsBox.map("Results vs. Secondary Parameter")
+    supraRunList.append(resultsBox)
+   }
+  } else {
+   print "Can't display Summary Results Window unless useGraphics is true"
+  }
+ }
+ 
+ proc /* inputOutputDisplay */ displaySummary() { local i
+  for i=0,gr.numSecondaryLoop-1 {
+   writePrimarySummary(i)
+  }
+  if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+   for i=0,gr.numPrimaryLoop-1 {
+    writeSecondarySummary(i)
+   }
+  }
+ }
+ 
+ proc /* inputOutputDisplay */ writePrimarySummary() { local i,j,k
+  j = $1
+  if (gu.isNotNoneStr(gr.primaryLoopStr)) {
+   fprint("Primary Parameter--%s:", gr.primaryLoopStr)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3g", primaryLoopVars.x[i])
+   fprint("\n")
+  }
+  if (gu.isNotNoneStr(gr.slavePrimaryLoopStr)) {
+   fprint("Slave Parameter--%s:", gr.slavePrimaryLoopStr)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3g", slavePrimaryLoopVars.x[i])
+   fprint("\n")
+  }
+  if (gr.lDenFollowsStimFreq) {
+   if (!strcmp(gr.primaryLoopStr,"stimFreq")) {
+    fprint("lDen:                        ")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+      gu.stimFreqTolDen(primaryLoopVars.x[i]))
+    fprint("\n")
+   }
+   if (!strcmp(gr.slavePrimaryLoopStr,"stimFreq")) {
+    fprint("lDen:                        ")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+     gu.stimFreqTolDen(slavePrimaryLoopVars.x[i]))
+    fprint("\n")
+   }
+  }
+  if (gr.getvsFollowsStimFreq()) {
+   if (!strcmp(gr.primaryLoopStr,"stimFreq")) {
+    fprint("stimVS:                      ")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+     gu.stimFreqToStimVS(primaryLoopVars.x[i], gr.getvsFollowsStimFreq()))
+    fprint("\n")
+   }
+   if (!strcmp(gr.slavePrimaryLoopStr,"stimFreq")) {
+    fprint("stimVS:                      ")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+     gu.stimFreqToStimVS(slavePrimaryLoopVars.x[i], gr.getvsFollowsStimFreq()))
+    fprint("\n")
+   }
+  }
+  fprint("Rate In-Phase [spikes/s]:    ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ratesI.getcol(j).x[i])
+  fprint("\n")
+  for k=1,gr.p.nArray-2 {
+   fprint("Rate DPhase %3d[spikes/s]:   ", k*gr.CDArrayloop[0][0].phasediff)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ratesArr[k].getcol(j).x[i])
+   fprint("\n")
+  } 
+  fprint("Rate Out-of-Phase [spikes/s]:")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ratesO.getcol(j).x[i])
+  fprint("\n")
+  fprint("ITD Discrim. [x350]:     ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ITDDiscrim.getcol(j).x[i])
+  fprint("\n")
+  fprint("Vector Strength In-Phase:    ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSsI.getcol(j).x[i])
+  fprint("\n")
+  for k=1,gr.p.nArray-2 {
+   fprint("VS DPhase %3d[spikes/s]:     ", k*gr.CDArrayloop[0][0].phasediff)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSsArr[k].getcol(j).x[i])
+   fprint("\n")
+  } 
+  fprint("Vector Strength Out-of-Phase:")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSsO.getcol(j).x[i])
+  fprint("\n")
+  fprint("Vector Strength Stimulus:    ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSStim.getcol(j).x[i])
+  fprint("\n")
+  fprint("Stimulus Frequency [Hz]: %d\n",gr.p.stimFreq)
+ }
+ 
+ proc /* inputOutputDisplay */ writeSecondarySummary() { local i,j,k
+  j = $1
+  fprint("Secondary Parameter--%s:", gr.secondaryLoopStr)
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3g", secondaryLoopVars.x[i])
+  fprint("\n")
+  if (gu.isNotNoneStr(gr.slaveSecondaryLoopStr)) {
+   fprint("Slave Parameter--%s:", gr.slaveSecondaryLoopStr)
+   for i=0,gr.numSecondaryLoop-1 fprint(" %3g", slaveSecondaryLoopVars.x[i])
+   fprint("\n")
+  }
+  fprint("Rate In-Phase [spikes/s]:    ")
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3d", ratesI.getrow(j).x[i])
+  fprint("\n")
+  for k=1,gr.p.nArray-2 {
+   fprint("Rate DPhase %3d[spikes/s]:   ", k*gr.CDArrayloop[0][0].phasediff)
+   for i=0,gr.numSecondaryLoop-1 fprint(" %3d", ratesArr[k].getrow(j).x[i])
+   fprint("\n")
+  } 
+  fprint("Rate Out-of-Phase [spikes/s]:")
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3d", ratesO.getrow(j).x[i])
+  fprint("\n")
+  fprint("ITD Discrim. [x350]:     ")
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3d", ITDDiscrim.getrow(j).x[i])
+  fprint("\n")
+  fprint("Vector Strength In-Phase:    ")
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3d", VSsI.getrow(j).x[i])
+  fprint("\n")
+  for k=1,gr.p.nArray-2 {
+   fprint("VS DPhase %3d[spikes/s]:     ", k*gr.CDArrayloop[0][0].phasediff)
+   for i=0,gr.numSecondaryLoop-1 fprint(" %3d", VSsArr[k].getrow(j).x[i])
+   fprint("\n")
+  } 
+  fprint("Vector Strength Out-of-Phase:")
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3d", VSsO.getrow(j).x[i])
+  fprint("\n")
+  fprint("Vector Strength Stimulus:    ")
+  for i=0,gr.numSecondaryLoop-1 fprint(" %3d", VSStim.getrow(j).x[i])
+  fprint("\n")
+  fprint("Stimulus Frequency [Hz]: %d\n",gr.p.stimFreq)
+ }
+ 
+ proc /* inputOutputDisplay */ saveSummary() { local i
+  if (!strcmp(filebase,"")) {
+   makeFilebase()
+  }
+  sprint(filename,filebase,".sum")
+  print "\nSaving Summary to: ",filename
+  wopen(filename)
+  fprint("# %s\n#\n",filename)
+  if (strcmp(gr.userComment,"")) {
+   fprint("# %s\n#\n",gr.userComment)
+  }
+  for i=0,gr.numSecondaryLoop-1 {
+   writePrimarySummary(i)
+  }
+  if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+   for i=0,gr.numPrimaryLoop-1 {
+    writeSecondarySummary(i)
+   }
+  }
+  wopen()
+  print "Saving Finished"
+ }
+ 
+ proc /* inputOutputDisplay */ savePrimaryMFileInit() {
+  fprint("%% %s\n%%\n",filename)
+  if (strcmp(gr.userComment,"")) {
+   fprint("%% %s\n%%\n",gr.userComment)
+   fprint("disp('Comment: %s')\n",gr.userComment)
+  }
+  fprint("figure;\n")
+  fprint("nPlots = %d;\n", gr.numSecondaryLoop)
+  fprint("set(gcf,'Position', [296 440 435 130*nPlots]);\n\n")
+  fprint("lDen = [];\n")
+  fprint("stimVS = [];\n")
+  if (gu.isNotNoneStr(gr.primaryLoopStr)) {
+   fprint("primaryLoopStr = '%s';\n", gr.primaryLoopStr)
+   fprint("%s = [ ", gr.primaryLoopStr)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3g", primaryLoopVars.x[i])
+   fprint(" ];\n")
+  } else {
+   fprint("primaryLoopStr = '';\n")
+  }
+  if (gu.isNotNoneStr(gr.slavePrimaryLoopStr)) {
+   fprint("slavePrimaryLoopStr = '%s';\n", gr.slavePrimaryLoopStr)
+   fprint("%s = [ ", gr.slavePrimaryLoopStr)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3g", slavePrimaryLoopVars.x[i])
+   fprint(" ];\n")
+  } else {
+   fprint("slavePrimaryLoopStr = '';\n")
+  }
+  if (gr.lDenFollowsStimFreq) {
+   if (!strcmp(gr.primaryLoopStr,"stimFreq")) {
+    fprint("lDen = [")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+      gu.stimFreqTolDen(primaryLoopVars.x[i]))
+    fprint(" ];\n")
+   }
+   if (!strcmp(gr.slavePrimaryLoopStr,"stimFreq")) {
+    fprint("lDen = [")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+     gu.stimFreqTolDen(slavePrimaryLoopVars.x[i]))
+     fprint(" ];\n")
+   }
+  }
+  if (gr.getvsFollowsStimFreq()) {
+   if (!strcmp(gr.primaryLoopStr,"stimFreq")) {
+    fprint("stimVS = [")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+     gu.stimFreqToStimVS(primaryLoopVars.x[i], gr.getvsFollowsStimFreq()))
+    fprint(" ];\n")
+   }
+   if (!strcmp(gr.slavePrimaryLoopStr,"stimFreq")) {
+    fprint("stimVS = [")
+    for i=0,gr.numPrimaryLoop-1 fprint(" %3g", \
+     gu.stimFreqToStimVS(slavePrimaryLoopVars.x[i], gr.getvsFollowsStimFreq()))
+    fprint(" ];\n")
+   }
+  }
+ }
+ 
+ proc /* inputOutputDisplay */ saveSecondaryMFileInit() { local i
+  if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+   fprint("secondaryLoopStr = '%s';\n", gr.secondaryLoopStr)
+   fprint("%s = [ ", gr.secondaryLoopStr)
+   for i=0,gr.numSecondaryLoop-1 fprint(" %3g", secondaryLoopVars.x[i])
+   fprint(" ];\n")
+  }
+  if (gu.isNotNoneStr(gr.slaveSecondaryLoopStr)) {
+   fprint("slaveSecondaryLoopStr = '%s';\n", gr.slaveSecondaryLoopStr)
+   fprint("%s = [ ", gr.slaveSecondaryLoopStr)
+   for i=0,gr.numSecondaryLoop-1 fprint(" %3g", slaveSecondaryLoopVars.x[i])
+   fprint(" ];\n")
+  } else {
+   fprint("slaveSecondaryLoopStr = '';\n")
+  }
+ }
+ 
+ proc /* inputOutputDisplay */ savePrimaryMFile() { local i,j,k
+  j = $1
+  fprint("subplot(nPlots, 1, %d);\n",j+1)
+  fprint("RateIn  = [ ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ratesI.getcol(j).x[i])
+  fprint(" ];\n")
+  for k=1,gr.p.nArray-2 {
+   fprint("Rate%1d  = [ ", k*gr.CDArrayloop[0][0].phasediff)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ratesArr[k].getcol(j).x[i])
+   fprint(" ];\n")
+  } 
+  fprint("RateOut =[ ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", ratesO.getcol(j).x[i])
+  fprint(" ];\n")
+  fprint("VectorStrengthIn = [ ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSsI.getcol(j).x[i])
+  fprint(" ];\n")
+  for k=1,gr.p.nArray-2 {
+   fprint("VectorStrength%1d  = [ ", k*gr.CDArrayloop[0][0].phasediff)
+   for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSsArr[k].getcol(j).x[i])
+   fprint(" ];\n")
+  } 
+  fprint("VectorStrengthOut = [ ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSsO.getcol(j).x[i])
+  fprint(" ];\n")
+  fprint("VectorStrengthStim = [ ")
+  for i=0,gr.numPrimaryLoop-1 fprint(" %3d", VSStim.getcol(j).x[i])
+  fprint(" ];\n")
+  if (gu.isNotNoneStr(gr.primaryLoopStr)) {
+   tmpStr = gr.primaryLoopStr
+  } else {
+   tmpStr = "[]"
+  }
+  if (gu.isNotNoneStr(gr.slavePrimaryLoopStr)) {
+   tmpStr2 = gr.slavePrimaryLoopStr
+  } else {
+   tmpStr2 = "[]"
+  }
+  fprint("PlotSpikeRates(%s, %s, RateIn, RateOut, VectorStrengthIn, ...\n" \
+   , tmpStr, tmpStr2)
+  fprint("VectorStrengthStim, primaryLoopStr, slavePrimaryLoopStr, ...\n")
+  if (gu.isNotNoneStr(gr.secondaryLoopStr)) {
+   tmpStr = gr.secondaryLoopStr
+  } else {
+   tmpStr = ""
+  }
+  fprint(" lDen, stimVS, '%s', %3g);\n", tmpStr, secondaryLoopVars.x[j] )
+ }
+ 
+ proc /* inputOutputDisplay */ saveSecondaryMFile() {
+ }
+ 
+  strdef s1,s2,s3,s4,s5
+ proc /* inputOutputDisplay */ saveMFile() { local subs
+  if (!strcmp(filebase,"")) {
+   makeFilebase()
+  }
+  sprint(filename,filebase,".m")
+  print "Saving matlab file to: ",filename
+  wopen(filename)
+  savePrimaryMFileInit() 
+  saveSecondaryMFileInit() 
+  for i=0,gr.numSecondaryLoop-1 {
+   savePrimaryMFile(i)
+  }
+  //for i=0,gr.numPrimaryLoop-1 {
+  // saveSecondaryMFile(i)
+  //}
+  wopen()
+  print "Saving matlab file Finished"
+ }
+ 
+ proc /* inputOutputDisplay */ doOutputResults() {
+  if (t > gr.p.ignoreSpikesBefore) {
+   makeFilebase()
+   if (gr.saveResults) saveResults()
+   if (gr.displayResults) displayResults()
+   prepareSummary()
+   if (gr.summaryResultsWin) summaryResultsWin()
+   if (gr.displaySummary) displaySummary() 
+   if (gr.saveSummary) saveSummary()
+   if (gr.saveMFile) saveMFile()
+   if (gr.saveHocFile) saveHocFile("")
+  }
+  if (strcmp(gr.userComment,"")) {
+   fprint("Comment: %s\n",gr.userComment)
+  }
+ }
+ 
+/*******************************/
+
+endtemplate inputOutputDisplay
+
+/*******************************/
+
+
+/*******************************/
+
+begintemplate runtime
+
+/*******************************/
+
+ public numPrimaryLoop, primaryLoopStr, primaryLoopFirst, primaryLoopLast, \
+  primaryLoopUseLog, slavePrimaryLoopStr, slavePrimaryLoopFirst, \
+  slavePrimaryLoopLast, slavePrimaryLoopUseLog, \
+  numSecondaryLoop, secondaryLoopStr, secondaryLoopFirst, secondaryLoopLast, \
+  secondaryLoopUseLog, slaveSecondaryLoopStr, slaveSecondaryLoopFirst, \
+  slaveSecondaryLoopLast, slaveSecondaryLoopUseLog, \
+  lDenFollowsStimFreq, somagFollowsDendg, autoSpikeChannels, \
+  vsFollowsStimFreq, getvsFollowsStimFreq, setvsFollowsStimFreq, \
+  setStimProcType, getStimProcType, stimProcType, commentPrompt, \
+  userComment, showAllTimeGraphs, showAllInfoStrips, \
+  showAxonV, showAxonSomaV, showDenV, showStim, showInhib, \
+  saveResults, summaryResultsWin, displaySummary, saveSummary, saveMFile, \
+  displayResults, saveHocFile, \
+  p, ploop, CDArrayloop, CDArrayList, \
+  forallcds, forallcdArrays, \
+  displaysControl, simControl, runControlCD,  mainPanelCD, \
+  preinit, postinit, prerun, preadvance, postadvance, postrun
+
+ 
+ external gu, gp, go, gpi, versionStr, stimProcName, timeGraphList, cvode, \
+   steps_per_ms, dtReq, graphList, realtime, useGraphics, requestdt, \
+   v_init, tstop, runStopAt, runStopIn, using_cvode_,  run, \
+   stdinit, setdt, \
+   cvode_active, cvode_local, continuerun, steprun, tstop_changed, \
+   stdrun_quiet, graphmenu, pointprocessesmenu, distmechmenu, \
+   miscellaneousmenu, userpostrun
+// use_lvardt_ 	removed from above for nrn 5.3 compatibility TMM
+ /***************** 
+  * Declarations  * 
+  *****************/
+ 
+ // Doubles can't be declared, so we define them with -1e12
+ strdef primaryLoopStr, slavePrimaryLoopStr
+ numPrimaryLoop = -1e12
+ primaryLoopFirst = -1e12
+ primaryLoopLast = -1e12
+ primaryLoopUseLog = -1e12
+ slavePrimaryLoopFirst = -1e12
+ slavePrimaryLoopLast = -1e12
+ slavePrimaryLoopUseLog = -1e12
+ 
+ strdef secondaryLoopStr, slaveSecondaryLoopStr
+ numSecondaryLoop = -1e12
+ secondaryLoopFirst = -1e12
+ secondaryLoopLast = -1e12
+ secondaryLoopUseLog = -1e12
+ slaveSecondaryLoopFirst = -1e12
+ slaveSecondaryLoopLast = -1e12
+ slaveSecondaryLoopUseLog = -1e12
+ 
+ lDenFollowsStimFreq = -1e12
+ somagFollowsDendg = -1e12
+ autoSpikeChannels = -1e12
+ double vsFollowsStimFreq[4]
+ double stimProcType[2]
+ 
+ showAllTimeGraphs = -1e12
+ showAllInfoStrips = -1e12
+ showAxonV = -1e12
+ showAxonSomaV = -1e12
+ showDenV = -1e12
+ showStim = -1e12
+ showInhib = -1e12
+ commentPrompt = -1e12
+ strdef userComment
+  
+ saveResults = -1e12
+ displayResults = -1e12
+ summaryResultsWin = -1e12
+ displaySummary = -1e12
+ saveSummary = -1e12
+ saveMFile = -1e12
+ saveHocFile = -1e12
+
+ 
+ objref CDList	            // lists Coincidence Detectors                     
+ objref CDArrayList	        // lists Coincidence Detector Arrays
+ objref p                   // internal copy of gp (to protect from user)
+ objref ploop[1][1]         // will be [numPrimaryLoop][numSecondaryLoop]
+ objref CDArrayloop[1][1]   // will be [numPrimaryLoop][numSecondaryLoop]
+
+ strdef tmpStr // for temporarily holding a string
+ objref tmpObj // for temporarily holding an object
+ objref o      // for iterating over a list's objects
+ objref null   // null of type object
+ objref this   // automatically refers to this object
+
+ proc /* runtime */ init() {
+  cvode = new CVode()
+  // Integration method (if true) variable timestep (can be changed later)
+  {cvode_active(0)}
+  // if true, and if variable timesteps, allow timesteps to vary locally.
+  {cvode_local(0)}
+  requestdt()
+ 
+  numPrimaryLoop = 6
+  {variable_domain(&numPrimaryLoop,1,10000)}  /* enforce domain */
+  primaryLoopStr = "stimFreq"
+  primaryLoopFirst = 500/sqrt(2)
+  primaryLoopLast = 2000
+  primaryLoopUseLog = 1
+  slavePrimaryLoopStr = gu.noneStr
+  slavePrimaryLoopFirst = 0
+  slavePrimaryLoopLast = 1
+  slavePrimaryLoopUseLog = 0
+  
+   strdef secondaryLoopStr, slaveSecondaryLoopStr
+  numSecondaryLoop = 1
+  {variable_domain(&numSecondaryLoop,1,10000)}  /* enforce domain */
+  secondaryLoopStr = gu.noneStr
+  secondaryLoopFirst = 500
+  secondaryLoopLast = 2000
+  secondaryLoopUseLog = 1
+  slaveSecondaryLoopStr = gu.noneStr
+  slaveSecondaryLoopFirst = 1
+  slaveSecondaryLoopLast = 1
+  slaveSecondaryLoopUseLog = 1
+  
+  lDenFollowsStimFreq = 1
+  somagFollowsDendg = 0
+  autoSpikeChannels = 0
+
+  double stimProcType[gu.numStimTypes]
+  setStimProcType(gu.stimBinaural)
+  double vsFollowsStimFreq[gu.numAnimalTypes]
+  setvsFollowsStimFreq(gu.chick)
+
+  showAllTimeGraphs = 0
+  showAllInfoStrips = 0
+  showAxonV = 1
+  showAxonSomaV = 1
+  showDenV = 1
+  showStim = 1
+  showInhib = 1
+  commentPrompt = 0
+  sprint(userComment,"%s","")   
+
+  saveResults = 1
+  displayResults = 1
+  summaryResultsWin = 1
+  displaySummary = 1
+  saveSummary = 1
+  saveMFile = 1
+  saveHocFile = 1
+
+  CDList = new List("CD")
+  CDArrayList = new List()
+  p = new cdParam(gp)
+ }
+ 
+   
+ /*************************** 
+  *   Radio Button Utils    * 
+  ***************************/
+ 
+ proc setvsFollowsStimFreq() {local animalType, i
+  if (numarg()) {
+   animalType = $1
+  } else {
+   animalType = getvsFollowsStimFreq()
+  }
+  for i=0,gu.numAnimalTypes-1 {
+   vsFollowsStimFreq[i] = 0
+  }
+  vsFollowsStimFreq[animalType] = 1
+ }
+ 
+
+ func getvsFollowsStimFreq() {local animalType, i
+  animalType = 1 // in case none are set
+  for i=0,gu.numAnimalTypes-1 {
+   if (vsFollowsStimFreq[i]) {
+    animalType = i // choose last one in case more than one set
+   }
+  }
+  return animalType
+ }
+ 
+ proc setStimProcType() {local stimType, i
+  if (numarg()) {
+   stimType = $1
+  } else {
+   stimType = getStimProcType()
+  }
+  for i=0,gu.numStimTypes-1 {
+   stimProcType[i] = 0
+  }
+  stimProcType[stimType] = 1
+  stimProcName = gu.stimProcNames[stimType].s
+ }
+ 
+
+ func getStimProcType() {local stimType, i
+  stimType = 1 // in case none are set
+  for i=0,gu.numStimTypes-1 {
+   if (stimProcType[i]) {
+    stimType = i // choose last one in case more than one set
+   }
+  }
+  return stimType
+ }
+ 
+ /***************** 
+  *   Controls    * 
+  *****************/
+ 
+ 
+  objref displaysControlBox
+  objref displaysControlSubBox1
+ proc /* runtime */ displaysControl() {
+  displaysControlBox = new VBox()
+  displaysControlBox.intercept(1)
+  displaysControlSubBox1 = new HBox()
+  displaysControlSubBox1.intercept(1)
+  xpanel(" ", 1)
+   xmenu("File")
+    xbutton("About CD Lab...","aboutcdlab()")
+    xbutton("-------------------------", "")
+    xbutton("Open...","go.openHocFile()")
+    xbutton("Open simulationFamily.hoc",\
+			"go.openHocFile(\"simulationFamily.hoc\")")
+    xbutton("-------------------------", "")
+    xbutton("Save As...","go.saveHocFile()")
+    xbutton("Save simulationFamily.hoc",\
+			"go.saveHocFile(\"simulationFamily.hoc\")")
+    xbutton("Save cdlabInit.hoc","go.saveHocFile(\"cdlabInit.hoc\")")
+    xbutton("-------------------------", "")
+    xbutton("Quit...","quitRequest()")
+   xmenu()
+   xmenu("Control Windows")
+    xbutton("CD Lab Parameters Window","gp.CDlabWin()")
+    xbutton("NEURON Main Panel","mainPanelCD()")
+    xbutton("Simulation Control", "simControl()")
+    xbutton("RunControl CD Lab", "runControlCD()")
+   xmenu()
+   xlabel("                  ")
+   xpanel()
+  displaysControlSubBox1.intercept(0)
+  displaysControlSubBox1.map()
+  xpanel(" ", 0)
+   //xlabel("During run:")
+   xcheckbox("Show Time Plots",&showAllTimeGraphs)
+  xpanel()
+  displaysControlSubBox1 = new HBox()
+  displaysControlSubBox1.intercept(1)
+   xpanel(" ", 0)
+    xlabel(" ") 
+   xpanel()
+   xpanel(" ", 0)
+    xlabel("Max. to Display:")
+    xvalue("Dendrites","gp.showMaxDen", 1,"", 0, 1 )
+    xvalue("Synapes/den","gp.showMaxExSyn", 1,"", 0, 1 )
+    xcheckbox("Show Axon Node of RanvierV",&showAxonV)
+    xcheckbox("Show Soma V",&showAxonSomaV)
+    xcheckbox("Show Mid-Dendrite V",&showDenV)
+    xcheckbox("Show Stimuli",&showStim)
+    xcheckbox("Show Inhibition",&showInhib)
+   xpanel()
+  displaysControlSubBox1.intercept(0)
+  displaysControlSubBox1.map()
+  xpanel(" ", 0)
+   xcheckbox("Show Info Strips",&showAllInfoStrips)
+  xpanel()
+  xpanel(" ", 0)
+   xlabel("Before run:")
+   xcheckbox("Prompt for Comment",&commentPrompt)
+  xpanel()
+  xpanel(" ", 0)
+   xlabel("After run:")
+   xcheckbox("Display Summary Graphs",&summaryResultsWin)
+   xcheckbox("Display Summary Text",&displaySummary)
+   xcheckbox("Display Results Text",&displayResults)
+   xcheckbox("Save Summary Text",&saveSummary)
+   xcheckbox("Save Results Text",&saveResults)
+   xcheckbox("Save Results Matlab File",&saveMFile)
+   xcheckbox("Save Simulation File",&saveHocFile)
+   xvarlabel(go.fileroot)
+  xpanel()
+  displaysControlBox.intercept(0)
+  displaysControlBox.map("File & Displays Control",151-50,185-10,214,426+20)
+ }
+ 
+  objref simWinBox
+  objref simWinSubBox1
+ proc /* runtime */ simControl() {
+  simWinBox = new VBox()
+  simWinBox.intercept(1)
+  xpanel(" ", 0)
+   xvalue("# Primary Values","numPrimaryLoop", 1,"", 0, 1 ) 
+   gp.pickParamMenu("Parameter to vary:", "primaryLoopStr")
+   xvarlabel(primaryLoopStr) 
+   xvalue("First Value","primaryLoopFirst", 1,"", 0, 1 )
+   xvalue("Last Value","primaryLoopLast", 1,"", 0, 1 ) 
+   xcheckbox("Vary with Log Scale",&primaryLoopUseLog)
+   gp.pickParamMenu("Slave parameter to vary:", "slavePrimaryLoopStr")
+   xvarlabel(slavePrimaryLoopStr) 
+   xvalue("Slave First Value","slavePrimaryLoopFirst", 1,"", 0, 1 )
+   xvalue("Slave Last Value","slavePrimaryLoopLast", 1,"", 0, 1 ) 
+   xcheckbox("Vary with Log Scale",&slavePrimaryLoopUseLog)
+  xpanel()
+  xpanel(" ", 0)
+   xvalue("# Secondary Values","numSecondaryLoop", 1,"", 0, 1 ) 
+   gp.pickParamMenu("Parameter to vary:", "secondaryLoopStr")
+   xvarlabel(secondaryLoopStr) 
+   xvalue("First Value","secondaryLoopFirst", 1,"", 0, 1 )
+   xvalue("Last Value","secondaryLoopLast", 1,"", 0, 1 ) 
+   xcheckbox("Vary with Log Scale",&secondaryLoopUseLog)
+   gp.pickParamMenu("Slave parameter to vary:", "slaveSecondaryLoopStr")
+   xvarlabel(slaveSecondaryLoopStr) 
+   xvalue("Slave First Value","slaveSecondaryLoopFirst", 1,"", 0, 1 )
+   xvalue("Slave Last Value","slaveSecondaryLoopLast", 1,"", 0, 1 ) 
+   xcheckbox("Vary with Log Scale",&slaveSecondaryLoopUseLog)
+  xpanel()
+  xpanel(" ", 0)
+   xcheckbox("lDen Follows stimFreq", &lDenFollowsStimFreq)
+   xcheckbox("Soma 'g's from Dendrite", &somagFollowsDendg)
+   xcheckbox("Auto Spike Channels", &autoSpikeChannels)
+  xpanel()
+  simWinSubBox1 = new HBox()
+  simWinSubBox1.intercept(1)
+   xpanel(" ", 0)
+    xlabel("VS from") 
+    xlabel(" Stimulus") 
+    xlabel(" Frequency:") 
+   xpanel()
+   setvsFollowsStimFreq()
+   xpanel(" ", 0)
+    xradiobutton("VS is Indpendent", \
+     "setvsFollowsStimFreq(gu.noAnimal)",(gu.noAnimal==getvsFollowsStimFreq()))
+    xradiobutton("Follows as in Chick      ", \
+     "setvsFollowsStimFreq(gu.chick)",(gu.chick==getvsFollowsStimFreq()))
+    xradiobutton("Follows as in Owl      ", \
+     "setvsFollowsStimFreq(gu.owl)",(gu.owl==getvsFollowsStimFreq()))
+    xradiobutton("Follows as in Caiman      ", \
+     "setvsFollowsStimFreq(gu.caiman)",(gu.caiman==getvsFollowsStimFreq()))
+   xpanel()
+  simWinSubBox1.intercept(0)
+  simWinSubBox1.map()
+  simWinSubBox1 = new HBox()
+  simWinSubBox1.intercept(1)
+   xpanel(" ", 0)
+    xlabel("Stimulus:") 
+   xpanel()
+   xpanel(" ", 0)
+    setStimProcType()
+    xradiobutton("Binaural                                  ", \
+     "setStimProcType(gu.stimBinaural)", (gu.stimBinaural==getStimProcType()))
+    xradiobutton("Monaural                                  ", \
+     "setStimProcType(gu.stimMonaural)", (gu.stimMonaural==getStimProcType()))
+    xradiobutton("Binaual ILD                               ", \
+     "setStimProcType(gu.stimBinauralILD)", (gu.stimBinauralILD==getStimProcType()))
+   xpanel()
+  simWinSubBox1.intercept(0)
+  simWinSubBox1.map()
+  simWinBox.intercept(0)
+  simWinBox.map("Simulation Control",540-50,0,234,642)
+ }
+ 
+ 
+  objref /* runtime */ runControlCDBox
+ proc runControlCD() {/* like nrncontrolmenu but w/positional info & more */
+  runControlCDBox = new VBox()
+  runControlCDBox.intercept(1)
+  xpanel("RunControl", 0)
+  xvalue("t","t", 2 )
+  xbutton("Init & Run","run()")
+  xvalue("Init","v_init", 1,"stdinit()", 1, 1 ) 
+  xbutton("Stop","stoprun=1")
+  runStopAt = tstop
+  xvalue("Continue til","runStopAt", 1, \
+		 "{continuerun(runStopAt) stoprun=1 postrun()}", 1, 1 )
+  //runStopIn = 50
+  xvalue("Continue for","runStopIn", 1, \
+		 "{continuerun(t + runStopIn) stoprun=1 postrun()}", 1, 1 )
+  xbutton("Single Step","steprun()")
+  xvalue("Tstop","tstop", 1,"tstop_changed()", 0, 1 )
+  xvalue("dt Requested (ms)","dtReq", 1,"requestdt()", 0, 1 ) 
+  xvalue("dt","dt", 1,"setdt()", 0, 1 ) 
+  xvalue("Points plotted/ms","steps_per_ms", 1,"setdt()", 0, 1 )
+  if (object_id(cvode)) {
+   xcheckbox("Use variable dt", &using_cvode_, "cvode_active()")
+//   xcheckbox("Local variable dt", &use_lvardt_, "cvode_local()") // removed for nrn5.3 compat
+  }
+  xvalue("Celsius","celsius", 2 )
+  xpanel()
+  xpanel("Controls:", 0)
+  xbutton("File & Displays Control", "displaysControl()")
+  xpanel()
+  runControlCDBox.intercept(0)
+  runControlCDBox.map("RunControl CD Lab",760-50,1,237,349+22)
+ }
+
+ proc /* runtime */ mainPanelCD() { // like nrnmainmenu but w/position info
+  xpanel("NEURON Main Panel")
+  xcheckbox("Quiet", &stdrun_quiet)
+  xpvalue("Real Time", &realtime)
+  xbutton("RunControl", "gr.runControlCD()")
+  //xbutton("RunControl", "nrncontrolmenu()")
+  graphmenu()
+  pointprocessesmenu()
+  distmechmenu()
+  miscellaneousmenu()
+  xpanel(410-50,0)
+ }
+
+ /************************ 
+  * Fast List Executions * 
+  ************************/
+ 
+ // By keeping all CDs and CDArrays in a list, we can execute a function in all
+ // of them very quickly.
+ 
+ proc /* runtime */ forallcds() { local i
+  strdef coincidenceProcCD
+  coincidenceProcCD = $s1
+  for i=0,CDList.count()-1 {
+   execute1(coincidenceProcCD,CDList.object(i))
+  }
+ }
+ 
+ proc /* runtime */ forallcdArrays() { local i
+  strdef coincidenceProcCDA
+  coincidenceProcCDA = $s1
+  for i=0,CDArrayList.count()-1 {
+   execute1(coincidenceProcCDA,CDArrayList.object(i))
+  }
+ }
+ 
+ /****************** 
+  * Set Up for Run * 
+  ******************/
+ 
+ proc /* runtime */ checkLimits() {
+  if (gu.isNoneStr(primaryLoopStr)) {
+   numPrimaryLoop = 1
+  }
+  if (gu.isNoneStr(secondaryLoopStr)) {
+   numSecondaryLoop = 1
+  }
+  if ((primaryLoopFirst<=0)||(primaryLoopLast<=0)) {
+   primaryLoopUseLog = 0
+  }
+  if ((slavePrimaryLoopFirst<=0)||(slavePrimaryLoopLast<=0)) {
+   slavePrimaryLoopUseLog = 0
+  }
+  if ((secondaryLoopFirst<=0)||(secondaryLoopLast<=0)) {
+   secondaryLoopUseLog = 0
+  }
+  if ((slaveSecondaryLoopFirst<=0)||(slaveSecondaryLoopLast<=0)) {
+   slaveSecondaryLoopUseLog = 0
+  }
+ }
+
+ proc setStim() {
+  stimProcName = gu.stimProcNames[getStimProcType()].s
+ }
+
+ objref tmpParam
+ proc obeyRules() {local i
+  tmpParam = $o1
+  if (lDenFollowsStimFreq) {
+   tmpParam.lDen = gu.stimFreqTolDen(tmpParam.stimFreq)
+  }
+  if (getvsFollowsStimFreq()) {
+   tmpParam.stimVS = gu.stimFreqToStimVS(tmpParam.stimFreq, \
+										 getvsFollowsStimFreq())
+  }
+  if (somagFollowsDendg) {
+   tmpParam.gKHvaBarSoma = tmpParam.gKHvaBarDen
+   tmpParam.gKLvaBarSoma = tmpParam.gKLvaBarDen
+  }
+  if (autoSpikeChannels) {
+   tmpParam.gKHHBarAxonHill = tmpParam.gNaBarAxonHill/3
+   tmpParam.gNaBarAxonNode = tmpParam.gNaBarAxonHill/2
+   tmpParam.gKHHBarAxonNode = tmpParam.gNaBarAxonNode/3
+   tmpParam.q10KHH = tmpParam.q10Na
+  }
+ gpi.roundIntParams(tmpParam)
+ }
+ 
+ proc /* runtime */ cleanup() { local i,count
+  {graphList[0].remove_all()}
+  {timeGraphList.remove_all()}
+  count = CDArrayList.count()
+  for i=0,count-1 {
+   CDArrayList.object(i).cleanup()
+  }
+  {CDArrayList.remove_all()}
+  //cvode = null
+  //cvode = new CVode()
+  go.filebase = "" // reset so will be remade anew
+ }
+
+ proc /* runtime */ preinit() { local i,j
+  printf("\n")
+  checkLimits()
+  setStim()
+  obeyRules(gp)
+  p = new cdParam(gp)
+  objref ploop[numPrimaryLoop][numSecondaryLoop] 
+  objref CDArrayloop[numPrimaryLoop][numSecondaryLoop]
+  cleanup()
+  for i=0,numPrimaryLoop-1 {
+   for j=0,numSecondaryLoop-1 {
+    ploop[i][j] = new cdParam(p)
+    if (gu.isNotNoneStr(primaryLoopStr)) {
+     if (primaryLoopUseLog) {
+      sprint(tmpStr, \
+       "ploop[%d][%d].%s = %g*%g^(%d/gu.max(numPrimaryLoop-1,1))", \
+       i, j, primaryLoopStr, primaryLoopFirst, \
+       primaryLoopLast/primaryLoopFirst, i)
+     } else {
+      sprint(tmpStr, \
+       "ploop[%d][%d].%s = %g + %g*%d/gu.max(numPrimaryLoop-1,1)", \
+       i, j, primaryLoopStr, primaryLoopFirst, \
+       primaryLoopLast-primaryLoopFirst, i)
+     }
+     execute1(tmpStr,this)
+    }
+    if (gu.isNotNoneStr(slavePrimaryLoopStr)) {
+     if (slavePrimaryLoopUseLog) {
+      sprint(tmpStr, \
+       "ploop[%d][%d].%s = %g*%g^(%d/gu.max(numPrimaryLoop-1,1))", \
+       i, j, slavePrimaryLoopStr, slavePrimaryLoopFirst, \
+       slavePrimaryLoopLast/slavePrimaryLoopFirst, i)
+     } else {
+      sprint(tmpStr, \
+       "ploop[%d][%d].%s = %g + %g*%d/gu.max(numPrimaryLoop-1,1)", \
+       i, j, slavePrimaryLoopStr, slavePrimaryLoopFirst, \
+       slavePrimaryLoopLast-slavePrimaryLoopFirst, i)
+     }
+     execute1(tmpStr,this)
+    }
+    if (gu.isNotNoneStr(secondaryLoopStr)) {
+     if (secondaryLoopUseLog) {
+      sprint(tmpStr, \
+       "ploop[%d][%d].%s = %g*%g^(%d/gu.max(numSecondaryLoop-1,1))", \
+       i, j, secondaryLoopStr, secondaryLoopFirst, \
+       secondaryLoopLast/secondaryLoopFirst, j)
+     } else {
+      sprint(tmpStr, \
+       "ploop[%d][%d].%s = %g + %g*%d/gu.max(numSecondaryLoop-1,1)", \
+       i, j, secondaryLoopStr, secondaryLoopFirst, \
+       secondaryLoopLast-secondaryLoopFirst, j)
+     }
+     execute1(tmpStr,this)
+     if (gu.isNotNoneStr(slaveSecondaryLoopStr)) {
+      if (slaveSecondaryLoopUseLog) {
+       sprint(tmpStr, \
+        "ploop[%d][%d].%s = %g*%g^(%d/gu.max(numSecondaryLoop-1,1))", \
+        i, j, slaveSecondaryLoopStr, slaveSecondaryLoopFirst, \
+        slaveSecondaryLoopLast/slaveSecondaryLoopFirst, j)
+      } else {
+       sprint(tmpStr, \
+        "ploop[%d][%d].%s = %g + %g*%d/gu.max(numSecondaryLoop-1,1)", \
+        i, j, slaveSecondaryLoopStr, slaveSecondaryLoopFirst, \
+        slaveSecondaryLoopLast-slaveSecondaryLoopFirst, j)
+      }
+      execute1(tmpStr,this)
+     }
+    }
+    obeyRules(ploop[i][j])
+    CDArrayloop[i][j] = new CDArray(ploop[i][j])
+    //{timeGraphList.append(ploop[i][j])}
+    {CDArrayList.append(CDArrayloop[i][j])}
+   }
+  }
+  forallcdArrays("preinit()")
+  if (showAllTimeGraphs) { 
+   for i=0,numPrimaryLoop-1 {
+    for j=0,numSecondaryLoop-1 {
+     CDArrayloop[i][j].maketimegraphArray(showAxonV,\
+      showAxonSomaV, showDenV, showStim, showInhib)
+    } 
+   }
+  }
+  if (showAllInfoStrips) {
+   forallcdArrays("CDArrayInfoStrip()")
+  }
+ }
+ 
+ proc /* runtime */ postinit() { local i
+  for i=0,CDArrayList.count-1 {
+   CDArrayList.object(i).postinit()
+  }
+  if (useGraphics && commentPrompt) {
+   string_dialog("Enter comment:", userComment)
+  }
+  {doNotify()} // sporadic but repeatable crashes on solaris without this
+ }
+ 
+ proc /* runtime */ prerun() { local i
+  for i=0,CDArrayList.count-1 {
+   CDArrayList.object(i).prerun()
+  }
+ }
+
+ proc /* runtime */ preadvance() { local i, graphTimeQ
+  graphTimeQ = t*steps_per_ms
+  if (graphTimeQ - int(graphTimeQ < float_epsilon)) {
+   for i = 0, CDList.count()-1 {
+    CDList.object(i).updateGraphOnlyVars()
+   }
+  }
+ }
+ 
+ proc /* runtime */ postadvance() { local i
+  for i=0,CDArrayList.count-1 {
+   CDArrayList.object(i).postadvance()
+  }
+ }
+ 
+ proc /* runtime */ postrun() {
+  forallcdArrays("postrun()")
+  print "dtReq = ",dtReq, "ms"
+  print "dt = ",dt, "ms"
+  print "t =",t, "ms"
+  print "realtime = ",realtime, "s"
+  print ""
+  go.doOutputResults()
+  userpostrun()
+ }
+
+ proc /* runtime */ aboutcdlab() {
+  sprint(tmpStr,"%s: \nA laboratory simulator to explore neuronal Coincidence Detection. \nCopyright 1998-2000, Jonathan Z. Simon (jzsimon@isr.umd.edu) and\n University of Maryland.", versionStr)
+  continue_dialog(tmpStr)
+  print tmpStr
+ }
+
+ proc /* runtime */ quitRequest() {
+  if (boolean_dialog("Really Quit?", "Quit", "No")) {
+   quit()
+  }
+ }
+
+
+/*******************************/
+
+endtemplate runtime
+
+/*******************************/
+
+
+/************************************* 
+ * Procedures: Standard System Calls * 
+ *************************************/
+ 
+// The init() procedure is called by stdinit(), which is the standard
+// initialization routine.
+// The default init() calls only finitialize(v_init) and fcurrent().
+// We redefine it to call preinit() first, then the original routines,
+// and then postinit()
+proc init() {
+ gr.preinit()
+ finitialize(v_init)       // standard
+ fcurrent()                // standard
+ cvode.re_init()         // necessary after fcurrent() if cvode used
+ gr.postinit()
+ gr.prerun()
+}
+
+/* The advance() procedure is called by the standard run routines.       *
+ * The default advance() calles only fadvance().                         *
+ * We redefine it to call preadvance() first, then the original routine, *
+ * and then postadvance() */
+ 
+proc advance() {
+ gr.preadvance()
+ fadvance()
+ gr.postadvance()
+}
+
+/* The run() procedure is called by the standard run routines.      *
+ * The default run() calles only stdinit(), setdt(), and            *
+ * continuerun(tstop).                                            . *
+ * We redefine it to call the original routines, and then postrun() */
+ 
+proc run() {
+ stdinit()
+ setdt()
+ continuerun(tstop)
+ gr.postrun()
+}
+
+/******************* 
+ * Control Windows * 
+ *******************/
+
+proc initialWins() {
+ //Graphical resource values; override specs in lib/nrn.defaults
+ {
+    if (unix_mac_pc()==1) {
+	ivoc_style("*font", "*helvetica*normal*--10*")
+	ivoc_style("*MenuBar*font", "*helvetica*bold*--10*")
+	ivoc_style("*MenuItem*font", "*helvetica*bold*--10*")
+	ivoc_style("*use_transient_windows", "no")
+	ivoc_style("*pwm_save_file_filter", "*.hoc")
+	ivoc_style("*scene_menu_box_size", "10")
+	ivoc_style("*panel_scroll", "26")
+	ivoc_style("*CBWidget_ncolor", "10")
+	ivoc_style("*CBWidget_nbrush", "15")
+    }
+ }
+ //load_proc("nrnmainmenu")
+ pwman_place(5,0)
+ gr.mainPanelCD()
+ gp.CDlabWin()
+ gr.displaysControl()
+ gr.simControl()
+ gr.runControlCD()
+ {doNotify()} //manually update field editors for mac
+}
+
+/***********************
+ * Other Utilities * 
+ ***********************/
+ 
+ strdef userInitFile 
+proc userInit() { local n
+ n = numarg()
+ if (n==0) {
+  userInitFile = "cdlabInit.hoc"
+ } else {
+  userInitFile = $s1
+ }
+ if (gu.existsFile(userInitFile)) {
+  printf("\nLoading %s\n",userInitFile)
+  xopen(userInitFile)
+ }
+}
+
+proc usercomment() {
+ if (numarg() > 1) {
+  gr.userComment = $s1
+ } else {
+  gr.userComment = ""
+ }
+}
+
+/* Point Process Location */
+strdef pp_sec
+proc print_pp_location() {local x
+ x = $o1.get_loc()               //Argument must be a point process
+ pp_sec=secname()
+ printf("%s located at %s(%g)\n", $o1,pp_sec,x)
+ pop_section()
+}
+
+/* Section Properties */
+strdef sp_name
+proc printSecProperties() {
+ sp_name = $s1                 //Argument must be a section name in quotes
+ forsec sp_name psection()
+}
+
+/* view variables, objects, etc. */
+objref scobj
+proc viewVars() {
+ scobj = new SymChooser()
+ scobj.run()
+ scobj.text(tmpStr)
+ print tmpStr
+ objref scobj
+}
+
+//proc printExSynapseloc() { local i, j
+// for i = 0, p.nDen-1 dendrite[i] {
+//  for j = 0, p.nExSyn-1 {
+//   print_pp_location(exSynapse[i][j])
+//  }
+// }
+//}
+
+//proc exSynapseprops() { local i,j
+// for i = 0, p.nDen-1 dendrite[i] {
+//  print "dendrite ",i
+//  for j = 0, p.nExSyn-1 {
+//   print "synapse ",j,":: i: ",exSynapse[i][j].i,"; e: ",exSynapse[i][j].e, \
+//    "; gmax ", exSynapse[i][j].gmax,"; onset ", exSynapse[i][j].onset
+//  }
+// }
+//}
+
+
+/***************************************
+ *    Begin Here for Simulation Runs   * 
+ ***************************************/
+
+gu = new globConstsUtils()
+gpi= new pInfo()
+gp = new cdParam()
+go = new inputOutputDisplay()
+gr = new runtime()
+
+timeGraphList = new List()
+
+userInit()
+
+if (useGraphics) {
+ initialWins()
+}
+
+if (i!=-1e12) {
+ print "Warning: i = ", i
+}
+

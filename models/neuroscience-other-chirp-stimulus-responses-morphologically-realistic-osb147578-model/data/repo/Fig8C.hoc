@@ -1,0 +1,578 @@
+
+/**************************************************************
+Written by Rishikesh Narayanan.
+
+Papers:
+
+Rishikesh Narayanan and Daniel Johnston, “Long-term potentiation
+in rat hippocampal neurons is accompanied by spatially widespread
+changes in intrinsic oscillatory dynamics and excitability,” Neuron,
+56(6), pp. 1061–1075, December 2007.
+
+Rishikesh Narayanan and Daniel Johnston, “The h channel mediates
+location dependence and plasticity of intrinsic phase response in
+rat hippocampal neurons,” The Journal of Neuroscience, 28(22), pp.
+5846–5860, May 2008.
+**************************************************************/
+
+
+load_file("stdlib.hoc")
+load_file("ObliquePath.hoc")
+
+//**************************************************************//
+// Current clamp Parameters
+//**************************************************************//
+
+tstop = 1500
+steps_per_ms = 40
+dt = 0.025
+
+stamp=-0.1		// Stimulus Amplitude and Delay
+stdur=1000
+stdel=20
+
+//**************************************************************//
+// Chirp Parameters
+//**************************************************************//
+
+objref fchirp, ChirpStim
+tstop = 25050
+steps_per_ms = 40
+dt = 0.025
+ChirpAmp=0.05
+
+// --------------------------------------------------------------
+// Resistances and Capacitances
+// --------------------------------------------------------------
+
+rasoma  = 50			
+raend   = 35
+raaxon = 50
+
+rm     = 200000
+rmsoma = rm
+rmdend = rm
+rmend=12000
+rmaxon = rm
+
+c_m       = 1
+cmsoma    = c_m
+cmdend    = c_m
+cmaxon    = c_m
+
+v_init    = -65
+celsius   = 34
+
+// --------------------------------------------------------------
+// Reversal potentials
+// --------------------------------------------------------------
+
+Eh=-30
+
+//--------------------------------------------------------------
+// Active conductance densities and other related parameters
+//--------------------------------------------------------------
+
+gh=0.0006		// Base value of gh
+
+gh=3.4e-5
+
+//--------------------------------------------------------------
+
+create axon[2]
+objref sh, st, apc, vec, g
+strdef str1, str2, str3
+objref SD, AXON, SA, Basal, Trunk
+objref s, ampasyn[1], nmdasyn[1]
+objref bpropampasyn, bpropnmdasyn
+objref LM, RAD, RADt, LUC, PSA, PSB, ORI
+objref secref, f1
+objref netlist
+objref apamp[1], ampvec[1]
+objref sapamp, sampvec
+objref g1, nc
+objref r, st1
+objref Trial
+objref local_trunk
+objref pl[150],opl[150]
+
+create soma[1], apical[1], basal[1]
+
+objref v3
+
+
+/**********************************************************************/
+// Passive Conductances 
+
+proc setpassive() {
+	forall {
+	  	insert pas
+	  	e_pas = v_init
+		Ra=rasoma
+	}
+	forsec SD {		// For somato-dendritic compartments
+		cm=cmdend
+		g_pas=1/rmdend
+	}
+	forsec "soma" {
+	  	cm = cmsoma 
+		g_pas=1/rmsoma
+	}
+	forsec Trunk {
+		for (x) {
+			rdist=raddist(x)
+			rm = rmsoma + (rmend - rmsoma)/(1.0 + exp((200-rdist)/50))
+			g_pas(x)=1/rm
+			Ra = rasoma + (raend - rasoma)/(1.0 + exp((210-rdist)/50))
+		}
+	}	
+
+	for i=0,plcount {
+    	seccount=0
+    	forsec pl[i] {
+       		if(!seccount){
+           		trunk_pas=g_pas(1)
+				seccount=seccount+1
+       		} else {
+           		g_pas=trunk_pas
+				seccount=seccount+1
+       		}
+       		//print secname() 
+    	}
+	}       
+
+}
+
+/**********************************************************************/
+// Active Conductances 
+// Ih has somatic conductance, as in Poirazi et al., 2003.
+
+proc setactive () {local xdist, ndist
+
+	forsec Trunk {	// Trunk
+		insert hd  
+
+		for (x) {
+			xdist=raddist(x)
+			ghdbar_hd(x) = gh*(1+100/(1+exp(-(xdist-380)/34.0)))
+
+			if (xdist > 100){
+				if (xdist>300) { 
+					ndist=300
+				} else { // 100 <= xdist <= 300
+					ndist=xdist
+				}
+				vhalfl_hd(x)=-82-8*(ndist-100)/200
+			} else {	// xdist < 100
+				vhalfl_hd(x)=-82
+			}	
+
+		}
+	}
+
+	for i=0,plcount { // Aplical obliques
+    	seccount=0
+    	forsec pl[i] {
+        	if(!seccount){	// The first section is the trunk
+            	trunk_h=ghdbar_hd(1)
+				trunk_vhalf=vhalfl_hd(1)
+				seccount=seccount+1
+        	} else {
+				insert hd
+            	ghdbar_hd=trunk_h
+				vhalfl_hd=trunk_vhalf
+				seccount=seccount+1
+        	}
+        	//print secname() 
+    	}
+	}       
+
+	forsec "soma" {
+		insert hd  ghdbar_hd=gh vhalfl_hd=-82
+	}	
+
+	forsec Basal {
+		insert hd  ghdbar_hd=gh vhalfl_hd=-82
+	}	
+
+	forall if (ismembrane("hd") ) ehd_hd=Eh
+	
+}
+
+/**********************************************************************/
+
+proc init_cell() {
+	setpassive()
+	addaxon()
+	setactive()
+	access soma[2]	// Reinitializing distance origin
+	distance()
+	print "Number of compartments: ", totcomp
+
+
+	finitialize(v_init)
+	fcurrent()
+        forall {
+            for (x) {
+        		if (ismembrane("hd")) {
+					e_pas(x)=v(x)+i_hd(x)/g_pas(x)
+                } else {
+        			e_pas(x)=v(x)
+                }
+            }
+        }
+}
+
+/**********************************************************************/
+
+proc current_clamp(){	
+	access apical[65] 
+	st1=new IClamp(.5)
+	st1.dur = stdur
+	st1.del = stdel
+	st1.amp = stamp
+	access soma[0]
+}
+
+/**********************************************************************/
+
+proc load_3dcell() {
+
+// $s1 filename
+
+	forall delete_section()
+	xopen($s1)
+
+	SD = new SectionList()
+	SA = new SectionList()
+	Trunk = new SectionList()
+	Trial = new SectionList()
+	Basal = new SectionList()
+
+	forsec "soma" {
+		SD.append()
+		SA.append()
+	}
+
+	forsec "basal" { 
+		SD.append()
+		Basal.append()
+	}
+
+	forsec "apical"{
+		SD.append()
+		SA.append()
+	}
+
+	// Trunk. 
+
+	soma[0]	   Trunk.append()
+	apical[0]  Trunk.append() 
+	apical[4]  Trunk.append() 
+	apical[6]  Trunk.append() 
+	apical[14] Trunk.append() 
+	apical[15] Trunk.append() 
+	apical[16] Trunk.append() 
+	apical[22] Trunk.append() 
+	apical[23] Trunk.append() 
+	apical[25] Trunk.append() 
+	apical[26] Trunk.append() 
+	apical[27] Trunk.append() 
+	apical[41] Trunk.append() 
+	apical[42] Trunk.append() 
+	apical[46] Trunk.append() 
+	apical[48] Trunk.append() 
+	apical[56] Trunk.append() 
+	apical[58] Trunk.append() 
+	apical[60] Trunk.append() 
+	apical[62] Trunk.append() 
+	apical[64] Trunk.append() 
+	apical[65] Trunk.append() 
+	apical[69] Trunk.append() 
+	apical[71] Trunk.append()
+	apical[81] Trunk.append() 
+	apical[83] Trunk.append() 
+	apical[95] Trunk.append()
+	apical[103] Trunk.append()
+	apical[104] Trunk.append()
+
+	// Define obliques
+
+	load_file("oblique-paths.hoc")
+
+	// Compartmentalize 
+
+	setpassive() // Before compartmentalization, set passive
+
+	// The lambda constraint
+	totcomp=0
+	forall { 
+		soma[1] area(0.5)
+		nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1  
+		totcomp=totcomp+nseg
+	}
+	access soma[2]
+	distance()
+
+	init_cell()
+
+// If you want to know the Radial distances of all trunk compartments.
+
+	/*forsec Trunk {
+		for(x) {
+			print secname(), " ", x, " ", raddist(x)
+		}
+	}*/	
+}
+
+/**********************************************************************/
+// For cell number n123 on the DSArchive, converted with CVAPP to give
+// HOC file, the following definition holds. This is the same as Poirazi et
+// al. have used in Neuron, 2003. The argument is that the subtree seems
+// so long to be a dendrite, and the cell does not have a specific axon.
+// There is a catch, though, if the morphology is closely scanned, then 
+// basal dendrites would branch from these axonal segments - which
+// may be fine given the amount of ambiguity one has while tracing! 
+
+proc addaxon() {
+
+	AXON = new SectionList()
+
+	for i = 30,34 basal[i] {
+		AXON.append()
+		Basal.remove()
+	}
+
+	for i = 18,22 basal[i] {
+		AXON.append()
+		Basal.remove()
+	}
+
+	forsec AXON {
+		e_pas=v_init 
+		g_pas = 1/rmaxon 
+		Ra=raaxon 
+		cm=cmaxon
+	}
+}
+
+/********************************************************************/
+
+proc initsub() {
+	load_3dcell("n123.hoc")
+	finitialize(v_init)
+	fcurrent()
+}
+
+/********************************************************************/
+
+proc update_Gh() { local xdist
+	forsec "apical" {
+	   if (ismembrane("hd") ) {
+			for (x) {
+				xdist=raddist(x)
+				ghdbar_hd(x)=gh*(1+2*xdist/100.0)
+			}
+	    }
+	}
+
+	forsec "soma" {
+		ghdbar_hd=gh 
+	}	
+
+	forsec Basal {
+		ghdbar_hd=gh
+	}	
+
+	update_init()
+}
+
+/********************************************************************/
+proc update_init(){
+	finitialize(v_init)
+	fcurrent()
+        forall {
+            for (x) {
+        		if (ismembrane("hd")) {
+					e_pas(x)=v(x)+i_hd(x)/g_pas(x)
+                } else {
+        			e_pas(x)=v(x)
+                }
+            }
+        }
+}
+/********************************************************************/
+// Procedure to calculate radial distances. The following three coordinates
+// are the centroid of the somatic compartments. Radial distances are
+// computed by translating each x to corresponding pt3d()s and using this
+// centroid for computing the radial distance.
+
+somax=2.497
+somay=-13.006
+somaz=11.12
+double distances[200]
+
+func raddist() {
+	distn0=distance(0)
+	distances[0]=0
+	sum=0
+
+	for i=1,n3d()-1 {
+		xx=(x3d(i)-x3d(i-1))*(x3d(i)-x3d(i-1))
+		yy=(y3d(i)-y3d(i-1))*(y3d(i)-y3d(i-1))
+		zz=(z3d(i)-z3d(i-1))*(z3d(i)-z3d(i-1))
+		sum=sum+sqrt(xx+yy+zz)
+		distances[i]=sum
+	}
+
+	xval=$1
+
+// Amoung the various pt3d's find which one matches the distance of
+// current x closely
+
+	distn=distance(xval)
+	match=distn-distn0
+	matchptdist=100000
+	for i=0,n3d()-1 {		
+		matptdist=(match-distances[i])*(match-distances[i])
+		if(matchptdist>matptdist){
+			matchptdist=matptdist
+			matchi=i
+		}
+	}
+
+// Find the distance of the closely matched point to the somatic
+// centroid and use that as the distance for this BPAP measurement			
+
+	xx=(x3d(matchi)-somax)*(x3d(matchi)-somax)
+	yy=(y3d(matchi)-somay)*(y3d(matchi)-somay)
+	zz=(z3d(matchi)-somaz)*(z3d(matchi)-somaz)
+	return sqrt(xx+yy+zz)
+}
+
+/*****************************************************************/
+
+proc GenerateChirp() {
+	ChirpStim=new Vector(25050/dt)
+	ChirpStim.fill(0)
+	for i=50/dt, ChirpStim.size()-1 {
+		xval=(i-50/dt)*dt/1000
+		ChirpStim.x[i]=ChirpAmp*sin(2*3.141592654*25*(i-50/dt)/(2*(25000/dt)) *xval)
+	}
+	fchirp=new File()
+	fchirp.wopen("ChirpI.txt")
+	ChirpStim.printf(fchirp,"%f\n")
+}
+
+
+/*****************************************************************/
+// Compute the response of the trunk compartments to local Chirp stimuli
+// Output saved in files in a directory called Output. Create a directory
+// called Output before you run this.
+
+proc Chirp_Trunk() {
+	print "\n\nComputing Trunk Compartment Responses to Local Chirp Stimuli.."
+	print "\n\nOutput will be saved in the Output directory..."
+	print "\n\nNote: These simulations take time, as each location requires 25050 ms of simulation data!"
+	initsub()
+	GenerateChirp()
+	print "Chirp Generated....\n"
+	count=0
+	
+	update_init()
+	forsec Trunk {
+		for(x) {
+			if(x != 0) { // x=0 distance is equal to x=1 of prev section
+				print count, " ", secname(), " ", x, raddist(x)
+				st=new IClamp(x)
+				st.dur=tstop
+				st.del=0
+				v3=new Vector()
+				v3.record(&v(x))
+			
+				ChirpStim.play(&st.amp,dt)
+			
+				f1=new File()
+			
+				finitialize(v_init)
+				fcurrent()
+				while (t < tstop){
+					fadvance()
+				}
+				
+				sprint(str1,"Output/ChirpOutput_%d.txt",count)
+				f1.wopen(str1)
+				v3.printf(f1,"%f\n")
+				f1.close()
+				count=count+1
+			}
+		}
+	}	
+}	
+
+/*****************************************************************/
+// Calculate Input resistance of various trunk compartments.
+
+objref st
+objref f1
+
+proc RN_Trunk () {
+	print "\n\nComputing Input Resistances Along Trunk..."
+	print "\n\nOutput will be saved in Trunk_RN.txt..."
+	initsub()
+	v3=new Vector()
+	v3.record(&soma.v(0.5))
+	f1=new File()
+	tstop=250
+	
+	
+	f1.wopen("Trunk_RN.txt")
+
+	update_init()
+	count=0
+	forsec Trunk {
+		for(x) {
+			if(x != 0) { // x=0 distance is equal to x=1 of prev section
+
+				st=new IClamp(0.5)
+				st.dur=tstop
+				st.del=0
+				st.amp=-0.1
+	
+				v3=new Vector()
+				v3.record(&v(x))
+			
+				finitialize(v_init)
+				fcurrent()
+	
+				while (t < tstop){
+					fadvance()
+				}
+				f1.printf("%f\t%f\n",raddist(x),-((v3.x[tstop/dt-1]-v_init)/100e-6)*1e-3)
+				print secname(), " ", x," ", raddist(x)," ", -((v3.x[tstop/dt-1]-v_init)/100e-6)*1e-3
+			}	
+		}	
+		count=count+1
+	}	
+	f1.close()
+}
+
+/*****************************************************************/
+
+
+// Use the following code if you want to visualize the h channel gradient
+// in a shape plot.
+
+//objref sp
+//sp=new PlotShape()
+//sp.variable("ghdbar_hd")
+//sp.show(0)
+//sp.exec_menu("Shape Plot")
+//sp.scale(1e-5,2e-4)
+
+xpanel("Chirp Stimulus Responses in a 3D model with h Channels")
+xlabel("Select one of the simulations below")
+xbutton("Compute Input Resistances Along Trunk", "RN_Trunk()")
+xbutton("Save Local Chirp Responses for Locations Along Trunk", "Chirp_Trunk()")
+xpanel()
+

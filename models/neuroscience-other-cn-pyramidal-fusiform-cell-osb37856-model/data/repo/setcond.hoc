@@ -1,0 +1,24 @@
+// setcond.hoc - set conductance levels for pyr model
+//
+// 2/2/2000 P. Manis pmanis@med.unc.edu
+//
+//
+
+proc setcond() {
+h[2] = new HBox()
+h[2].intercept(1)
+
+xpanel("Conductance levels")
+xvalue("gNa","gnabar_pyr",1,"",0,0)
+xvalue("gKd","gkbar_pyr",1,"",0,0)
+xvalue("gKif", "gkifbar_pyr",1,"",0,0)
+xvalue("Kif_vh","kif_vh_pyr",1,"",0,0)
+xvalue("gKis", "gkisbar_pyr",1,"",0,0)
+xvalue("gH", "ghbar_pyr",1,"",0,0)
+xvalue("Rsf", "rsf_pyr",1,"",0,0)
+xpanel()
+h[2].intercept(0)
+h[2].map("Set Conductance Parameters", 250, 350, 250, 200)
+
+}
+

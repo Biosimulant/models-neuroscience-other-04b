@@ -1,0 +1,6 @@
+// Starts
+
+load_file("nrngui.hoc")
+load_file("Cell1_Cl_HCO3_Pas.hoc")
+load_file("GDP_Cl_All_long.ses")
+load_file("Random_PSCs_gGABA-0.789-nGABA-534_gAMPA-0.305_Div_Cl_100percCorrel.hoc")

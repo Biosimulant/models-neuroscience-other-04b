@@ -1,0 +1,6 @@
+// Start
+
+load_file("nrngui.hoc")
+load_file("Cell1_Cl_HCO3_tonicGABA.hoc")
+load_file("GDP_Cl_HCO3_All_short.ses")
+load_file("Single_GDP_tonicGABA_gGABA-0.789-nGABA-534_Div_gAMPA_Div_Cl.hoc")

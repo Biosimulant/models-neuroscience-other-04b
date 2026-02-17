@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model206310206310Model'
+description: Comparing correlation responses to motion estimation models (Salazar-Gatzimas
+  et al. 2016)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:206310
+  source_db: opensourcebrain
+  source_id: '206310'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/206310
+  download_url: https://github.com/OpenSourceBrain/206310.git
+  license: ''
+bsim:
+  entrypoint: src.model_206310_206310_model:Model206310206310Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

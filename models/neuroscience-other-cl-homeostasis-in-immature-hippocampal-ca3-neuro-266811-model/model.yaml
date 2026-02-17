@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: ClHomeostasisInImmatureHippocampalCa3Neuro266811Model'
+description: '{"value": "Model used for the revision of the manuscript.\r\nInsertion
+  of a passive Cl- flux and an active Cl-accumulation. Parameters adapted to match
+  the properties of [Cl-]i determined in immature '
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:266811
+  source_db: modeldb
+  source_id: '266811'
+  standard: other
+  original_url: https://modeldb.science/266811
+  download_url: https://modeldb.science/download/266811
+  license: ''
+bsim:
+  entrypoint: src.cl_homeostasis_in_immature_hippocampal_ca3_neuro_266811_model:ClHomeostasisInImmatureHippocampalCa3Neuro266811Model
+  init_kwargs:
+    model_path: data/266811.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

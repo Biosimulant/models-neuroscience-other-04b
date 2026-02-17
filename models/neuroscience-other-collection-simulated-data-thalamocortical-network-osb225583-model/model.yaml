@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model225583225583Model'
+description: Collection of simulated data from a thalamocortical network model (Glabska,
+  Chintaluri, Wojcik 2017)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:225583
+  source_db: opensourcebrain
+  source_id: '225583'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/225583
+  download_url: https://github.com/OpenSourceBrain/225583.git
+  license: ''
+bsim:
+  entrypoint: src.model_225583_225583_model:Model225583225583Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

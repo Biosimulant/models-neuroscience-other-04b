@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model257027257027Model'
+description: Circadian rhythmicity shapes astrocyte morphology and neuronal function
+  in CA1 (McCauley et al 2020)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:257027
+  source_db: opensourcebrain
+  source_id: '257027'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/257027
+  download_url: https://github.com/OpenSourceBrain/257027.git
+  license: ''
+bsim:
+  entrypoint: src.model_257027_257027_model:Model257027257027Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

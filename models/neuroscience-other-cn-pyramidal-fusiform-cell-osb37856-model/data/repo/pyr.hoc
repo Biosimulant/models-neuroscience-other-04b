@@ -1,0 +1,332 @@
+//  Neuron model for Dorsal Cochlear Nucleus Pyramidal cell
+//	Somatic model with multiple potassium conductances
+//	Version 1.0: 8/3/98. Paul B. Manis
+//	Version using Patrick Kanold's parameters from
+//	measured K currents (Kanold and Manis, 1999) and ad-hoc sodium channel.
+//	1/8/99	Added routines to do hyp and hyp2 protocols
+//	1/15/99 Modified to incorporate MCna - Moore and Cox state sodium channel
+//	1/15/99 Added Ih current +
+//	1/25/99 Added routines to calculate rmp and adjust leak Vrev to make
+//			RMP go to specific value.
+//	1/28/99 Set to Patrick's default model performance for specific simulation
+//			Generated pyrpbmcc.nrn for my modifications.
+//	1/27/2000 Updated to include voltage-dependence of Ikif and Ikis
+//	1/29/2000 Split to several hoc files for better modularity
+//
+//  This file defines the variables, initializes the cell, and provides
+//	a gui to control the execution of simulations.
+//
+//	pok4.mod defines the model mechanisms for the cell 
+//		(in windows, compile with mknrndll; in linux, compile with nrnivmodl) 
+//	mcna.mod defines the Moore-Cox state sodium channel if needed
+//	ih.mod defines the Dextesche Ih current model
+//
+//	Added two-pulse protocol to compare with experimental data
+//	5/17/2000 PB Manis
+//
+//	Added noise protocol - use noise (gaussian) to drive cell.
+//
+	
+
+xopen("$(NEURONHOME)/lib/hoc/noload.hoc")
+nrnmainmenu()
+
+tstop = 250		// final time in run 
+
+maxout = 2048 	// subsample data for output 
+
+ndend = 1
+create soma
+access soma
+create dend[ndend]
+
+objectvar istim
+// objref glypyr
+objref stim_list
+objref caplist
+objref linlist
+
+objref fsl, fisi, fsinj, fsv, fapn, spikes, spiket, mystim, fcap, fdel
+strdef basename, filename, runtype, spikefile, hypfile
+objref gv, gfsl, gfisi, vgraph, vigraph, spkgraph
+objref h[3]
+
+init_vec_size=25000 // points in initial vectors for data (large... to minimize resizing)
+outstep = 1
+
+// output data sets
+// idat, vdat and tdat vectors are updated for each run - they hold
+// current, voltage and time data respectively
+
+objref idat, vdat, tdat
+idat = new Vector(init_vec_size, 0)
+vdat = new Vector(init_vec_size, 0)
+tdat = new Vector(init_vec_size, 0)
+
+// state variable arrays - store the time course of the state variables
+// pyr_m and _h are the sodium channel state variables
+// pyr_ kifa, kifi are the Ikif activation and inactivation state variables
+// pyr_ kisa, kisi are the Ikis activation and inactivation state variables
+// ih_h is the activation variable for the hyperpolarization-activated cationic current
+// state is the selected one in the monitor list - note it may be empty; check monitor flag first
+
+objref pyr_m, pyr_h, pyr_n, pyr_kifa, pyr_kifi, pyr_kisa, pyr_kisi, pyr_kh, ih_h, pyr_state
+pyr_m = new Vector(init_vec_size, 0)
+pyr_h = new Vector(init_vec_size, 0)
+pyr_n = new Vector(init_vec_size, 0)
+pyr_kifa = new Vector(init_vec_size, 0)
+pyr_kifi = new Vector(init_vec_size, 0)
+pyr_kisa = new Vector(init_vec_size, 0)
+pyr_kisi = new Vector(init_vec_size, 0)
+pyr_kh = new Vector(init_vec_size, 0)
+pyr_state = new Vector(init_vec_size, 0)
+monitor=0
+
+// spike detection and analysis arrays
+
+objref sdat, tsdat
+sdat = new Vector(init_vec_size, 0)
+tsdat = new Vector(init_vec_size, 0)
+
+// output analysis arrays for spikes across all runs
+// init_sp_size is the array size for the max expected spikes per trial
+
+init_sp_size = 200
+
+fsl = new Vector(init_sp_size)
+fisi = new Vector(init_sp_size)
+fsv = new Vector(init_sp_size)
+fapn = new Vector(init_sp_size)
+spikes = new Vector(init_sp_size)
+spiket = new Vector(init_sp_size)
+fsinj = new Vector(init_sp_size)
+mystim = new Vector(init_sp_size)
+fcap = new Vector(init_sp_size)
+fdel = new Vector(init_sp_size)
+
+// define vectors holding variables for
+// parameterized runs
+
+stim_list = new Vector(10)
+caplist = new Vector(10)
+
+// define file descriptors
+
+objref fid, f, flog
+
+fid = new File()
+
+iv_mini = -0.3
+iv_maxi = 0.4
+iv_nstepi = 12
+variable_domain(&iv_nstepi, 2, 50)
+
+hyp_condi = 0.02 // it was 0
+variable_domain(&hyp_condi, -2, 2)
+hyp_mini = -0.3
+hyp_maxi = 0.0
+hyp_nstepi = 60
+variable_domain(&hyp_nstepi, 2, 50)
+hyp_testi = 0.1 // it was 0.047
+variable_domain(&hyp_testi, 0, 2)
+hyp_inti  = -0.0
+variable_domain(&hyp_inti, -2, 2)
+
+hyp_mint = 1
+variable_domain(&hyp_mint, 0.001, 1000)
+hyp_maxt = 100
+variable_domain(&hyp_maxt, 0.001, 1000)
+hyp_nstept = 30
+variable_domain(&hyp_nstept, 2, 50)
+
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  The following routines and helpers are used to 
+//	define the pyramidal cell model
+//	The model is for a point cell, 300 Mohm input R, 12 pF cap
+//	This resembles an isolated neuron (about 20x20 micron cylinder)
+//	The cell can be scaled by changing scalefactor (10 would be about right
+//	for a full-sized somatic model, except Rin is too low - should be about 50 Mohm)
+//  routine to convert conductances from nS as given elsewhere
+//  to mho/cm2 as required by NEURON 1/28/99 P. Manis
+
+func nstomho() {
+	return (1E-9*$1/somaarea)
+}
+
+func mho2ns() {
+	return ($1*somaarea/1E-9)
+}
+
+
+objectvar random
+random = new Random()
+proc poisson_syn() { local i, t
+
+// Onset times for synapse obey Poisson statistics
+// poisson_syn(KSyn100 object, maximum duration of onsets, mean interval)
+
+	t = 0
+	i = 0
+	while (t < $2) {
+		t = t + random.negexp($3) // we could adjust the rate here to match that of AN fibers
+		$o1.onset[i] = t
+		i = i+1
+	}
+	$o1.onset[i+1] = 1e20
+}
+
+proc regular_syn() { local i, t
+
+// Onset times for synapse and regular firing
+// fillsyn(KSyn100 object, delay to first, maximum duration of onsets, interval)
+
+	t = $2
+	i = 0
+	tmax = $3+$2
+	while (t <= tmax) {
+		$o1.onset[i] = t
+		t = t + $4 // we could adjust the rate here to match that of AN fibers
+		i = i+1
+	}
+	$o1.onset[i] = 1e20 // way beyond anything we look at 
+}
+
+// Set up the cell geometry and conductances 
+
+proc init_cell() {
+
+// if arg $1 is 1, then we also define the current stimulus for this instance
+
+	scalefactor=1 // This determines the relative size of the cell
+	rinsf=1			// input resistance adjustment (also current...)
+	totcap = scalefactor * 12 // cap in pF for cell 
+	effcap = totcap // sometimes we change capacitance - that's effcap
+	somaarea = totcap *1E-6 / cm // pf -> uF, cm = 1uf/cm^2 nominal; result is in cm2 
+	lstd = 1E4*sqrt(somaarea/3.14159) // convert from cm to um 
+	
+// set temperature and axial resistivity (ra) later set to correct Ra for segment 
+
+	celsius=33
+	gnab = nstomho(350)*scalefactor
+	gkb = nstomho(80)*scalefactor // used to be 20 - changed to make ap width correct
+	gkfb = nstomho(150)*scalefactor
+	gksb = nstomho(40)*scalefactor
+	ghb = nstomho(3)*scalefactor
+	stdrin = 300*rinsf/scalefactor
+	stdrmp = -60
+
+// set up soma like a pyramidal cell 
+	
+    soma {
+		nseg = 1
+		diam = lstd
+		L = lstd // these are expressed in microns... 
+		insert pyr
+		gnabar_pyr =  gnab 
+        gkbar_pyr =  gkb 
+		gkifbar_pyr = gkfb
+        gkisbar_pyr = gksb 
+		ghbar_pyr = ghb  // Setting this to 0 turns ih-current off.
+		kif_vh_pyr = -89.6
+}
+
+// define the current clamp electrode and default settings
+
+	if($1 == 1) {
+		istim = new IClamp2(0.5) // use our new iclamp method
+		istim.dur1 = 2
+		istim.amp1 = 0
+		istim.dur2 = 50
+		istim.amp2 = 0
+		istim.dur3 = 100
+		istim.amp3 = 0.120
+		istim.dur4 = 0
+		istim.amp4 = 0
+		istim.dur5 = 0
+		istim.amp5 = 0
+	}
+
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// build the display and do actions for the display
+//--------------------------------------------------------------------------
+// Initialize the cell, get the session, and print the   
+// default RMP and ajdust Erev Eleak for appropriate RMP                   
+//
+// load our specific routines
+
+load_file("util_vm.hoc") // utilities - findrmp, setrin, etc.
+init_cell(1) // initialize cell including electrode
+load_file("util_run.hoc") // utilities for running (rununtil and runlog)
+load_file("util_iv.hoc")  // utilities for running ivs - linspace and logspace for example
+load_file("runiv.hoc")  // procedure to run a standard IV (parameterized current injection)
+load_file("runhyp.hoc") // hyp (prepulse level protocol)
+load_file("showgate.hoc") // show the gating files
+load_file("setcond.hoc") // set the conductance levels
+
+// the following ling changes a value normally set in nrn/lib/stdrun.hoc
+
+forall Ra = 70  //  set_ra(70)
+
+set_v_init(stdrmp) // change default rmp to stdrmp (nominally -60 mV for this model)
+ek = -81.5
+eh = -43
+ena = 50
+setrin(-60, stdrin) // make sure Rin is correctly set before proceeding
+set_v_init(stdrmp)
+adjleak(stdrmp)
+dt=0.01
+
+natype = 1	// 1 is Na with fixed taus (Bernander), 0 is normal Moore-Cox state model
+
+// then build a control panel for this system...
+
+
+   h[1]= new HBox()
+   h[1].intercept(1)
+
+	xpanel("Pyramidal Cell Paremeter Control")
+	xlabel("Run Protocols")
+	xbutton("Fig 2","runiv()")        
+	xbutton("Fig 3A","runhyp(1,0,0,0)")
+	xbutton("Fig 3B","runhyp(1,0,1,0)")        
+	xbutton("Fig 4A","runhyp(1,1,0,0)") 
+	xbutton("Fig 4B","runhyp(1,1,1,0)")
+	xbutton("Fig 10A","runhyp(1,0,0,1)")
+	xbutton("Fig 10B","runhyp(1,1,0,1)")
+	
+	xlabel("Utility")
+	xbutton("Show gating functions", "showgate()")
+	xbutton("Set conductance params", "setcond()")
+	xbutton("Restore Defaults", "init_cell(0)")   
+	xbutton("Turn ih-current off","ghbar_pyr = 0")
+	xlabel("Stop the run")
+	xbutton("Stop","stoprun=1")
+
+ 
+   xpanel()   
+   xpanel("Pyramidal cell run control",0)
+   xlabel("Currents in nA")
+   xvalue("IV I-min","iv_mini", 1, "", 0, 0)
+   xvalue("IV I-max","iv_maxi", 1, "", 0, 0)
+   xvalue("IV steps","iv_nstepi", 1, "", 0, 0)
+   xlabel("Currents in nA")
+   xvalue("Hyp CondI","hyp_condi",1,"",0,0)
+   xvalue("Hyp I-min","hyp_mini", 1, "", 0, 0)
+   xvalue("Hyp I-max","hyp_maxi", 1, "", 0, 0)
+   xvalue("Hyp steps","hyp_nstepi", 1, "", 0, 0)
+   xvalue("Hyp I-int", "hyp_inti", 1, "", 0, 0)
+   xvalue("Hyp testI","hyp_testi", 1, "", 0, 0)
+   xlabel("Times in msec")
+   xvalue("Hyp2 t-min","hyp_mint", 1, "", 0, 0)
+   xvalue("Hyp2 t-max","hyp_maxt", 1, "", 0, 0)
+   xvalue("Hyp2 steps","hyp_nstept", 1, "", 0, 0)
+
+   xpanel()
+  
+   h[1].intercept(0)
+   h[1].map("Experiments: Main Control", 0, 190, 390, 400)
+
+// after this we're in the hands of the user

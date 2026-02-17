@@ -1,0 +1,3 @@
+//moddir plus5HT/3cell
+load_file("nrngui.hoc")
+load_file("plus5HT/3cell/3cell.hoc")

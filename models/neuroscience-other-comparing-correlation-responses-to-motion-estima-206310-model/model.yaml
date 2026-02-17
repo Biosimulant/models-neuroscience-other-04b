@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: ComparingCorrelationResponsesToMotionEstima206310Model'
+description: '{"value": "Code to generate responses of HRC-like and BL-like model
+  elementary motion detectors to correlated noise stimuli, including two models with
+  more realistic temporal filtering.", "attr_id": 2'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:206310
+  source_db: modeldb
+  source_id: '206310'
+  standard: other
+  original_url: https://modeldb.science/206310
+  download_url: https://modeldb.science/download/206310
+  license: ''
+bsim:
+  entrypoint: src.comparing_correlation_responses_to_motion_estima_206310_model:ComparingCorrelationResponsesToMotionEstima206310Model
+  init_kwargs:
+    model_path: data/206310.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

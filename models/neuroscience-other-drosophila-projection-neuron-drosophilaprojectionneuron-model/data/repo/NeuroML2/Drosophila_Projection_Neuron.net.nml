@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2  https://raw.githubusercontent.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta5.xsd" id="network_Drosophila_Projection_Neuron">
+
+    <notes>
+
+Network structure (NeuroML 2beta5) for project: Drosophila_Projection_Neuron saved with neuroConstruct v1.7.1 on: 17:28:55, 29-Nov-18
+
+Cell Group: F4B3 contains 1 cells
+Cell Group: F4B2 contains 1 cells
+Cell Group: F4B1 contains 1 cells
+
+
+
+    </notes>
+
+
+    <include href="Figure4B1.cell.nml"/>
+    <include href="Figure4B2.cell.nml"/>
+    <include href="Figure4B3.cell.nml"/>
+    <include href="LeakConductance.channel.nml"/>
+    <include href="LeakConductance.channel.nml"/>
+    <include href="LeakConductance.channel.nml"/>
+    <network id="network_Drosophila_Projection_Neuron" type="networkWithTemperature" temperature="6.3 degC">
+
+        
+
+        <population id="F4B3" component="Figure4B3" type="populationList" size="1">
+           <annotation>
+                <property tag="color" value="0.44140625 0.6796875 0.2890625"/>
+            </annotation>
+            <instance id="0">
+                <location x="200.0" y="0.0" z="0.0"/>
+            </instance>
+        </population>
+
+        <population id="F4B2" component="Figure4B2" type="populationList" size="1">
+           <annotation>
+                <property tag="color" value="0.5625 0.60546875 0.2578125"/>
+            </annotation>
+            <instance id="0">
+                <location x="0.0" y="0.0" z="0.0"/>
+            </instance>
+        </population>
+
+        <population id="F4B1" component="Figure4B1" type="populationList" size="1">
+           <annotation>
+                <property tag="color" value="0.39453125 0.21484375 0.5859375"/>
+            </annotation>
+            <instance id="0">
+                <location x="-200.0" y="0.0" z="0.0"/>
+            </instance>
+        </population>
+
+
+
+            <!--There are no synaptic connections present in the network-->
+
+
+            <!--There are no electrical inputs present in the network-->
+
+
+
+
+    </network>
+
+</neuroml>

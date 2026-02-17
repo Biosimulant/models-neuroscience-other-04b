@@ -1,0 +1,58 @@
+// function to compute stimulus level required to acheive
+// a specified voltage in the steady state
+// 2/8/99 P. Manis
+
+func setstim() {
+	finitialize($1)
+	fcurrent()
+	itot = (ina(0.5)+ik(0.5)+ih(0.5)+ica(0.5)+il_pok(0.5))*somaarea*1e6
+	return itot
+}
+
+objref s
+s = new Vector(100, 0)
+proc lists() {
+s = $o1
+	n = s.size
+	for i = 0, (n-1) {
+		printf("i: %6.0f = %8.3f \n", i, s.x[i])
+	}
+}
+// the next two routines are utility functions for generating
+// parameterized stimuli
+
+/* make array in log space */
+proc logspace() {
+	a = $1
+	b = $2
+	c = $3
+	if(c <= 1 || a <= 0 || b <= 0) {
+		printf("\nBad call to logspace: c <= 1 | a <= 0 | b <= 0 a: %f b: %f c: %f\n", a, b, c)
+		stim_list.resize(1)
+		stim_list.x[1] = 1
+		return
+	}
+	stim_list.resize(c)
+	logstep=(log10(b)-log10(a))/(c-1)
+	for i = 0, c-1 {
+		stim_list.x[i] = 10^(log10(a)+(logstep * i))
+	}
+}
+
+/* make array in linear space */
+proc linspace() {
+	a = $1
+	b = $2
+	c = $3
+	if(c <= 0 || a > b) {
+		printf("\nbad call to linspace: c = 0 | a > b  a: %f b: %f c: %f \n", a, b, c)
+		stim_list.resize(1)
+		stim_list.x[1] = 1
+		return
+	}
+	stim_list.resize(c)
+	linstep = (b - a) / (c-1)
+	for i = 0, c-1 {
+		stim_list.x[i] = a + (linstep*i)
+	}
+}

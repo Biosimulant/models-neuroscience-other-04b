@@ -1,0 +1,255 @@
+// runhyp.hoc - run a standard prepulse protocol - usually with hyperpolarization (hence the name)
+//
+//	1/28-30/2000
+//	Paul B. Manis : pmanis@med.unc.edu
+//
+// This version replaces separate versions of runhyp/runhyp2
+// Call with 2 parameters:	the first ($1) identifies the run number
+//							the second identifies the protocol ($2=0, level; $2=1, duration)
+//
+// 5/17/2000 added twin pulse protocol
+
+objref gspk, gstate
+objref gvarray[40], gv0r, gspk0
+objref lfspk, lfisi
+objref pvdat, ptdat, psdat
+
+objref hg, vg
+
+proc runhyp() {local i, j
+	stoprun = 0
+
+// The third parameter is what specifies the value of gkifbar -- whether default (0) or 0(1).
+// The fourth parameter is what specifies the value of gbar_pyr -- whether default (0) or 0 (1).
+
+	kk = $1
+		 
+	if ($3 == 1) {
+	 gkifbar_pyr = 0
+	}
+
+	if ($4 == 1) {
+	 ghbar_pyr = 0
+	 }
+	 	
+	if($2 == 0) {
+		spikefile = "HypV"
+		nstep = hyp_nstepi
+		linspace(hyp_mini*scalefactor, hyp_maxi*scalefactor, nstep) // generate results in stim_list
+	}
+	
+	if($2 == 1) {
+		spikefile = "HypT"
+		nstep = hyp_nstept
+		logspace(hyp_mint, hyp_maxt, nstep)
+	}
+	
+	if($2 == 2) {
+		spikefile = "HypW"
+		nstep = hyp_nstepi
+		linspace(hyp_mini, hyp_maxi, nstep)
+	}
+
+	
+adjleak(-60)
+set_v_init(stdrmp) // change default rmp to stdrmp (nominally -60 mV for this model)
+set_ra(70)
+ek = -81.5
+eh = -43
+ena = 50
+setrin(-60, stdrin) // make sure Rin is correctly set before proceeding
+
+adjleak(stdrmp)
+dt=0.01
+		
+	if($2 == 1 || $2 == 0) {
+	
+		istim.dur1=50
+		istim.amp1=hyp_condi*scalefactor*(284/300)/rinsf
+		istim.dur2=50
+		istim.amp2=-0.1*scalefactor*(284/300)/rinsf
+		istim.dur3=100
+//		istim.amp3= hyp_testi*scalefactor/rinsf
+        istim.amp3 = hyp_testi*(284/300)*scalefactor/rinsf //Ratio of conductances - Neuron vs. Matlab
+		istim.dur4 =100
+		istim.amp4=0
+		hypstop = 210
+	}
+	
+	if($2 == 1) {
+		hypstop = 270
+		istim.amp3= 0.1*scalefactor/rinsf // fix stimulus at smaller value.....
+		                                  		                                  
+	}
+	
+	if ($4 == 1) {
+	    istim.amp2 = -0.2*scalefactor/rinsf
+	    }
+	    		
+	if($2 == 2 ) {
+		istim.dur1=5
+		istim.amp1=0
+		istim.dur2=50
+		istim.amp2=0.2*scalefactor/rinsf
+		istim.dur3=100
+		istim.amp3= hyp_inti*scalefactor/rinsf
+		istim.dur4=100
+		istim.amp4= hyp_testi*scalefactor/rinsf
+		hypstop = 270
+	}
+
+	totaldelay = istim.dur1+istim.dur2
+
+		if($2 == 2) {
+		totaldelay=totaldelay+istim.dur3
+	     }
+	
+	pulsewidth = istim.dur3
+	basename="hyp"
+
+	fsv.resize(nstep)
+	fsl.resize(nstep)
+	fisi.resize(nstep)
+	fdel.resize(nstep)
+	fcap.resize(nstep)
+	fsinj.resize(nstep)
+
+    hg = new HBox()
+    hg.intercept(1)
+    
+    vigraph = new VBox()
+	vigraph.intercept(1)
+	
+	for i=0,4 { 
+   gvarray[i] = new Graph()
+   }   
+	
+    vigraph.intercept(0)
+	vigraph.map(spikefile, 400,190,350,400)   
+
+	vg = new VBox()
+	vg.intercept(1)
+   	gspk = new Graph()
+	vg.intercept(0)
+	vg.map(spikefile, 400,190,350,400)
+	
+	hg.intercept(0)
+	hg.map
+		
+	for j=0,4 {
+	    gvarray[j].erase_all()
+	    }
+	
+	for j = 0,4{
+	   gvarray[j].size(0,hypstop,-125,50)
+	   }
+	
+	gspk.erase_all()
+	gspk.size(0, stim_list.max, 0, 60)
+	
+	ns = nstep - 1
+    
+	maxout = 2048
+	
+	pvdat = new Vector(maxout)
+	ptdat = new Vector(maxout)
+	psdat = new Vector(maxout)
+    
+	c = 0
+	s_t = int((ns+1)/5)
+	
+ 	for j = 0, ns {
+		if($2 == 0 || $2   == 2) {
+			istim.amp2 = stim_list.x[j] // update the variable we are parameterizing
+			istim.amp1=hyp_condi*scalefactor/rinsf
+			}
+		if($2 == 1) {
+			istim.dur2 = stim_list.x[j]
+			totaldelay = istim.dur1+istim.dur2
+		}
+		
+		rununtil(hypstop, j)
+  	  	
+		if(stoprun == 1) {
+			printf("\n RUN STOPPED \n")
+			return
+		}
+
+// resample the vdat to a lower density for plotting...
+		
+		n1=vdat.size-1
+		dsize = idat.size -1
+		outstep = int(dsize/maxout)
+		pvdat.copy(vdat, 0, 0, -1, 1, outstep)
+		ptdat.copy(tdat, 0, 0, -1, 1, outstep)
+		
+		if ((j+1)%(s_t) == 0) {
+		
+		pvdat.line(gvarray[c], ptdat, (j%5)+1, 0) // plot the voltage traces
+		gvarray[c].label(0.05, 0.95, "Voltage")
+		gvarray[c].flush()
+		c = c + 1
+		}
+	
+  		if(monitor >0) {
+			psdat.copy(pyr_state, 0, 0, -1, 1, outstep)
+			psdat.line(gstate, ptdat, (j%5)+1, 0) // plot state plot
+		}
+		
+  	
+// graph the result - as latency and ISI vs prepulse final voltage 
+	
+	 if($2 == 0 || $2 == 2) {
+		fsl.cl(0,j).mark(gspk, fsv.cl(0,j), "O", 4, 1, 1)
+		fisi.cl(0,j).mark(gspk, fsv.cl(0,j), "+", 4, 2, 1)
+		gspk.size(fsv.min, fsv.max, -150, 150) // always keep sizing on screen 
+	 }
+	 if($2 == 1) {
+		fsl.cl(0,j).mark(gspk, stim_list.cl(0, j), "O", 4, 1, 1)
+		fisi.cl(0,j).mark(gspk, stim_list.cl(0,j), "+", 4, 2, 1)
+		gspk.size(stim_list.min, stim_list.max, -150, 150)
+	 }   	
+		gspk.flush()
+		doEvents()
+	}
+	
+	
+	if($2 == 0 || $2 == 2) {
+		fsl.line(gspk, fsv, 1, 1)
+		fisi.line(gspk, fsv, 2, 1)
+		gspk.size(fsv.min, fsv.max, -150, 150) // always keep sizing on screen 
+	}
+	
+	if($2 == 1) {
+		fsl.line(gspk, stim_list, 1, 1)
+		fisi.line(gspk, stim_list, 2, 1)
+		gspk.size(stim_list.min, stim_list.max, -150, 150)
+	}
+	
+	gspk.label(0.05, 0.95, "FSL, FISI vs vm")
+	gspk.flush()
+	doEvents()
+
+
+	printf("\n HYP run is complete \n")
+
+    init_cell(0)	
+}
+
+// procedure to vary the half-inactivation voltage of Ikif
+// over a range, then running the hyp protocol. Hyp prints
+// out the data sets into fitxxxx.dat, where xxxx is the value of m
+// during the run.
+
+objref metavhalf
+
+proc vary_hyp() {local m
+   	linspace(-100,-70, 7)
+	metavhalf = new Vector(1)
+	metavhalf = stim_list.c
+	for m = 0, metavhalf.size-1 {
+		kif_vh_pyr = metavhalf.x[m]
+		runhyp(m, 0)
+	printf("new v1/2: %8.4f", kif_vh_pyr)
+	}
+}		

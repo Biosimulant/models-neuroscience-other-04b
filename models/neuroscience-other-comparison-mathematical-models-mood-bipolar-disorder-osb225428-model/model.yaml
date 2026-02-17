@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model225428225428Model'
+description: A comparison of mathematical models of mood in bipolar disorder (Cochran
+  et al. 2017)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:225428
+  source_db: opensourcebrain
+  source_id: '225428'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/225428
+  download_url: https://github.com/OpenSourceBrain/225428.git
+  license: ''
+bsim:
+  entrypoint: src.model_225428_225428_model:Model225428225428Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

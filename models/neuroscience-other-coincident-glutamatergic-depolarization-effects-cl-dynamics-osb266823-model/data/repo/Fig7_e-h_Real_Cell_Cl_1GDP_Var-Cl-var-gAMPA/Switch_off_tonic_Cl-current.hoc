@@ -1,0 +1,30 @@
+//--------------------------------------------------------------------------//
+// Initialize Handler to switch of tonic current ar a given Timepoint START //
+//--------------------------------------------------------------------------//
+
+// Handling of the output data ([Cl-]i and i(SEclamp)) via the print window
+
+objref fih
+fih = new FInitializeHandler("init_tonic()")
+
+proc init_tonic() {
+  tonic_leak_value = 0.00000625
+print ("Init ok")     
+  cvode.event(START, "set_tonic()")
+}
+
+proc set_tonic() {
+  tonic_leak_value = 0.1
+Print ("Set ok")
+  if (cvode.active()) {
+    cvode.re_init()
+  } else {
+    fcurrent()
+  }
+}
+
+START =  5000 // ms
+
+// Run Simulation --------------------------------------------------------
+     call init_tonic()
+     run()

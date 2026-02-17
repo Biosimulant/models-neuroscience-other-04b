@@ -1,0 +1,33 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model244688244688Model'
+description: Channel density variability among CA1 neurons (Migliore et al. 2018)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:244688
+  source_db: opensourcebrain
+  source_id: '244688'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/244688
+  download_url: https://github.com/OpenSourceBrain/244688.git
+  license: ''
+bsim:
+  entrypoint: src.model_244688_244688_model:Model244688244688Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

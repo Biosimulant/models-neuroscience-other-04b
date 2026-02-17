@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model266518266518Model'
+description: Combining modeling, deep learning for MEA neuron localization, classification
+  (Buccino et al 2018)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:266518
+  source_db: opensourcebrain
+  source_id: '266518'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/266518
+  download_url: https://github.com/OpenSourceBrain/266518.git
+  license: ''
+bsim:
+  entrypoint: src.model_266518_266518_model:Model266518266518Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

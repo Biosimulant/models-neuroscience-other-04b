@@ -1,0 +1,6 @@
+// Starts
+
+load_file("nrngui.hoc")
+load_file("Cell1_Cl_HCO3_Pas_fine.hoc")
+load_file("GDP_Cl_HCO3_All_short.ses")
+load_file("Single_GDP_gGABA-0.789-nGABA-534_gAMPA-0.305_Div_Cl_100pSpatialCorrel.hoc")

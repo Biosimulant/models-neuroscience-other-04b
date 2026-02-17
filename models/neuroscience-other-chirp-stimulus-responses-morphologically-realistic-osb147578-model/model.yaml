@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model147578147578Model'
+description: Chirp stimulus responses in a morphologically realistic model (Narayanan
+  and Johnston, 2007)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:147578
+  source_db: opensourcebrain
+  source_id: '147578'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/147578
+  download_url: https://github.com/OpenSourceBrain/147578.git
+  license: ''
+bsim:
+  entrypoint: src.model_147578_147578_model:Model147578147578Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

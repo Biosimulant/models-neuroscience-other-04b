@@ -1,0 +1,202 @@
+{load_file("nrngui.hoc")}
+objectvar save_window_, rvp_
+objectvar scene_vector_[4]
+objectvar ocbox_, ocbox_list_, scene_, scene_list_
+{ocbox_list_ = new List()  scene_list_ = new List()}
+{pwman_place(0,0,0)}
+
+//Begin PointProcessGroupManager
+{
+load_file("pointgrp.hoc")
+}
+{
+ocbox_ = new PointProcessGroupManager(0)
+}
+{object_push(ocbox_)}
+{
+ms = new MechanismStandard("IClamp")
+ms.set("del", 1, 0)
+ms.set("dur", 0.5, 0)
+ms.set("amp", 6, 0)
+mnews("IClamp", ms)
+select(0)
+execute("Ssoma[1] ocbox_.move(0)")
+ms = new MechanismStandard("IClamp")
+ms.set("del", 0, 0)
+ms.set("dur", 0.5, 0)
+ms.set("amp", 0, 0)
+mnews("IClamp", ms)
+select(1)
+execute("Ssoma[2] ocbox_.move(0)")
+ms = new MechanismStandard("IClamp")
+ms.set("del", 0, 0)
+ms.set("dur", 0, 0)
+ms.set("amp", 0, 0)
+mnews("IClamp", ms)
+select(2)
+execute("Ssoma[3] ocbox_.move(0)")
+}
+{object_pop() doNotify()}
+{
+ocbox_ = ocbox_.v1
+ocbox_.map("PointProcessGroupManager", 368, 348, 545.4, 362.7)
+}
+objref ocbox_
+//End PointProcessGroupManager
+
+{
+save_window_ = new Graph(0)
+save_window_.size(0,30,-80,40)
+scene_vector_[3] = save_window_
+{save_window_.view(0, -80, 30, 120, 367, 6, 731.7, 200.8)}
+graphList[0].append(save_window_)
+save_window_.save_name("graphList[0].")
+save_window_.addvar("Ssoma[2].v( 0.5 )", 1, 1, 0.79877, 0.819323, 2)
+}
+{
+xpanel("RunControl", 0)
+v_init = -65
+xvalue("Init","v_init", 1,"stdinit()", 1, 1 )
+xbutton("Init & Run","run()")
+xbutton("Stop","stoprun=1")
+runStopAt = 5
+xvalue("Continue til","runStopAt", 1,"{continuerun(runStopAt) stoprun=1}", 1, 1 )
+runStopIn = 1
+xvalue("Continue for","runStopIn", 1,"{continuerun(t + runStopIn) stoprun=1}", 1, 1 )
+xbutton("Single Step","steprun()")
+t = 27.4
+xvalue("t","t", 2 )
+tstop = 30
+xvalue("Tstop","tstop", 1,"tstop_changed()", 0, 1 )
+dt = 0.025
+xvalue("dt","dt", 1,"setdt()", 0, 1 )
+steps_per_ms = 40
+xvalue("Points plotted/ms","steps_per_ms", 1,"setdt()", 0, 1 )
+screen_update_invl = 0.05
+xvalue("Scrn update invl","screen_update_invl", 1,"", 0, 1 )
+realtime = 16.18
+xvalue("Real Time","realtime", 0,"", 0, 1 )
+xpanel(24,104)
+}
+{
+xpanel("Temperature", 0)
+celsius = 12
+xvalue("celsius","celsius", 1,"", 0, 1 )
+xpanel(32,546)
+}
+{
+xpanel("forall Ra=global_ra", 0)
+global_ra = 100
+xvalue("global Ra","global_ra", 1,"set_ra()", 1, 1 )
+xpanel(30,656)
+}
+{
+xpanel("Sax[1](0 - 1) (Parameters)", 0)
+xlabel("Sax[1](0 - 1) (Parameters)")
+xlabel("nseg = 1200")
+Sax[1].L = 6000
+xvalue("L","Sax[1].L", 1,"define_shape()", 0, 0 )
+Sax[1].cm = 1
+xvalue("cm","Sax[1].cm", 1,"", 0, 0 )
+Sax[1].diam = 7
+xvalue("diam","Sax[1].diam", 1,"", 0, 0 )
+Sax[1].gnabar_hh2 = 0.12
+xvalue("gnabar_hh2","Sax[1].gnabar_hh2", 1,"", 0, 0 )
+Sax[1].gkbar_hh2 = 0.036
+xvalue("gkbar_hh2","Sax[1].gkbar_hh2", 1,"", 0, 0 )
+Sax[1].gl_hh2 = 0.0003
+xvalue("gl_hh2","Sax[1].gl_hh2", 1,"", 0, 0 )
+Sax[1].el_hh2 = -54.3
+xvalue("el_hh2","Sax[1].el_hh2", 1,"", 0, 0 )
+Sax[1].mvhalfa_hh2 = -45
+xvalue("mvhalfa_hh2","Sax[1].mvhalfa_hh2", 1,"", 0, 0 )
+Sax[1].mvhalfb_hh2 = -55
+xvalue("mvhalfb_hh2","Sax[1].mvhalfb_hh2", 1,"", 0, 0 )
+Sax[1].hvhalfa_hh2 = -62
+xvalue("hvhalfa_hh2","Sax[1].hvhalfa_hh2", 1,"", 0, 0 )
+Sax[1].hvhalfb_hh2 = -31
+xvalue("hvhalfb_hh2","Sax[1].hvhalfb_hh2", 1,"", 0, 0 )
+Sax[1].nvhalfa_hh2 = -53
+xvalue("nvhalfa_hh2","Sax[1].nvhalfa_hh2", 1,"", 0, 0 )
+Sax[1].nvhalfb_hh2 = -63
+xvalue("nvhalfb_hh2","Sax[1].nvhalfb_hh2", 1,"", 0, 0 )
+Sax[1].ena = 50
+xvalue("ena","Sax[1].ena", 1,"", 0, 0 )
+Sax[1].ek = -77
+xvalue("ek","Sax[1].ek", 1,"", 0, 0 )
+xpanel(442,750)
+}
+{
+xpanel("Sax[2](0 - 1) (Parameters)", 0)
+xlabel("Sax[2](0 - 1) (Parameters)")
+xlabel("nseg = 1200")
+Sax[2].L = 6000
+xvalue("L","Sax[2].L", 1,"define_shape()", 0, 0 )
+Sax[2].cm = 1
+xvalue("cm","Sax[2].cm", 1,"", 0, 0 )
+Sax[2].diam = 7
+xvalue("diam","Sax[2].diam", 1,"", 0, 0 )
+Sax[2].gnabar_hh2 = 0.12
+xvalue("gnabar_hh2","Sax[2].gnabar_hh2", 1,"", 0, 0 )
+Sax[2].gkbar_hh2 = 0.036
+xvalue("gkbar_hh2","Sax[2].gkbar_hh2", 1,"", 0, 0 )
+Sax[2].gl_hh2 = 0.0003
+xvalue("gl_hh2","Sax[2].gl_hh2", 1,"", 0, 0 )
+Sax[2].el_hh2 = -54.3
+xvalue("el_hh2","Sax[2].el_hh2", 1,"", 0, 0 )
+Sax[2].mvhalfa_hh2 = -45
+xvalue("mvhalfa_hh2","Sax[2].mvhalfa_hh2", 1,"", 0, 0 )
+Sax[2].mvhalfb_hh2 = -55
+xvalue("mvhalfb_hh2","Sax[2].mvhalfb_hh2", 1,"", 0, 0 )
+Sax[2].hvhalfa_hh2 = -62
+xvalue("hvhalfa_hh2","Sax[2].hvhalfa_hh2", 1,"", 0, 0 )
+Sax[2].hvhalfb_hh2 = -31
+xvalue("hvhalfb_hh2","Sax[2].hvhalfb_hh2", 1,"", 0, 0 )
+Sax[2].nvhalfa_hh2 = -53
+xvalue("nvhalfa_hh2","Sax[2].nvhalfa_hh2", 1,"", 0, 0 )
+Sax[2].nvhalfb_hh2 = -63
+xvalue("nvhalfb_hh2","Sax[2].nvhalfb_hh2", 1,"", 0, 0 )
+Sax[2].ena = 50
+xvalue("ena","Sax[2].ena", 1,"", 0, 0 )
+Sax[2].ek = -77
+xvalue("ek","Sax[2].ek", 1,"", 0, 0 )
+xpanel(772,748)
+}
+{
+xpanel("Sax[3](0 - 1) (Parameters)", 0)
+xlabel("Sax[3](0 - 1) (Parameters)")
+xlabel("nseg = 1200")
+Sax[3].L = 6000
+xvalue("L","Sax[3].L", 1,"define_shape()", 0, 0 )
+Sax[3].cm = 1
+xvalue("cm","Sax[3].cm", 1,"", 0, 0 )
+Sax[3].diam = 7
+xvalue("diam","Sax[3].diam", 1,"", 0, 0 )
+Sax[3].gnabar_hh2 = 0.12
+xvalue("gnabar_hh2","Sax[3].gnabar_hh2", 1,"", 0, 0 )
+Sax[3].gkbar_hh2 = 0.036
+xvalue("gkbar_hh2","Sax[3].gkbar_hh2", 1,"", 0, 0 )
+Sax[3].gl_hh2 = 0.0003
+xvalue("gl_hh2","Sax[3].gl_hh2", 1,"", 0, 0 )
+Sax[3].el_hh2 = -54.3
+xvalue("el_hh2","Sax[3].el_hh2", 1,"", 0, 0 )
+Sax[3].mvhalfa_hh2 = -45
+xvalue("mvhalfa_hh2","Sax[3].mvhalfa_hh2", 1,"", 0, 0 )
+Sax[3].mvhalfb_hh2 = -55
+xvalue("mvhalfb_hh2","Sax[3].mvhalfb_hh2", 1,"", 0, 0 )
+Sax[3].hvhalfa_hh2 = -62
+xvalue("hvhalfa_hh2","Sax[3].hvhalfa_hh2", 1,"", 0, 0 )
+Sax[3].hvhalfb_hh2 = -31
+xvalue("hvhalfb_hh2","Sax[3].hvhalfb_hh2", 1,"", 0, 0 )
+Sax[3].nvhalfa_hh2 = -53
+xvalue("nvhalfa_hh2","Sax[3].nvhalfa_hh2", 1,"", 0, 0 )
+Sax[3].nvhalfb_hh2 = -63
+xvalue("nvhalfb_hh2","Sax[3].nvhalfb_hh2", 1,"", 0, 0 )
+Sax[3].ena = 50
+xvalue("ena","Sax[3].ena", 1,"", 0, 0 )
+Sax[3].ek = -77
+xvalue("ek","Sax[3].ek", 1,"", 0, 0 )
+xpanel(1101,741)
+}
+objectvar scene_vector_[1]
+{doNotify()}

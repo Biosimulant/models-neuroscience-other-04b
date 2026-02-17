@@ -1,0 +1,107 @@
+// showgate.hoc
+// put up a display of all of the gating plots for the pyramidal cell model
+//
+// 2/1/2000 P. Manis
+//
+
+minv = -100
+maxv = 50
+nv = 50
+
+objref sg, sg1, sg2
+objref sgna, sgk, sgkif, sgkis, sgkift, sgkist, sgh
+objref gt_nah, gt_nam, gt_kdm, gt_kifh, gt_kifm, gt_kism, gt_kish, gt_h
+objref gt_kiftm, gt_kifth, gt_kistm, gt_kisth
+gt_nah = new Vector(nv)
+gt_nam = new Vector(nv)
+gt_kdm = new Vector(nv)
+gt_kifm = new Vector(nv)
+gt_kifh = new Vector(nv)
+gt_kism = new Vector(nv)
+gt_kish = new Vector(nv)
+gt_h = new Vector(nv)
+gt_kiftm = new Vector(nv)
+gt_kifth = new Vector(nv)
+gt_kistm = new Vector(nv)
+gt_kisth = new Vector(nv)
+
+proc showgate(){
+
+	sg = new HBox()
+	sg.intercept(1) // capture input
+	xpanel("Na, Kd, H")
+	sg1 = new VBox()
+		sg1.intercept(1)
+		sgna = new Graph()
+		sgna.label(0.05, 0.95,"Na")
+		sgna.size(minv, maxv, 0, 1)
+		sgk = new Graph()
+		sgk.label(0.05, 0.95,"Kd")
+		sgk.size(minv, maxv, 0, 1)
+		sgh = new Graph()
+		sgh.label(0.05, 0.95, "Ih")
+		sgh.size(minv, maxv, 0, 1)
+		sg1.intercept(0)
+		sg1.map("Na, Kd, H", 0, 0, 100, 100)
+	xpanel()
+	xpanel("IKif, IKis")
+		sg2 = new VBox()
+		sg2.intercept(1)
+		sgkif = new Graph()
+		sgkif.label(0.05, 0.95, "IKif")
+		sgkif.size(minv, maxv, 0, 1)
+		sgkift = new Graph()
+		sgkift.label(0.05, 0.95, "IKif")
+		sgkift.size(minv, maxv, 0, 10)
+		sgkis = new Graph()
+		sgkis.label(0.05,0.95, "IKis")
+		sgkis.size(minv, maxv, 0, 1)
+		sgkist = new Graph()
+		sgkist.label(0.05,0.95, "IKis")
+		sgkist.size(minv, maxv, 0, 200)
+		sg2.intercept(0)
+		sg2.map("IKif, IKis", 100, 0, 100, 100)
+	xpanel()
+	sg.intercept(0)
+	sg.map("Gating", 200, 100, 300, 400)
+
+	linspace(minv, maxv, nv)
+	for i=0,stim_list.size-1 {
+		vx = stim_list.x[i]
+		gt_nam.x[i] = na_m_pyr(vx)^2
+		gt_nah.x[i] = na_h_pyr(vx)
+		gt_kdm.x[i] = kd_m_pyr(vx)^2
+		gt_kifm.x[i] = kif_m_pyr(vx)^4
+		gt_kifh.x[i] = kif_h_pyr(vx)
+		gt_kism.x[i] = kis_m_pyr(vx)^4
+		gt_kish.x[i] = kis_h_pyr(vx)
+		gt_kiftm.x[i] = kif_mt_pyr(vx)
+		gt_kifth.x[i] = kif_ht_pyr(vx)
+		gt_kistm.x[i] = kis_mt_pyr(vx)
+		gt_kisth.x[i] = kis_ht_pyr(vx)
+		gt_h.x[i] = kh_m_pyr(vx)
+	}
+	gt_nam.line(sgna, stim_list, 1, 1)
+	gt_nah.line(sgna, stim_list, 2, 1)
+	gt_kdm.line(sgk, stim_list, 1, 1)
+	gt_h.line(sgh, stim_list, 1, 1)
+
+	gt_kifm.line(sgkif, stim_list, 1, 1)
+	gt_kifh.line(sgkif, stim_list, 2, 1)
+	gt_kism.line(sgkis, stim_list, 1, 1)
+	gt_kish.line(sgkis, stim_list, 2, 1)
+	gt_kiftm.line(sgkift, stim_list, 1, 1)
+	gt_kifth.line(sgkift, stim_list, 2, 1)
+	gt_kistm.line(sgkist, stim_list, 1, 1)
+	gt_kisth.line(sgkist, stim_list, 2, 1)
+
+	sgna.flush()
+	sgk.flush()
+	sgkif.flush()
+	sgkis.flush()
+	sgh.flush()
+	doEvents()
+}
+
+	
+ 

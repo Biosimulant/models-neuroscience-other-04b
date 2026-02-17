@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CompartmentalDifferencesInCampSignalingPath245529Model'
+description: '{"value": "Model of cAMP signaling pathways in hippocampal CA1 pyramidal
+  neurons investigate mechanisms underlying the experimentally observed difference
+  in cAMP and PKA FRET between proximal and dist'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:245529
+  source_db: modeldb
+  source_id: '245529'
+  standard: other
+  original_url: https://modeldb.science/245529
+  download_url: https://modeldb.science/download/245529
+  license: ''
+bsim:
+  entrypoint: src.compartmental_differences_in_camp_signaling_path_245529_model:CompartmentalDifferencesInCampSignalingPath245529Model
+  init_kwargs:
+    model_path: data/245529.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

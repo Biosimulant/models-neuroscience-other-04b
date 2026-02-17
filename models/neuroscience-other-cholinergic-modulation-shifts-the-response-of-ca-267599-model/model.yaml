@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: CholinergicModulationShiftsTheResponseOfCa267599Model'
+description: '{"value": "Model of Cholinergic modulation of a CA1 pyramidal cell through
+  TRPM4, includes a nanodomain", "attr_id": 24}'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:267599
+  source_db: modeldb
+  source_id: '267599'
+  standard: other
+  original_url: https://modeldb.science/267599
+  download_url: https://modeldb.science/download/267599
+  license: ''
+bsim:
+  entrypoint: src.cholinergic_modulation_shifts_the_response_of_ca_267599_model:CholinergicModulationShiftsTheResponseOfCa267599Model
+  init_kwargs:
+    model_path: data/267599.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

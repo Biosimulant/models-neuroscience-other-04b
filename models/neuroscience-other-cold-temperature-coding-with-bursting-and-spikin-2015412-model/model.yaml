@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: ColdTemperatureCodingWithBurstingAndSpikin2015412Model'
+description: '{"value": "Temperature sensation involves thermosensitive TRP (thermoTRP)
+  and non-TRP channels. Drosophila larval Class III (CIII) neurons serve as the primary
+  cold nociceptors and express a suite of '
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:2015412
+  source_db: modeldb
+  source_id: '2015412'
+  standard: other
+  original_url: https://modeldb.science/2015412
+  download_url: https://modeldb.science/download/2015412
+  license: ''
+bsim:
+  entrypoint: src.cold_temperature_coding_with_bursting_and_spikin_2015412_model:ColdTemperatureCodingWithBurstingAndSpikin2015412Model
+  init_kwargs:
+    model_path: data/2015412.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

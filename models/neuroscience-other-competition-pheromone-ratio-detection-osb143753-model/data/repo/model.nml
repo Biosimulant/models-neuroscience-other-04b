@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<networkml xmlns="http://morphml.org/networkml/schema" xmlns:meta="http://morphml.org/metadata/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://morphml.org/networkml/schema  NetworkML_v1.7.xsd" lengthUnits="micron">
+
+<meta:notes>
+
+Network structure for project: x1 saved with neuroConstruct v1.2.2 on: 19:14:32, 15-May-09
+
+Cell Group: LN1 contains 1 cells
+Cell Group: PN contains 1 cells
+Cell Group: LNz contains 1 cells
+Cell Group: PNi contains 1 cells
+Cell Group: ORNb contains 1 cells
+Cell Group: LN2 contains 1 cells
+Cell Group: ORNa contains 1 cells
+
+Network connection: LNz-LN1 contains 1 individual synaptic connections
+Network connection: LN2-LNz contains 1 individual synaptic connections
+Network connection: ORNb-LNz contains 1 individual synaptic connections
+Network connection: ORNa-LNz contains 1 individual synaptic connections
+Network connection: LN1-LNz contains 1 individual synaptic connections
+Network connection: ORNb-LN2 contains 1 individual synaptic connections
+Network connection: LN2-LN1 contains 1 individual synaptic connections
+Network connection: LN1-LN2 contains 1 individual synaptic connections
+Network connection: ORNa-LN1 contains 1 individual synaptic connections
+Network connection: LNz-PNi contains 1 individual synaptic connections
+Network connection: PNi-PN contains 1 individual synaptic connections
+Network connection: LNz-LN2 contains 1 individual synaptic connections
+
+</meta:notes>
+
+<meta:properties>
+    <meta:property>
+	<meta:tag>neuroConstruct_random_seed</meta:tag>
+	<meta:value>-2095241054</meta:value>
+    </meta:property>
+    <meta:property>
+	<meta:tag>neuroConstruct_sim_config</meta:tag>
+	<meta:value>Default Simulation Configuration</meta:value>
+    </meta:property>
+</meta:properties>
+
+<populations>
+    <population name="LN1" cell_type="HH">
+	<instances size="1">
+	    <instance id="0">
+		<location x="6.0" y="-73.61524" z="37.5"/>
+	    </instance>
+	</instances>
+    </population>
+    <population name="PN" cell_type="HH">
+	<instances size="1">
+	    <instance id="0">
+		<location x="-16.0" y="-16.0" z="-127.0"/>
+	    </instance>
+	</instances>
+    </population>
+    <population name="LNz" cell_type="HH">
+	<instances size="1">
+	    <instance id="0">
+		<location x="31.437284" y="-0.35245514" z="57.219738"/>
+	    </instance>
+	</instances>
+    </population>
+    <population name="PNi" cell_type="HH">
+	<instances size="1">
+	    <instance id="0">
+		<location x="-16.0" y="-16.0" z="-97.0"/>
+	    </instance>
+	</instances>
+    </population>
+    <population name="ORNb" cell_type="DotPoisson">
+	<instances size="1">
+	    <instance id="0">
+		<location x="30.84151" y="111.14973" z="324.96512"/>
+	    </instance>
+	</instances>
+    </population>
+    <population name="LN2" cell_type="HH">
+	<instances size="1">
+	    <instance id="0">
+		<location x="6.0" y="56.38476" z="37.5"/>
+	    </instance>
+	</instances>
+    </population>
+    <population name="ORNa" cell_type="DotPoisson">
+	<instances size="1">
+	    <instance id="0">
+		<location x="57.5488" y="-135.62527" z="246.17108"/>
+	    </instance>
+	</instances>
+    </population>
+</populations>
+
+<projections units="Physiological Units">
+    <projection name="LNz-LN1" source="LNz" target="LN1">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.55582243" post_cell_id="0" post_segment_id="10" post_fraction_along="0.38091567">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="LN2-LNz" source="LN2" target="LNz">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.8175385" post_cell_id="0" post_segment_id="10" post_fraction_along="0.08029305">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="ORNb-LNz" source="ORNb" target="LNz">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="1" pre_fraction_along="0.9915016" post_cell_id="0" post_segment_id="9" post_fraction_along="0.4251294">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="ORNa-LNz" source="ORNa" target="LNz">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="1" pre_fraction_along="0.4514249" post_cell_id="0" post_segment_id="9" post_fraction_along="0.023154497">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="LN1-LNz" source="LN1" target="LNz">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.2117557" post_cell_id="0" post_segment_id="10" post_fraction_along="0.42112848">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="ORNb-LN2" source="ORNb" target="LN2">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="1" pre_fraction_along="0.96524084" post_cell_id="0" post_segment_id="10" post_fraction_along="0.14532664">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="LN2-LN1" source="LN2" target="LN1">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.5863692" post_cell_id="0" post_segment_id="10" post_fraction_along="0.50665826">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="LN1-LN2" source="LN1" target="LN2">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.6822715" post_cell_id="0" post_segment_id="10" post_fraction_along="0.44029188">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="ORNa-LN1" source="ORNa" target="LN1">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="1" pre_fraction_along="0.82270634" post_cell_id="0" post_segment_id="10" post_fraction_along="0.58317965">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="LNz-PNi" source="LNz" target="PNi">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.8898634" post_cell_id="0" post_segment_id="10" post_fraction_along="0.30973306">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="PNi-PN" source="PNi" target="PN">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.23782128" post_cell_id="0" post_segment_id="9" post_fraction_along="0.69209504">
+	    </connection>
+	</connections>
+    </projection>
+    <projection name="LNz-LN2" source="LNz" target="LN2">
+	<synapse_props synapse_type="AB" internal_delay="5.0" weight="1.0" threshold="-20.0">
+	</synapse_props>
+	<connections>
+	    <connection id="0" pre_cell_id="0" pre_segment_id="7" pre_fraction_along="0.9626454" post_cell_id="0" post_segment_id="9" post_fraction_along="0.18079913">
+	    </connection>
+	</connections>
+    </projection>
+</projections>
+
+    <!--There are no electrical inputs present in the network-->
+
+
+</networkml>

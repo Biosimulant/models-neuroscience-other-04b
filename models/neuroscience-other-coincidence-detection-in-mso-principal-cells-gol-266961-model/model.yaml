@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CoincidenceDetectionInMsoPrincipalCellsGol266961Model'
+description: '{"value": "How a particular combination of anatomical and biophysical
+  properties results in a short integration window (good for detection of closely-coincident
+  inputs) while also enabling efficient a'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:266961
+  source_db: modeldb
+  source_id: '266961'
+  standard: other
+  original_url: https://modeldb.science/266961
+  download_url: https://modeldb.science/download/266961
+  license: ''
+bsim:
+  entrypoint: src.coincidence_detection_in_mso_principal_cells_gol_266961_model:CoincidenceDetectionInMsoPrincipalCellsGol266961Model
+  init_kwargs:
+    model_path: data/266961.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

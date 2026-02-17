@@ -1,0 +1,6 @@
+load_file("nrngui.hoc")
+
+load_file("cell_soma_dendrite.hoc")
+load_file("init_Cldif.hoc")
+load_file("Isolated_Dendrite.ses")
+load_file("GABA-AMPA_BS_Var-temp_rel_AMPA_Var-Cl_essential_traces_high res.hoc")

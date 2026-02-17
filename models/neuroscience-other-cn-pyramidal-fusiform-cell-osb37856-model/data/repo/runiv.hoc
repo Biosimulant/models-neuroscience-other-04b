@@ -1,0 +1,83 @@
+// Run a basic "iv". This routine varies the stimulating current over the defined
+// range and collects the resulting voltages.
+// Paul B. Manis. 1996.
+// procedure as a separate file , Jan 28, 2000.
+
+objref gs, gap, gi
+
+proc runiv() {
+
+/* set up stimulus timing and basics */
+
+    stoprun = 0
+	
+    vgraph = new VBox() // create a vertical box
+	vgraph.intercept(1) // capture all graphics-directed input to the box
+	gv = new Graph() // put a graph in the box
+	gv.label(0.05, 0.95, "Voltage")  // simplicity - label in upper left corner
+	gi = new Graph() // current plot
+	gi.label(0.5, 0.95, "Current") //
+	gap = new Graph() // put a graph in the box
+	gap.label(0.05, 0.95, "AP count")  // simplicity - label in upper left corner
+	vgraph.intercept(0)
+	vgraph.map("IV", 400, 190, 350, 300)
+
+	istim.amp1=0
+    istim.dur1 = 5 /* 1 msec at rmp */
+    istim.amp2=0
+    istim.dur2=100	/* 50 msec step */
+    istim.amp3=0	/* rest is at I=0 */
+    istim.dur3=100
+    istim.amp4=0
+    istim.dur4=0
+    istim.amp5=0
+    istim.dur5=0
+
+// now set up IV protocol
+
+	nstep = iv_nstepi
+	linspace(iv_mini*scalefactor, iv_maxi*scalefactor, nstep) // generate results in stim_list
+    basename="res" // base name for iv is res for result
+    tmax = 140
+
+	totaldelay = istim.dur1
+	pulsewidth = istim.dur2
+
+	
+	gv.size(0, tmax, -140, 40)
+	gi.size(0, tmax, stim_list.min, stim_list.max)
+	gap.size(stim_list.min, stim_list.max, 0, 20)
+	ns=nstep-1
+	for j = 0, ns {
+		istim.amp2 = stim_list.x[j] // update the variable we are parameterizing
+        rununtil(200, j)
+        vdat.line(gv, tdat, j+1, 0) // plot the voltage traces
+		idat.line(gi, tdat, j+1, 0) // plot the current traces
+        		
+		fapn.cl(0,j).mark(gap, stim_list.cl(0,j), "O", 6, 2, 1)
+		
+		if(fapn.x[j]> 20) {
+			gap.size(stim_list.min, stim_list.max, 0, fapn.x[j])
+		}
+		if(monitor==1)	pyr_m.line(gs, tdat, j+1, 0)
+		if(monitor==2)  pyr_h.line(gs, tdat, j+1, 0)
+		if(monitor==3)  pyr_n.line(gs, tdat, j+1, 0)
+		if(monitor==4)  pyr_kifa.line(gs, tdat, j+1, 0)
+		if(monitor==5)  pyr_kifi.line(gs, tdat, j+1, 0)
+		if(monitor==6)  pyr_kisa.line(gs, tdat, j+1, 0)
+		if(monitor==7)  pyr_kisi.line(gs, tdat, j+1, 0)
+		if(monitor==8)  pyr_kh.line(gs, tdat, j+1, 0)
+		
+		gv.flush() // and force the window to update
+    	gap.flush()
+    	
+   		if(stoprun == 1) {
+			printf("\n RUN STOPPED \n")
+			return
+		}
+	}
+	fapn.line(gap, stim_list, 2, 1)
+	gap.flush()
+	doEvents() // completion
+
+}

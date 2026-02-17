@@ -1,0 +1,24 @@
+<pre>
+   		1D Linear Cochlear Model for the gerbil
+
+					R. Naidu and D. Mountain
+				Cochlear Biophysics Laboratory
+			Boston University Hearing Research Center
+
+ The model computes Pressure difference and the BM volume
+ velocity by picking a number for the fluid volume velocity
+ through the helicotrema and then working back towards
+ the base.  At each section the fluid volume velocity is computed
+ by adding the fluid volume velocity from the previous section to
+ the basilar membrane volume velocity.  The pressure drop across the
+ fluid due to this velocity is then computed and added to the pressure
+ difference across the cochlear partition.  Since the model is linear,
+ the results above can then be scaled to the pressure difference at the
+ stapes.
+
+The Matlab file is self contained and can be run by just typing the name PBmodel
+at the matlab prompt.
+
+This and other auditory models are available at 
+<a href='http://earlab.bu.edu'>EarLab</a>, a digital warehouse of auditory models and data.
+</pre>

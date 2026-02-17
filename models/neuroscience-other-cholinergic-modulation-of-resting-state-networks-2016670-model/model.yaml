@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CholinergicModulationOfRestingStateNetworks2016670Model'
+description: '{"value": "Brain activity during the resting state is widely used to
+  examine brain organization, cognition and alterations in disease states. While it
+  is known that neuromodulation and the state of al'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:2016670
+  source_db: modeldb
+  source_id: '2016670'
+  standard: other
+  original_url: https://modeldb.science/2016670
+  download_url: https://modeldb.science/download/2016670
+  license: ''
+bsim:
+  entrypoint: src.cholinergic_modulation_of_resting_state_networks_2016670_model:CholinergicModulationOfRestingStateNetworks2016670Model
+  init_kwargs:
+    model_path: data/2016670.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

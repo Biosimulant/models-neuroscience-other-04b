@@ -1,0 +1,8 @@
+For the determination of R-input the cell (either passive or with tonicGABA) was manually loaded
+in the GUI and then the Determine_Rinput rig was startet. 
+This configuration allows the manual determination of current-induced voltage deflection,
+from which R-input was calculated.
+
+In this configuration als g_pas and g_tonic can be modified.
+
+This configutation was used to mact R-input for both cell types.

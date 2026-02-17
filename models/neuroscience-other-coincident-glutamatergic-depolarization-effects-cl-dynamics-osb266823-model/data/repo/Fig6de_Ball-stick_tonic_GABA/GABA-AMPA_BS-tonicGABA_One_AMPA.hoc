@@ -1,0 +1,95 @@
+// Simulation and analysis of Spatiotemporal Component of Cl- Gradients in a isolated dendrite
+// Here simulation of one AMPA Synapses
+// Here application in a simple Ball and Stick Model
+
+
+// Determination Parameters AMPA
+  ANZAHL_AMPA = 1           //Anzahl der synaptischen Pulse
+  G_AMPA = 0.000305 * 0   //Value from Lombardi et al 2018 
+  E_AMPA = 0                // Reversal Potential of Exp2Syn
+  DECAY_AMPA = 11      
+  AMPA_SYN_LOCATION = 0.5   // Position GABA Synapse for Pulses
+  AMPA_Delay = 198000
+
+
+// Determine [Cl-]i -----------
+
+   Cl_intra = 5              // mM
+
+//----- Define run parameters ---------------------
+  tstop = 200000   // Duration
+  slowdown_start = AMPA_Delay - 1000
+  v_init = -60   // Initial voltage
+  dt_fast = 10      // Step Interval in ms
+  dt_slow = 0.2      // Step Interval in ms
+
+// Functions init_changedt and set_changedt -----------------//
+//                                                           //
+// Event Handler that decreases dt at a given timepoint      //
+// required for fast equilibratin at low temp resolution     //
+// but a high resolution for phases with synaptic events      //
+// ----------------------------------------------------------//
+
+objref fih
+fih = new FInitializeHandler("init_slowchangedt()")
+
+proc init_slowchangedt() {
+  printf("\n Init_slowchangedt-ok, Start = %g ms \n",slowdown_start)
+  dt = dt_fast  
+  cvode.event(slowdown_start, "set_slowdt()")
+}
+
+proc set_slowdt() {
+  printf("\n Call executed - changed to slow dt \n")
+  dt = dt_slow
+  if (cvode.active()) {
+    cvode.re_init()
+  } else {
+    fcurrent()
+  }
+}
+
+
+//-- Initialize Graph for Display of [Cli]i in the right scale
+objectvar Cl_graph
+Cl_graph = new Graph(0)
+Cl_graph.size(slowdown_start,tstop,5.76,5.77)
+Cl_graph.view(slowdown_start, 5.76, tstop - slowdown_start, 0.01, 462, 636, 961.2, 200.8)
+graphList[0].append(Cl_graph)
+Cl_graph.addexpr("dend.cli( 0.5 )", 1, 1, 0.8, 0.9, 2)
+
+//----- Insert synapses -------------------------
+
+  objref ampasyn
+  dend {
+    // insert AMPA synapse 
+    ampasyn = new Exp2Syn(AMPA_SYN_LOCATION)
+    ampasyn.tau1 = 0.1 
+    ampasyn.tau2 = DECAY_AMPA
+    ampasyn.e = E_AMPA
+  }
+
+// Definition of synaptic Stimuli
+  objref stimAMPApuls      //Pulssequenz AMPA
+  stimAMPApuls = new NetStim(AMPA_SYN_LOCATION)
+  stimAMPApuls.number = ANZAHL_AMPA
+
+
+// Linkage of synaptic Inputs
+  objref synpulseampa
+
+// Update Cl- homeostasis in all compartments ----------------------------------------------
+  forsec all {
+    cli0_cldif_CA3_NKCC1_HCO3 = Cl_intra
+    cli_Start_cldif_CA3_NKCC1_HCO3 = Cl_intra
+    cli_cldif_CA3_NKCC1_HCO3 = Cl_intra
+  }
+
+//-- Stimulate AMPA --------------------------------------------------------------
+   dend {
+      stimAMPApuls.start = AMPA_Delay 
+      synpulseampa = new NetCon(stimAMPApuls, ampasyn, 0, 0, G_AMPA)
+   }
+
+// Run Simulation --------------------------------------------------------
+   run()

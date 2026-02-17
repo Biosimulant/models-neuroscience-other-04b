@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: ComplexDynamicsReproducingGolgiCellElectror262456Model'
+description: '{"value": "Excerpts from three papers abstracts: \"Brain neurons exhibit
+  complex electroresponsive properties \u2013 including intrinsic subthreshold oscillations
+  and pacemaking, resonance and phase-r'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:262456
+  source_db: modeldb
+  source_id: '262456'
+  standard: other
+  original_url: https://modeldb.science/262456
+  download_url: https://modeldb.science/download/262456
+  license: ''
+bsim:
+  entrypoint: src.complex_dynamics_reproducing_golgi_cell_electror_262456_model:ComplexDynamicsReproducingGolgiCellElectror262456Model
+  init_kwargs:
+    model_path: data/262456.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

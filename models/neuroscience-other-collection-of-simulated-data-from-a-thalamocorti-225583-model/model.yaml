@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CollectionOfSimulatedDataFromAThalamocorti225583Model'
+description: '{"value": "\"A major challenge in experimental data analysis\r\nis the
+  validation of analytical methods in a fully controlled\r\nscenario where the justification
+  of the interpretation can\r\nbe made d'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:225583
+  source_db: modeldb
+  source_id: '225583'
+  standard: other
+  original_url: https://modeldb.science/225583
+  download_url: https://modeldb.science/download/225583
+  license: ''
+bsim:
+  entrypoint: src.collection_of_simulated_data_from_a_thalamocorti_225583_model:CollectionOfSimulatedDataFromAThalamocorti225583Model
+  init_kwargs:
+    model_path: data/225583.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

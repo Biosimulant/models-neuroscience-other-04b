@@ -1,0 +1,119 @@
+load_file("stdlib.hoc")
+load_file("stdrun.hoc")
+load_file("nrngui.hoc") 
+
+//load morphology
+load_file("morphology.hoc")
+
+//Some simulation parameters
+stdrun=1
+celsius=30
+v_init=-75 
+cai0_ca_ion=5e-06 
+cao0_ca_ion=2
+ca2i0_ca2_ion=5e-06
+ca2o0_ca2_ion=2
+
+//integration time step
+dt = 0.025 //0.01 was the original simulation time step 
+tstop = 520
+
+//inserting current clamp at soma
+access soma
+objectvar stim
+stim = new IClamp(0.5)
+stim.del = 500 //this model needs quite a long time to achieve an equilibrium state
+stim.dur = 20
+stim.amp = 0.6
+
+//for writing result files
+objref somav, ahv, isav
+somav = new Vector(52000)
+ahv = new Vector(52000)
+isav = new Vector(52000)
+somav.record(&soma.v(0.5), dt)
+ahv.record(&AH.v(0.5), dt)
+isav.record(&isa.v(0.5), dt)
+
+objref all
+all = new File()
+strdef datei
+
+//defining some functions
+proc run_sim_graph_coarse() {
+    dt = 0.025
+    init()
+    run()
+}
+
+proc run_sim_graph() {
+    dt = 0.01
+    print "running simulation please wait"
+    init()
+    run()
+    print "writing data file of soma, axon hillock, and initial segment voltages"
+    write_file()
+    print "done"
+}
+
+proc write_file() {
+    sprint(datei, "outputfilename") 
+    all.wopen(datei)
+
+    for i=0, ahv.size()-1 {
+        all.printf("%g %g %g \r\n", somav.x(i), ahv.x(i), isav.x(i))
+    }
+
+    all.close
+}
+
+
+//building gui controls for easy access to changed model parameters
+
+objref vbox
+vbox = new VBox()
+vbox.intercept(1)
+xpanel("")
+xlabel("shift at AIS varied from 0 to -15 in the publication")
+xvalue("shift at AIS", "isa.sh_naxMig")
+xlabel("Na density at AIS varied from 0.05 to 0.75 in the publication")
+xvalue("Na density at AIS", "isa.gbar_naxMig")
+xpanel()
+vbox.intercept(0)
+vbox.map("adjust model parameters", 100, 150, -1, -1)
+
+objref vbox3
+vbox3 = new VBox()
+vbox3.intercept(1)
+xpanel("Wimmer et al 2009")
+xlabel("Re-create figure 8A")
+xlabel("The first button runs at a coarse resolution of dt = 0.025 ms")
+xlabel("The second button runs at pulication resolution of dt = 0.01 ms")
+xlabel("")
+xbutton("Demo Simulation/graph", "run_sim_graph_coarse()")
+xbutton("Run Simulation/graph then write file", "run_sim_graph()")
+xlabel("simulation time")
+xvalue("t")
+xpanel()
+vbox3.intercept(0)
+vbox3.map("run the simulation", 100,350,-1,-1)
+
+objref vbox2
+vbox2 = new VBox()
+vbox2.intercept(1)
+
+newPlot(505,520,-80,40)
+graphItem.save_name("graphList[0].")
+graphList[0].append(graphItem)
+graphItem.addexpr("AH.v(0.5)")
+
+vbox2.intercept(0)
+vbox2.map("mebrane voltage at axon hillock", 600,150,500,350)
+
+
+
+
+
+
+
+

@@ -1,0 +1,4 @@
+There are 6 tests for checking the robustness of the model against main parameters random changes (50%~200%). 
+As the codes for all these 6 parameters are quite similar, and avoiding redundancy, we put just one here
+for testing robustness against changes in  T-type Ca2+ channels conductivity.
+For the other five tests, same strategy is to be used.

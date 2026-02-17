@@ -1,0 +1,77 @@
+// --------------------------------------------------------------
+// Redefinition of the standard hoc procedure for initialization
+// that allows for pre-equilibration of currents and translation
+// of "rho" and "kappa" parameters into proper dendrite L and Ra
+// --------------------------------------------------------------
+// Taken from Zach Mainen's init routine - finds the initial RMP
+// at the "steady state" with zero current
+// 1/25/99 P. Manis
+// Note that this is no longer a "redefinition".
+
+proc findrmp() {
+
+  st_amp_save = istim.amp1   // preserve stimulus amplitude
+  istim.amp1 = 0             // turn stimulus off
+  old_el = el_pyr
+  el_pyr = $1 // try a new leak value and get the v...
+
+  t = -1e5               // back up in time
+  finitialize(v_init)    // initialize
+  fcurrent()
+  temp_dt = dt           
+  dt = 200                // take a few very large steps (allow Ih to settle)
+  for i=0,50 fadvance()  // to allow currents to reach steady state
+
+  t = 0                  // restore t,dt
+  dt = temp_dt
+
+  finitialize(v)         // initialize again
+  fcurrent()
+
+  istim.amp1 = st_amp_save   // restore stimulus
+  el_pyr = old_el  // restore old leak
+}
+
+
+// adjust leak to set cell at rmp as specified
+// 2/9/99 P. Manis
+// Uses current balance eq'n (per NEURON manual), better choice than interative method
+proc adjleak() {
+	finitialize($1) // sets v to target rmp, init's state variables to inf values
+	fcurrent()	// set all assigned variables consistent with states
+	// use current balance: 0 = ina + ik + ih + ica + gl_pyr*(v - el_pyr)		
+	el_pyr = (ina + ik + ih + gl_pyr*v)/gl_pyr
+	finitialize($1)
+	fcurrent()	// recalculate currents (il_hh)
+}
+
+// set Rin at V to a particular value by adjusting gl_pyr
+// requires 2 input values: v and Rin (in Mohm!)
+// 2/9/99 P. Manis
+proc setrin() {
+	ar=L*1E-4*diam*1E-4*3.14159 /* area of soma in cm2 */
+	finitialize($1)
+	fcurrent()
+	gtarget = 1/($2*ar*1e6) // make g from Rin, but assume input uints are Mohm
+	gtest = gtarget - (gna_pyr + gk_pyr + gkif_pyr + gkis_pyr + gh_pyr)
+	if(gtest < 0) {
+		printf("setRin: R=%7.1f requires negative gl_pyr (of %7.1f)\n", $2, 1/gtest)
+		return
+	}
+	gl_pyr = gtest
+	// verify by calling the standard routine
+	findRin($1)
+}
+
+// compute Rin and Tau_m by summing all conductances at rest and inverting result 
+// Tau_m is calculated as Rin*Cm, assuming 1 uF/cm2 (could specify cm to get actual value?)
+//
+proc findRin() {
+	finitialize($1)	/* make sure parameters are set for the new voltage */
+	fcurrent()
+	gin = gna_pyr + gk_pyr + gkif_pyr + gkis_pyr + gl_pyr + gh_pyr
+	ar=L*1E-4*diam*1E-4*3.14159 /* area of soma in cm2 */
+	rin = 1/(gin*ar)
+	cm_soma = ar*1E-6	/* in farads, assuming 1 uF/cm2 */
+	taum = rin * cm_soma * 1E3 /* convert to msec */
+}

@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CodingExplainsDevelopmentOfBinocularVision261483Model'
+description: '{"value": "This is the MATLAB code for the Active Efficient Coding model
+  introduced in Eckmann et al 2020.\r\nIt simulates an agent that self-calibrates
+  vergence and accommodation eye movements in a s'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:261483
+  source_db: modeldb
+  source_id: '261483'
+  standard: other
+  original_url: https://modeldb.science/261483
+  download_url: https://modeldb.science/download/261483
+  license: ''
+bsim:
+  entrypoint: src.coding_explains_development_of_binocular_vision_261483_model:CodingExplainsDevelopmentOfBinocularVision261483Model
+  init_kwargs:
+    model_path: data/261483.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

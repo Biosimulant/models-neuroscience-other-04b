@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CholinergicAndNicotinicRegulationOfDaNeuro266419Model'
+description: '{"value": "The model describes the modulation of firing properties of
+  DA neurons by acetylcholine (ACh) and nicotine in 5 cases: knock-out of \u00df2-containing
+  nAChRs, \u00df2-containing nAChRs only '
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:266419
+  source_db: modeldb
+  source_id: '266419'
+  standard: other
+  original_url: https://modeldb.science/266419
+  download_url: https://modeldb.science/download/266419
+  license: ''
+bsim:
+  entrypoint: src.cholinergic_and_nicotinic_regulation_of_da_neuro_266419_model:CholinergicAndNicotinicRegulationOfDaNeuro266419Model
+  init_kwargs:
+    model_path: data/266419.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

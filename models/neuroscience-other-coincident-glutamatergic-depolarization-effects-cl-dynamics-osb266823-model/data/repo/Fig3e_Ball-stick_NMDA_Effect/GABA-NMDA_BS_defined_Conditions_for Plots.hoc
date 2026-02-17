@@ -1,0 +1,92 @@
+// Simulation and analysis of Spatiotemporal Component of Cl- Gradients in a isolated dendrite
+// Here simulation of different AMPA Synapses
+// Here application in a simple Ball and Stick Model
+// Here one condition adapted manually - used to generate plots for figures.
+
+
+// Define Cl--Concentration
+   CL_CONC = 5  // [Cl-]i in mM
+
+// Determination Parameters GABA
+  ANZAHL_GABA = 1           //Anzahl der synaptischen Pulse
+  G_GABA = 0.000789 *0      //Value from Lombardi et al 2018 
+  P_GABA = 0.18
+  DECAY_GABA = 37           //Value from Lombardi et al 2018
+  GABA_SYN_LOCATION = 0.5   // Position GABA Synapse for Pulses
+  ONSET_GABA_PULSE = 20  
+
+// Determination Parameters NMDA
+  ANZAHL_NMDA = 1                   //Anzahl der synaptischen Pulse
+  G_NMDA = 0.000305 * 100             //Value from Lombardi et al 2018 
+  E_NMDA = 0                        // Reversal Potential of Exp2Syn
+  DECAY_NMDA = 500                //Value from Lombardi et al 2018
+  NMDA_SYN_LOCATION = 0.5   // Position GABA Synapse for Pulses
+  ONSET_NMDA_PULSE = 25  
+
+//----- Define run parameters ---------------------
+  tstop = 300   // Duration
+  v_init = -60   // Initial voltage
+  dt = 0.5      // Step Interval in ms
+
+
+// Define spatial properties of dendrite
+  ANZAHL_NODES = 100
+
+// Identification of the node with the GABA Synapse
+  SynPos = ANZAHL_NODES*GABA_SYN_LOCATION
+
+//----- Insert synapses -------------------------GG0789
+// Determination of GABA Synapse
+  objref gabasyn
+  dend {
+    // insert GABA synapse 
+    gabasyn = new gaba(GABA_SYN_LOCATION)
+    gabasyn.tau1 = 0.1 
+    gabasyn.tau2 = DECAY_GABA
+    gabasyn.P = P_GABA
+  }
+
+// Definition of synaptic Stimuli
+  objref stimGABApuls //Pulssequenz GABA
+  stimGABApuls = new NetStim(GABA_SYN_LOCATION)
+  stimGABApuls.number = ANZAHL_GABA
+  stimGABApuls.start = ONSET_GABA_PULSE
+
+// Linkage of synaptic Inputs
+  objref synpulsegaba
+
+// Determination of NMDA Synapse
+  objref NMDAsyn
+  dend {
+    // insert AMPA synapse 
+    NMDAsyn = new Exp2NMDA(NMDA_SYN_LOCATION)
+    NMDAsyn.tau1 = 8.8
+    NMDAsyn.tau2 = DECAY_NMDA 
+    NMDAsyn.e = E_NMDA
+  }
+
+// Definition of synaptic Stimuli
+  objref stimNMDApuls //Pulssequenz AMPA
+  stimNMDApuls = new NetStim(NMDA_SYN_LOCATION)
+  stimNMDApuls.number = ANZAHL_NMDA
+  stimNMDApuls.start = ONSET_NMDA_PULSE
+
+// Linkage of synaptic Inputs
+  objref synpulsenmda
+
+
+// Update Cl- homeostasis in all compartments ----------------------------------------------
+  forsec all {
+    cli0_cldif_CA3_NKCC1_HCO3 = CL_CONC
+    cli_Start_cldif_CA3_NKCC1_HCO3 = CL_CONC
+    cli_cldif_CA3_NKCC1_HCO3 = CL_CONC
+  }
+
+// Assign Value to Synapse
+  dend {
+      synpulsegaba = new NetCon(stimGABApuls, gabasyn, 0, 0, G_GABA)
+      synpulsenmda = new NetCon(stimNMDApuls, NMDAsyn, 0, 0, G_NMDA)
+  }
+
+// Run Simulation --------------------------------------------------------
+  run()

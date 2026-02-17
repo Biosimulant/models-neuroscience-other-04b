@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CombiningModelingDeepLearningForMeaNeuron266518Model'
+description: '{"value": "\"Neural circuits typically consist of many different types
+  of neurons, and one faces a challenge in disentangling their individual contributions
+  in measured neural activity. Classification'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:266518
+  source_db: modeldb
+  source_id: '266518'
+  standard: other
+  original_url: https://modeldb.science/266518
+  download_url: https://modeldb.science/download/266518
+  license: ''
+bsim:
+  entrypoint: src.combining_modeling_deep_learning_for_mea_neuron_266518_model:CombiningModelingDeepLearningForMeaNeuron266518Model
+  init_kwargs:
+    model_path: data/266518.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

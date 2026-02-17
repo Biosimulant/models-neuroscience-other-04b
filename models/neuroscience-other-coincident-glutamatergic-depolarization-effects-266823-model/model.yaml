@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CoincidentGlutamatergicDepolarizationEffects266823Model'
+description: '{"value": "\"... we used compartmental biophysical models of Cl- dynamics
+  simulating either a simple ball-and-stick topology or a reconstructed CA3 neuron.
+  These computational experiments demonstrated'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:266823
+  source_db: modeldb
+  source_id: '266823'
+  standard: other
+  original_url: https://modeldb.science/266823
+  download_url: https://modeldb.science/download/266823
+  license: ''
+bsim:
+  entrypoint: src.coincident_glutamatergic_depolarization_effects_266823_model:CoincidentGlutamatergicDepolarizationEffects266823Model
+  init_kwargs:
+    model_path: data/266823.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

@@ -1,0 +1,99 @@
+//=================================================================
+// util_run.hoc 
+// Author: Paul B. Manis. 1/30/2000
+
+//------------------------------------------------------------------
+// procedure rununtil: run with the current paramteres and record the result.
+// setup is done in calling routines
+// call with two arguments: the end time of the run, and an index for the number of the run
+// The filename is global 
+// Paul B. Manis 1/28/2000 (revised) 
+
+proc rununtil() {
+//
+// setup
+//
+	tstop = $1 // copy variables 
+	pos = $2
+	idat.record(&istim.i) // link current to stimulus
+	vdat.record(&soma.v(0.5)) // link voltage to soma voltage
+	tdat.record(&t) // link tdat to time
+	pyr_m.record(&soma.m_pyr(0.5)) // link state variables
+	pyr_h.record(&soma.h_pyr(0.5))
+	pyr_n.record(&soma.n_pyr(0.5))
+	pyr_kifa.record(&soma.kifa_pyr(0.5))
+	pyr_kifi.record(&soma.kifi_pyr(0.5))
+	pyr_kisa.record(&soma.kisa_pyr(0.5))
+	pyr_kisi.record(&soma.kisi_pyr(0.5))
+	pyr_kh.record(&soma.aih_pyr(0.5))
+
+	// select the stored single state measure
+
+	if(monitor == 1) {
+		pyr_state.record(&soma.h_pyr(0.5))
+	}
+	if(monitor == 2) {
+		pyr_state.record(&soma.m_pyr(0.5))
+	}
+	if(monitor == 3) {
+		pyr_state.record(&soma.n_pyr(0.5))
+	}
+	if(monitor == 4) {
+		pyr_state.record(&soma.kifa_pyr(0.5))
+	}
+	if(monitor == 5) {
+		pyr_state.record(&soma.kifi_pyr(0.5))
+	}
+	if(monitor == 6) {
+		pyr_state.record(&soma.kisa_pyr(0.5))
+	}
+	if(monitor == 7) {
+		pyr_state.record(&soma.kisi_pyr(0.5))
+	}
+	if(monitor == 8) {
+		pyr_state.record(&soma.aih_pyr(0.5))
+	}
+	
+//
+// actually run the model
+//
+
+
+	run()
+	doEvents()
+	
+//
+// analyze the spike trains 
+//
+	tdelay = tdat.indwhere(">=", totaldelay)
+	sdat.copy(vdat, tdelay, -1) // just get the part after the step whatever delay is present 
+	tsdat.copy(tdat, tdelay, -1) // need a matching time base 
+	spikes.spikebin(sdat, 0) // get the spikes using NEURON spikebin method
+	spiket.indvwhere(spikes, ">", 0) // and then the indices	 
+	fapn.x[pos] = spiket.size-1 // number of spikes in the window
+	fslt = tsdat.x[spiket.x[0]] // find the first spike latency 
+	fsl.x[pos]=fslt-totaldelay
+	nspike = spiket.size
+	
+	if(nspike > 1) {     
+		fisit = tsdat.x[spiket.x[1]] - tsdat.x[spiket.x[0]]
+		fisi.x[pos]=fisit
+	}
+	
+	if(2 > nspike) {
+		fisit = 0
+		fisi.x[pos] = 0
+	}
+	
+	fsinj.x[pos] = istim.amp1
+
+	fdel.x[pos] = pulsewidth
+
+	t1 = tdat.indwhere(">=", totaldelay-1)
+	t2 = tdat.indwhere(">=", totaldelay)
+	vmean = vdat.mean(t1, t2)
+	fsv.x[pos] = vmean
+	fcap.x[pos] = effcap // save cap value... 
+}
+
+

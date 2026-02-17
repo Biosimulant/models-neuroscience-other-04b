@@ -1,0 +1,34 @@
+schema_version: '2.0'
+title: 'Neuroscience: Model149910149910Model'
+description: Competing oscillator 5-cell circuit and Parameterscape plotting (Gutierrez
+  et al. 2013)
+standard: other
+tags:
+- neuroscience
+- other
+- opensourcebrain
+- faithful
+authors:
+- Biosimulant Team
+- Open Source Brain
+upstream:
+  id: opensourcebrain:149910
+  source_db: opensourcebrain
+  source_id: '149910'
+  standard: other
+  original_url: https://github.com/OpenSourceBrain/149910
+  download_url: https://github.com/OpenSourceBrain/149910.git
+  license: ''
+bsim:
+  entrypoint: src.model_149910_149910_model:Model149910149910Model
+  init_kwargs:
+    model_path: data/repo
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

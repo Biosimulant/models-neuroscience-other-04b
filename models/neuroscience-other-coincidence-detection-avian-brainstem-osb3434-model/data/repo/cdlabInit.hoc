@@ -1,0 +1,29 @@
+// cdlabInit.hoc
+//
+{load_file("cdlab.hoc","cdlabVersion")} //make sure cdlab was loaded
+//
+// This file is automatically run at the end of cdlab.hoc, if it exists.
+//
+// You can add your own, personalized, initialization code to this file.
+//
+// You can open saved simulation files, such as:
+//      {xopen("reyesetalscript.hoc")}
+//      {xopen("simulationFamily.hoc")}
+// Or you can cut and paste specific lines from simulation files, such as:
+//      gp.iAmp = 0
+//      gp.iDel = 5
+//      gp.iDur = 15
+// or:
+//      gr.primaryLoopStr = "stimFreq"
+//      gr.numPrimaryLoop = 4
+//      gr.primaryLoopFirst = 707.1
+//      gr.primaryLoopLast = 2000
+//      gr.primaryLoopUseLog = 1
+//      gr.lDenFollowsStimFreq = 1
+//      gr.setvsFollowsStimFreq(0)
+//
+// or any combination, or any other valid NEURON code.
+
+
+// End any commands with 
+ {doNotify()}

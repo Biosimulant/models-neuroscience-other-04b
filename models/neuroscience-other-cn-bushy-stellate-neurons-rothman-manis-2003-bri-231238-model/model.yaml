@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CnBushyStellateNeuronsRothmanManis2003Bri231238Model'
+description: '{"value": "This model is an updated version of Romain Brette''s adaptation
+  of Rothman & Manis (2003). The model now uses Brian 2 instead of Brian 1 and can
+  be configured to use n cells instead of a sin'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:231238
+  source_db: modeldb
+  source_id: '231238'
+  standard: other
+  original_url: https://modeldb.science/231238
+  download_url: https://modeldb.science/download/231238
+  license: ''
+bsim:
+  entrypoint: src.cn_bushy_stellate_neurons_rothman_manis_2003_bri_231238_model:CnBushyStellateNeuronsRothmanManis2003Bri231238Model
+  init_kwargs:
+    model_path: data/231238.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state

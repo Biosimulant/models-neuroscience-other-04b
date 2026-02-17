@@ -1,0 +1,35 @@
+schema_version: '2.0'
+title: 'Neuroscience: CircadianRhythmicityShapesAstrocyteMorpholog257027Model'
+description: '{"value": "Most animal species operate according to a 24-hour period
+  set by the suprachiasmatic nucleus (SCN) of the hypothalamus. The rhythmic activity
+  of the SCN modulates hippocampal-dependent memo'
+standard: other
+tags:
+- neuroscience
+- other
+- modeldb
+- faithful
+authors:
+- Biosimulant Team
+- modeldb
+upstream:
+  id: modeldb:257027
+  source_db: modeldb
+  source_id: '257027'
+  standard: other
+  original_url: https://modeldb.science/257027
+  download_url: https://modeldb.science/download/257027
+  license: ''
+bsim:
+  entrypoint: src.circadian_rhythmicity_shapes_astrocyte_morpholog_257027_model:CircadianRhythmicityShapesAstrocyteMorpholog257027Model
+  init_kwargs:
+    model_path: data/257027.zip
+  min_dt: 0.01
+runtime:
+  python_version: '3.12'
+  dependencies:
+    packages:
+    - numpy==1.26.4
+io:
+  outputs:
+  - state
