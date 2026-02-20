@@ -1,0 +1,28 @@
+modules:
+  current_dipole_1:
+    class: src.current_dipole_in_laminar_neocortex_lee_et_al_20_151685_model:CurrentDipoleInLaminarNeocortexLeeEtAl20151685Model
+    args:
+      model_path: data/151685.zip
+  default_mode_2:
+    class: src.default_mode_network_model_matsui_et_al_2014_169775_model:DefaultModeNetworkModelMatsuiEtAl2014169775Model
+    args:
+      model_path: data/169775.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: current_dipole_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: default_mode_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

@@ -1,0 +1,28 @@
+modules:
+  contrast_invaria_1:
+    class: src.contrast_invariance_by_lgn_synaptic_depression_b_114637_model:ContrastInvarianceByLgnSynapticDepressionB114637Model
+    args:
+      model_path: data/114637.zip
+  cortex_learning_2:
+    class: src.cortex_learning_models_weber_at_al_2006_weber_an_83528_model:CortexLearningModelsWeberAtAl2006WeberAn83528Model
+    args:
+      model_path: data/83528.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: contrast_invaria_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cortex_learning_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

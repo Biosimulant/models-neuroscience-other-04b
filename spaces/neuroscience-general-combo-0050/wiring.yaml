@@ -1,0 +1,36 @@
+modules:
+  competing_oscill_1:
+    class: src.model_149910_149910_model:Model149910149910Model
+    args:
+      model_path: data/repo
+  competition_ap_2:
+    class: src.model_117459_117459_model:Model117459117459Model
+    args:
+      model_path: data/repo
+  competition_for_3:
+    class: src.competition_for_ap_initiation_sites_in_a_circuit_117459_model:CompetitionForApInitiationSitesInACircuit117459Model
+    args:
+      model_path: data/117459.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: competing_oscill_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: competition_ap_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: competition_for_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

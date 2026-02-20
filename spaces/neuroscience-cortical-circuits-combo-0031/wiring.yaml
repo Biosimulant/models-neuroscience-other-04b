@@ -1,0 +1,36 @@
+modules:
+  democratic_popul_1:
+    class: src.democratic_population_decisions_result_in_robust_136807_model:DemocraticPopulationDecisionsResultInRobust136807Model
+    args:
+      model_path: data/136807.zip
+  dendritic_discri_2:
+    class: src.dendritic_discrimination_of_temporal_input_seque_140828_model:DendriticDiscriminationOfTemporalInputSeque140828Model
+    args:
+      model_path: data/140828.zip
+  direct_recruitme_3:
+    class: src.direct_recruitment_of_s1_pyramidal_cells_and_int_147460_model:DirectRecruitmentOfS1PyramidalCellsAndInt147460Model
+    args:
+      model_path: data/147460.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: democratic_popul_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dendritic_discri_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: direct_recruitme_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

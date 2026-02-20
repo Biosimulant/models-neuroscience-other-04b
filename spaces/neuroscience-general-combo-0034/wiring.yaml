@@ -1,0 +1,36 @@
+modules:
+  channel_paramete_1:
+    class: src.channel_parameter_estimation_from_current_clamp_54154_model:ChannelParameterEstimationFromCurrentClamp54154Model
+    args:
+      model_path: data/54154.zip
+  chirp_stimulus_2:
+    class: src.model_147578_147578_model:Model147578147578Model
+    args:
+      model_path: data/repo
+  cholinergic_and_3:
+    class: src.cholinergic_and_nicotinic_regulation_of_da_neuro_266419_model:CholinergicAndNicotinicRegulationOfDaNeuro266419Model
+    args:
+      model_path: data/266419.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: channel_paramete_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: chirp_stimulus_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: cholinergic_and_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

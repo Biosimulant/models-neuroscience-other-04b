@@ -1,0 +1,28 @@
+modules:
+  collection_simul_1:
+    class: src.model_225583_225583_model:Model225583225583Model
+    args:
+      model_path: data/repo
+  combining_modeli_2:
+    class: src.model_266518_266518_model:Model266518266518Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: collection_simul_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: combining_modeli_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

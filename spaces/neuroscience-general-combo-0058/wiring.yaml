@@ -1,0 +1,44 @@
+modules:
+  demirtasetal19_1:
+    class: src.demirtasetal19_demirtasetal19_model:Demirtasetal19Demirtasetal19Model
+    args:
+      model_path: data/repo
+  dendritic_na_2:
+    class: src.dendritic_na_inactivation_drives_a_decrease_in_i_59480_model:DendriticNaInactivationDrivesADecreaseInI59480Model
+    args:
+      model_path: data/59480.zip
+  dendritic_na_3:
+    class: src.dendritic_na_spike_initiation_and_backpropagatio_124394_model:DendriticNaSpikeInitiationAndBackpropagatio124394Model
+    args:
+      model_path: data/124394.zip
+  dendritic_signal_4:
+    class: src.dendritic_signals_command_firing_dynamics_in_a_c_147218_model:DendriticSignalsCommandFiringDynamicsInAC147218Model
+    args:
+      model_path: data/147218.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: demirtasetal19_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dendritic_na_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: dendritic_na_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: dendritic_signal_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

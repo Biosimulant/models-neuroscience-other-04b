@@ -1,0 +1,86 @@
+schema_version: '2.0'
+title: 'Neuroscience: General (COMBO_0056)'
+description: Neuroscience general comparative space with 4 models, configured as non-causal
+  co-simulation.
+models:
+- repo: Biosimulant/models-neuroscience-other-04b
+  alias: contribution_of_1
+  manifest_path: models/neuroscience-other-contribution-of-atp-sensitive-potassium-channels-120243-model/model.yaml
+  parameters:
+    model_path: data/120243.zip
+- repo: Biosimulant/models-neuroscience-other-04b
+  alias: control_of_2
+  manifest_path: models/neuroscience-other-control-of-vibrissa-motoneuron-firing-harish-and-127022-model/model.yaml
+  parameters:
+    model_path: data/127022.zip
+- repo: Biosimulant/models-neuroscience-other-04b
+  alias: controlling_kca_3
+  manifest_path: models/neuroscience-other-controlling-kca-channels-with-different-ca2-buff-138382-model/model.yaml
+  parameters:
+    model_path: data/138382.zip
+- repo: Biosimulant/models-neuroscience-other-04b
+  alias: csashowcase_4
+  manifest_path: models/neuroscience-other-csashowcase-csashowcase-model/model.yaml
+  parameters:
+    model_path: data/repo
+- repo: Biosimulant/models-observability
+  alias: state_compare_mon
+  manifest_path: models/observability-state-comparison-monitor/model.yaml
+  parameters:
+    max_points: 2000
+    min_dt: 1.0
+- repo: Biosimulant/models-observability
+  alias: state_metrics_mon
+  manifest_path: models/observability-state-metrics-monitor/model.yaml
+  parameters:
+    max_points: 2000
+    min_dt: 1.0
+runtime:
+  duration: 0.3
+  tick_dt: 0.01
+  initial_inputs: {}
+wiring:
+- from: contribution_of_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: control_of_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: controlling_kca_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: csashowcase_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d
+scientific_context:
+  question: How do general mechanisms compare across these models?
+  mode: comparative
+  assumptions:
+  - Model implementations are used as published in their curated manifests without
+    biological reinterpretation.
+  - Time integration uses a shared global tick compatible with model min_dt constraints.
+  - Comparative (non-causal) mode is used because full deterministic IO coverage for
+    causal coupling was not satisfied.
+  expected_observables:
+  - Model output trajectories under shared runtime settings.
+  - Cross-model agreement/divergence in key state or metric signals.
+  - Relative behavior comparison without causal linkage claims.
+  limitations:
+  - No new biology is introduced beyond what upstream models encode.
+  - Cross-model semantic matching is rule-based and may under-connect uncertain routes.
+  provenance:
+  - 'neuroscience-other-contribution-of-atp-sensitive-potassium-channels-120243-model
+    :: modeldb:120243 :: https://modeldb.science/120243'
+  - 'neuroscience-other-control-of-vibrissa-motoneuron-firing-harish-and-127022-model
+    :: modeldb:127022 :: https://modeldb.science/127022'
+  - 'neuroscience-other-controlling-kca-channels-with-different-ca2-buff-138382-model
+    :: modeldb:138382 :: https://modeldb.science/138382'
+  - 'neuroscience-other-csashowcase-csashowcase-model :: opensourcebrain:CSAShowcase
+    :: https://github.com/OpenSourceBrain/CSAShowcase'
+  visualization_rationale: A dedicated monitor model receives all participating model
+    state streams (`state_a..state_d`) so trajectories can be compared in one place
+    without claiming causal coupling when IO semantics are incomplete.

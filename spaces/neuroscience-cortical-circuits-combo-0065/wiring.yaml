@@ -1,0 +1,44 @@
+modules:
+  drt_neuron_1:
+    class: src.drt_neuron_model_sousa_et_al_2014_151949_model:DrtNeuronModelSousaEtAl2014151949Model
+    args:
+      model_path: data/151949.zip
+  dynamic_cortical_2:
+    class: src.dynamic_cortical_interlaminar_interactions_carra_150806_model:DynamicCorticalInterlaminarInteractionsCarra150806Model
+    args:
+      model_path: data/150806.zip
+  dynamics_of_3:
+    class: src.dynamics_of_spike_initiation_prescott_et_al_2008_116123_model:DynamicsOfSpikeInitiationPrescottEtAl2008116123Model
+    args:
+      model_path: data/116123.zip
+  ebneretal2019_4:
+    class: src.ebneretal2019_ebneretal2019_model:Ebneretal2019Ebneretal2019Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: drt_neuron_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dynamic_cortical_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: dynamics_of_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: ebneretal2019_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

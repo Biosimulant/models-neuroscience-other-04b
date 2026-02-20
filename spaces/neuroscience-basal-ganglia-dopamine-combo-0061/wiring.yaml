@@ -1,0 +1,44 @@
+modules:
+  d2_dopamine_1:
+    class: src.d2_dopamine_receptor_modulation_of_interneuronal_98005_model:D2DopamineReceptorModulationOfInterneuronal98005Model
+    args:
+      model_path: data/98005.zip
+  dbs_of_2:
+    class: src.dbs_of_a_multi_compartment_model_of_subthalamic_151460_model:DbsOfAMultiCompartmentModelOfSubthalamic151460Model
+    args:
+      model_path: data/151460.zip
+  differential_mod_3:
+    class: src.differential_modulation_of_pattern_and_rate_in_a_84612_model:DifferentialModulationOfPatternAndRateInA84612Model
+    args:
+      model_path: data/84612.zip
+  dopamine_activat_4:
+    class: src.dopamine_activation_of_signaling_pathways_in_a_m_154968_model:DopamineActivationOfSignalingPathwaysInAM154968Model
+    args:
+      model_path: data/154968.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: d2_dopamine_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dbs_of_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: differential_mod_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: dopamine_activat_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

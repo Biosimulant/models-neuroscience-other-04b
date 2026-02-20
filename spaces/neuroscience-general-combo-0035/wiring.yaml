@@ -1,0 +1,36 @@
+modules:
+  cholinergic_modu_1:
+    class: src.cholinergic_modulation_of_resting_state_networks_2016670_model:CholinergicModulationOfRestingStateNetworks2016670Model
+    args:
+      model_path: data/2016670.zip
+  circadian_clock_2:
+    class: src.model_145800_145800_model:Model145800145800Model
+    args:
+      model_path: data/repo
+  circadian_clock_3:
+    class: src.model_145801_145801_model:Model145801145801Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: cholinergic_modu_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: circadian_clock_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: circadian_clock_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

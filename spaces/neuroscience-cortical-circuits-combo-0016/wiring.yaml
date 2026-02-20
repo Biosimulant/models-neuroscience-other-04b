@@ -1,0 +1,28 @@
+modules:
+  cholinergic_nico_1:
+    class: src.model_266419_266419_model:Model266419266419Model
+    args:
+      model_path: data/repo
+  circuit_thalamoc_2:
+    class: src.model_150240_150240_model:Model150240150240Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: cholinergic_nico_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: circuit_thalamoc_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

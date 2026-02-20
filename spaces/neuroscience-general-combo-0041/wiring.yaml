@@ -1,0 +1,36 @@
+modules:
+  cochlea_inner_1:
+    class: src.cochlea_inner_ear_models_in_python_zilany_et_al_169278_model:CochleaInnerEarModelsInPythonZilanyEtAl169278Model
+    args:
+      model_path: data/169278.zip
+  cochlea_2:
+    class: src.model_169278_169278_model:Model169278169278Model
+    args:
+      model_path: data/repo
+  cochlear_implant_3:
+    class: src.cochlear_implant_models_bruce_et_al_1999a_b_c_20_87760_model:CochlearImplantModelsBruceEtAl1999aBC2087760Model
+    args:
+      model_path: data/87760.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: cochlea_inner_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cochlea_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: cochlear_implant_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

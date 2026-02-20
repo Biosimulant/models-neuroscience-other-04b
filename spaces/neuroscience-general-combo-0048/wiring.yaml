@@ -1,0 +1,36 @@
+modules:
+  comparison_of_1:
+    class: src.comparison_of_da_based_stochastic_algorithms_pez_167772_model:ComparisonOfDaBasedStochasticAlgorithmsPez167772Model
+    args:
+      model_path: data/167772.zip
+  compartmental_mo_2:
+    class: src.compartmental_model_of_a_mitral_cell_popovic_et_53435_model:CompartmentalModelOfAMitralCellPopovicEt53435Model
+    args:
+      model_path: data/53435.zip
+  compartmental_mo_3:
+    class: src.compartmental_models_of_growing_neurites_graham_59582_model:CompartmentalModelsOfGrowingNeuritesGraham59582Model
+    args:
+      model_path: data/59582.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: comparison_of_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: compartmental_mo_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: compartmental_mo_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

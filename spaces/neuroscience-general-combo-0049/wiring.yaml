@@ -1,0 +1,36 @@
+modules:
+  compartmentaliza_1:
+    class: src.model_143604_143604_model:Model143604143604Model
+    args:
+      model_path: data/repo
+  compartmentaliza_2:
+    class: src.compartmentalization_of_gabaergic_inhibition_by_143604_model:CompartmentalizationOfGabaergicInhibitionBy143604Model
+    args:
+      model_path: data/143604.zip
+  competing_oscill_3:
+    class: src.competing_oscillator_5_cell_circuit_and_paramete_149910_model:CompetingOscillator5CellCircuitAndParamete149910Model
+    args:
+      model_path: data/149910.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: compartmentaliza_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: compartmentaliza_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: competing_oscill_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

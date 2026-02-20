@@ -1,0 +1,36 @@
+modules:
+  comparative_comp_1:
+    class: src.model_114310_114310_model:Model114310114310Model
+    args:
+      model_path: data/repo
+  comparing_correl_2:
+    class: src.comparing_correlation_responses_to_motion_estima_206310_model:ComparingCorrelationResponsesToMotionEstima206310Model
+    args:
+      model_path: data/206310.zip
+  comparison_da_3:
+    class: src.model_167772_167772_model:Model167772167772Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: comparative_comp_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: comparing_correl_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: comparison_da_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

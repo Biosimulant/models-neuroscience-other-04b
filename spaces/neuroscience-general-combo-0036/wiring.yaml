@@ -1,0 +1,36 @@
+modules:
+  circadian_clock_1:
+    class: src.model_148320_148320_model:Model148320148320Model
+    args:
+      model_path: data/repo
+  circadian_clock_2:
+    class: src.circadian_clock_model_based_on_protein_sequestra_145800_model:CircadianClockModelBasedOnProteinSequestra145800Model
+    args:
+      model_path: data/145800.zip
+  circadian_clock_3:
+    class: src.circadian_clock_model_in_mammals_detailed_versio_145801_model:CircadianClockModelInMammalsDetailedVersio145801Model
+    args:
+      model_path: data/145801.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: circadian_clock_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: circadian_clock_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: circadian_clock_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

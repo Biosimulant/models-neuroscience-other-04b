@@ -1,0 +1,36 @@
+modules:
+  cn_bushy_1:
+    class: src.model_37857_37857_model:Model3785737857Model
+    args:
+      model_path: data/repo
+  cn_bushy_2:
+    class: src.cn_bushy_stellate_neurons_rothman_manis_2003_bri_126899_model:CnBushyStellateNeuronsRothmanManis2003Bri126899Model
+    args:
+      model_path: data/126899.zip
+  cn_bushy_3:
+    class: src.cn_bushy_stellate_neurons_rothman_manis_2003_bri_231238_model:CnBushyStellateNeuronsRothmanManis2003Bri231238Model
+    args:
+      model_path: data/231238.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: cn_bushy_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cn_bushy_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: cn_bushy_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

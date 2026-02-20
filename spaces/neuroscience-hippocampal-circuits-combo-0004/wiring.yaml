@@ -1,0 +1,28 @@
+modules:
+  cl_homeostasis_1:
+    class: src.model_266811_266811_model:Model266811266811Model
+    args:
+      model_path: data/repo
+  cl_homeostasis_2:
+    class: src.cl_homeostasis_in_immature_hippocampal_ca3_neuro_266811_model:ClHomeostasisInImmatureHippocampalCa3Neuro266811Model
+    args:
+      model_path: data/266811.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: cl_homeostasis_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cl_homeostasis_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

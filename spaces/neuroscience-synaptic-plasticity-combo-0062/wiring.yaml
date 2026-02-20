@@ -1,0 +1,44 @@
+modules:
+  computing_with_1:
+    class: src.computing_with_neural_synchrony_brette_2012_144560_model:ComputingWithNeuralSynchronyBrette2012144560Model
+    args:
+      model_path: data/144560.zip
+  dendritic_proces_2:
+    class: src.dendritic_processing_of_excitatory_synaptic_inpu_113949_model:DendriticProcessingOfExcitatorySynapticInpu113949Model
+    args:
+      model_path: data/113949.zip
+  dendro_dendritic_3:
+    class: src.dendro_dendritic_synaptic_circuit_shepherd_brayt_144385_model:DendroDendriticSynapticCircuitShepherdBrayt144385Model
+    args:
+      model_path: data/144385.zip
+  differences_betw_4:
+    class: src.differences_between_type_a_and_b_photoreceptors_79471_model:DifferencesBetweenTypeAAndBPhotoreceptors79471Model
+    args:
+      model_path: data/79471.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: computing_with_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dendritic_proces_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: dendro_dendritic_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: differences_betw_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

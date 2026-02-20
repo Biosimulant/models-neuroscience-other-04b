@@ -1,0 +1,36 @@
+modules:
+  computer_simulat_1:
+    class: src.computer_simulations_of_neuron_glia_interactions_113446_model:ComputerSimulationsOfNeuronGliaInteractions113446Model
+    args:
+      model_path: data/113446.zip
+  configr_a_2:
+    class: src.configr_a_vision_based_model_for_long_range_figu_123086_model:ConfigrAVisionBasedModelForLongRangeFigu123086Model
+    args:
+      model_path: data/123086.zip
+  connection_set_3:
+    class: src.connection_set_algebra_csa_for_the_representatio_144455_model:ConnectionSetAlgebraCsaForTheRepresentatio144455Model
+    args:
+      model_path: data/144455.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: computer_simulat_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: configr_a_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: connection_set_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

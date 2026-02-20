@@ -1,0 +1,44 @@
+modules:
+  channel_density_1:
+    class: src.model_244688_244688_model:Model244688244688Model
+    args:
+      model_path: data/repo
+  chirp_stimulus_2:
+    class: src.chirp_stimulus_responses_in_a_morphologically_re_147578_model:ChirpStimulusResponsesInAMorphologicallyRe147578Model
+    args:
+      model_path: data/147578.zip
+  cholinergic_modu_3:
+    class: src.model_267599_267599_model:Model267599267599Model
+    args:
+      model_path: data/repo
+  cholinergic_modu_4:
+    class: src.cholinergic_modulation_shifts_the_response_of_ca_267599_model:CholinergicModulationShiftsTheResponseOfCa267599Model
+    args:
+      model_path: data/267599.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: channel_density_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: chirp_stimulus_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: cholinergic_modu_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: cholinergic_modu_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

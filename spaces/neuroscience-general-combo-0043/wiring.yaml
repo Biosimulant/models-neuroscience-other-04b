@@ -1,0 +1,36 @@
+modules:
+  code_szoboszlay_1:
+    class: src.golgicelldendgapjunctions_golgicelldendgapjunctions_model:GolgicelldendgapjunctionsGolgicelldendgapjunctionsModel
+    args:
+      model_path: data/repo
+  code_to_2:
+    class: src.code_to_calc_spike_trig_ave_sta_conduct_from_vm_116086_model:CodeToCalcSpikeTrigAveStaConductFromVm116086Model
+    args:
+      model_path: data/116086.zip
+  coding_explains_3:
+    class: src.coding_explains_development_of_binocular_vision_261483_model:CodingExplainsDevelopmentOfBinocularVision261483Model
+    args:
+      model_path: data/261483.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: code_szoboszlay_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: code_to_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: coding_explains_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

@@ -1,0 +1,36 @@
+modules:
+  computational_mo_1:
+    class: src.computational_model_of_a_central_pattern_generat_65412_model:ComputationalModelOfACentralPatternGenerat65412Model
+    args:
+      model_path: data/65412.zip
+  computational_mo_2:
+    class: src.computational_modeling_of_gephyrin_dependent_inh_182129_model:ComputationalModelingOfGephyrinDependentInh182129Model
+    args:
+      model_path: data/182129.zip
+  computational_mo_3:
+    class: src.computational_modelling_of_channelrhodopsin_2_ph_150804_model:ComputationalModellingOfChannelrhodopsin2Ph150804Model
+    args:
+      model_path: data/150804.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: computational_mo_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: computational_mo_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: computational_mo_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

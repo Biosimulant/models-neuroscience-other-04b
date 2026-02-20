@@ -1,0 +1,28 @@
+modules:
+  dentate_gyrus_1:
+    class: src.dentate_gyrus_morgan_et_al_2007_2008_santhakumar_124513_model:DentateGyrusMorganEtAl20072008Santhakumar124513Model
+    args:
+      model_path: data/124513.zip
+  dentate_gyrus_2:
+    class: src.dentate_gyrus_network_model_santhakumar_et_al_20_51781_model:DentateGyrusNetworkModelSanthakumarEtAl2051781Model
+    args:
+      model_path: data/51781.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: dentate_gyrus_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dentate_gyrus_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

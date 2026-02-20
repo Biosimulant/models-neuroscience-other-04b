@@ -1,0 +1,36 @@
+modules:
+  competition_mode_1:
+    class: src.competition_model_of_pheromone_ratio_detection_z_143753_model:CompetitionModelOfPheromoneRatioDetectionZ143753Model
+    args:
+      model_path: data/143753.zip
+  competition_pher_2:
+    class: src.model_143753_143753_model:Model143753143753Model
+    args:
+      model_path: data/repo
+  complex_dynamics_3:
+    class: src.complex_dynamics_reproducing_golgi_cell_electror_262456_model:ComplexDynamicsReproducingGolgiCellElectror262456Model
+    args:
+      model_path: data/262456.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: competition_mode_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: competition_pher_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: complex_dynamics_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

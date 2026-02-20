@@ -1,0 +1,44 @@
+modules:
+  currents_contrib_1:
+    class: src.currents_contributing_to_decision_making_in_neur_116606_model:CurrentsContributingToDecisionMakingInNeur116606Model
+    args:
+      model_path: data/116606.zip
+  cytoplasmic_elec_2:
+    class: src.cytoplasmic_electric_fields_and_electroosmosis_a_147740_model:CytoplasmicElectricFieldsAndElectroosmosisA147740Model
+    args:
+      model_path: data/147740.zip
+  dandiarchiveshow_3:
+    class: src.dandiarchiveshowcase_dandiarchiveshowcase_model:DandiarchiveshowcaseDandiarchiveshowcaseModel
+    args:
+      model_path: data/repo
+  data_driven_4:
+    class: src.data_driven_hh_type_model_of_the_lateral_pyloric_116957_model:DataDrivenHhTypeModelOfTheLateralPyloric116957Model
+    args:
+      model_path: data/116957.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: currents_contrib_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cytoplasmic_elec_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: dandiarchiveshow_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: data_driven_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

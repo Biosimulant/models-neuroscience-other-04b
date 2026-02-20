@@ -1,0 +1,44 @@
+modules:
+  contribution_of_1:
+    class: src.contribution_of_atp_sensitive_potassium_channels_120243_model:ContributionOfAtpSensitivePotassiumChannels120243Model
+    args:
+      model_path: data/120243.zip
+  control_of_2:
+    class: src.control_of_vibrissa_motoneuron_firing_harish_and_127022_model:ControlOfVibrissaMotoneuronFiringHarishAnd127022Model
+    args:
+      model_path: data/127022.zip
+  controlling_kca_3:
+    class: src.controlling_kca_channels_with_different_ca2_buff_138382_model:ControllingKcaChannelsWithDifferentCa2Buff138382Model
+    args:
+      model_path: data/138382.zip
+  csashowcase_4:
+    class: src.csashowcase_csashowcase_model:CsashowcaseCsashowcaseModel
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: contribution_of_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: control_of_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: controlling_kca_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: csashowcase_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

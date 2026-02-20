@@ -1,0 +1,44 @@
+modules:
+  determinants_of_1:
+    class: src.determinants_of_fast_calcium_dynamics_in_dendrit_97903_model:DeterminantsOfFastCalciumDynamicsInDendrit97903Model
+    args:
+      model_path: data/97903.zip
+  deterministic_ch_2:
+    class: src.deterministic_chaos_in_a_mathematical_model_of_a_125683_model:DeterministicChaosInAMathematicalModelOfA125683Model
+    args:
+      model_path: data/125683.zip
+  development_of_3:
+    class: src.development_of_orientation_selective_simple_cell_147929_model:DevelopmentOfOrientationSelectiveSimpleCell147929Model
+    args:
+      model_path: data/147929.zip
+  dichotomy_of_4:
+    class: src.dichotomy_of_action_potential_backpropagation_in_64167_model:DichotomyOfActionPotentialBackpropagationIn64167Model
+    args:
+      model_path: data/64167.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: determinants_of_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: deterministic_ch_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: development_of_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: dichotomy_of_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

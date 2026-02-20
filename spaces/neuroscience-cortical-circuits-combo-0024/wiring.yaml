@@ -1,0 +1,28 @@
+modules:
+  compartmental_mi_1:
+    class: src.model_53435_53435_model:Model5343553435Model
+    args:
+      model_path: data/repo
+  compartmental_mo_2:
+    class: src.model_59582_59582_model:Model5958259582Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: compartmental_mi_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: compartmental_mo_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

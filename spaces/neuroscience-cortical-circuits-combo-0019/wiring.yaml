@@ -1,0 +1,28 @@
+modules:
+  coincidence_dete_1:
+    class: src.coincidence_detection_in_mso_principal_cells_gol_266961_model:CoincidenceDetectionInMsoPrincipalCellsGol266961Model
+    args:
+      model_path: data/266961.zip
+  coincidence_dete_2:
+    class: src.model_266961_266961_model:Model266961266961Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: coincidence_dete_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: coincidence_dete_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

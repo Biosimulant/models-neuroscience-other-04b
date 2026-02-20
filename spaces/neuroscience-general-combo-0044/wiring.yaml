@@ -1,0 +1,36 @@
+modules:
+  coding_of_1:
+    class: src.coding_of_stimulus_frequency_by_latency_in_thala_58582_model:CodingOfStimulusFrequencyByLatencyInThala58582Model
+    args:
+      model_path: data/58582.zip
+  cognitive_and_2:
+    class: src.cognitive_and_motor_cortico_basal_ganglia_intera_195731_model:CognitiveAndMotorCorticoBasalGangliaIntera195731Model
+    args:
+      model_path: data/195731.zip
+  cognitive_motor_3:
+    class: src.model_195731_195731_model:Model195731195731Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: coding_of_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cognitive_and_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: cognitive_motor_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

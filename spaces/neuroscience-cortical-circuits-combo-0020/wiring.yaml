@@ -1,0 +1,28 @@
+modules:
+  coincident_gluta_1:
+    class: src.model_266823_266823_model:Model266823266823Model
+    args:
+      model_path: data/repo
+  coincident_signa_2:
+    class: src.coincident_signals_in_olfactory_bulb_granule_cel_244687_model:CoincidentSignalsInOlfactoryBulbGranuleCel244687Model
+    args:
+      model_path: data/244687.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: coincident_gluta_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: coincident_signa_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

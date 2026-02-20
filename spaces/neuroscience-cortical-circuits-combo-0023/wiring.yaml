@@ -1,0 +1,28 @@
+modules:
+  comparing_correl_1:
+    class: src.model_206310_206310_model:Model206310206310Model
+    args:
+      model_path: data/repo
+  comparison_mathe_2:
+    class: src.model_225428_225428_model:Model225428225428Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: comparing_correl_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: comparison_mathe_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

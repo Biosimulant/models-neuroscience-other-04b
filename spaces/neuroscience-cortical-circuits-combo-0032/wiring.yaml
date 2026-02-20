@@ -1,0 +1,36 @@
+modules:
+  distal_inhibitor_1:
+    class: src.distal_inhibitory_control_of_sensory_evoked_exci_167499_model:DistalInhibitoryControlOfSensoryEvokedExci167499Model
+    args:
+      model_path: data/167499.zip
+  distributed_repr_2:
+    class: src.distributed_representation_of_perceptual_categor_113459_model:DistributedRepresentationOfPerceptualCategor113459Model
+    args:
+      model_path: data/113459.zip
+  dlgninterneuronh_3:
+    class: src.dlgninterneuronhalnesetal2011_dlgninterneuronhalnesetal2011_model:Dlgninterneuronhalnesetal2011Dlgninterneuronhalnesetal2011Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: distal_inhibitor_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: distributed_repr_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: dlgninterneuronh_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

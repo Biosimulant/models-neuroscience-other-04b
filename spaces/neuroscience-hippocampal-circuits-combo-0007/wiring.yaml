@@ -1,0 +1,28 @@
+modules:
+  compartmental_di_1:
+    class: src.compartmental_differences_in_camp_signaling_path_245529_model:CompartmentalDifferencesInCampSignalingPath245529Model
+    args:
+      model_path: data/245529.zip
+  complex_ca1_2:
+    class: src.model_123927_123927_model:Model123927123927Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: compartmental_di_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: complex_ca1_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

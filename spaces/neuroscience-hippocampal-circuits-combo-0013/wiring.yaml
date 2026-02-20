@@ -1,0 +1,28 @@
+modules:
+  detailed_passive_1:
+    class: src.detailed_passive_cable_model_of_dentate_gyrus_ba_140789_model:DetailedPassiveCableModelOfDentateGyrusBa140789Model
+    args:
+      model_path: data/140789.zip
+  distributed_syna_2:
+    class: src.distributed_synaptic_plasticity_and_spike_timing_149913_model:DistributedSynapticPlasticityAndSpikeTiming149913Model
+    args:
+      model_path: data/149913.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: detailed_passive_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: distributed_syna_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

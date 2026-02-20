@@ -1,0 +1,28 @@
+modules:
+  communitymodelli_1:
+    class: src.communitymodellingca1_communitymodellingca1_model:Communitymodellingca1Communitymodellingca1Model
+    args:
+      model_path: data/repo
+  compartmental_di_2:
+    class: src.model_245529_245529_model:Model245529245529Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: communitymodelli_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: compartmental_di_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

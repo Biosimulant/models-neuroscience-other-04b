@@ -1,0 +1,44 @@
+modules:
+  comparison_full_1:
+    class: src.model_127728_127728_model:Model127728127728Model
+    args:
+      model_path: data/repo
+  comparison_of_2:
+    class: src.comparison_of_full_and_reduced_globus_pallidus_m_127728_model:ComparisonOfFullAndReducedGlobusPallidusM127728Model
+    args:
+      model_path: data/127728.zip
+  composite_spikin_3:
+    class: src.composite_spiking_network_neural_field_model_of_147366_model:CompositeSpikingNetworkNeuralFieldModelOf147366Model
+    args:
+      model_path: data/147366.zip
+  composite_spikin_4:
+    class: src.model_147366_147366_model:Model147366147366Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: comparison_full_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: comparison_of_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: composite_spikin_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: composite_spikin_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

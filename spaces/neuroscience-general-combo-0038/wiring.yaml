@@ -1,0 +1,36 @@
+modules:
+  clc_channels_1:
+    class: src.clc_2_channels_regulate_neuronal_excitability_no_142993_model:Clc2ChannelsRegulateNeuronalExcitabilityNo142993Model
+    args:
+      model_path: data/142993.zip
+  clc_channels_2:
+    class: src.model_142993_142993_model:Model142993142993Model
+    args:
+      model_path: data/repo
+  cn_bushy_3:
+    class: src.model_126899_126899_model:Model126899126899Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: clc_channels_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: clc_channels_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: cn_bushy_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

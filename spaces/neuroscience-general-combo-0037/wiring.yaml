@@ -1,0 +1,36 @@
+modules:
+  circadian_clock_1:
+    class: src.circadian_clock_model_in_mammals_pk_pd_model_kim_148320_model:CircadianClockModelInMammalsPkPdModelKim148320Model
+    args:
+      model_path: data/148320.zip
+  classic_model_2:
+    class: src.classic_model_of_the_tritonia_swim_cpg_getting_1_93326_model:ClassicModelOfTheTritoniaSwimCpgGetting193326Model
+    args:
+      model_path: data/93326.zip
+  classic_tritonia_3:
+    class: src.model_93326_93326_model:Model9332693326Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: circadian_clock_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: classic_model_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: classic_tritonia_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

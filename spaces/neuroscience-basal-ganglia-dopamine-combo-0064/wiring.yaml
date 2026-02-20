@@ -1,0 +1,44 @@
+modules:
+  dopamine_activat_1:
+    class: src.dopamine_activation_of_signaling_pathways_in_a_m_154968_model:DopamineActivationOfSignalingPathwaysInAM154968Model
+    args:
+      model_path: data/154968.zip
+  dopamine_modulat_2:
+    class: src.dopamine_modulated_medium_spiny_neuron_reduced_m_128818_model:DopamineModulatedMediumSpinyNeuronReducedM128818Model
+    args:
+      model_path: data/128818.zip
+  dopaminergic_cel_3:
+    class: src.dopaminergic_cell_bursting_model_kuznetsov_et_al_64285_model:DopaminergicCellBurstingModelKuznetsovEtAl64285Model
+    args:
+      model_path: data/64285.zip
+  dynamic_dopamine_4:
+    class: src.dynamic_dopamine_modulation_in_the_basal_ganglia_79488_model:DynamicDopamineModulationInTheBasalGanglia79488Model
+    args:
+      model_path: data/79488.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: dopamine_activat_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dopamine_modulat_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: dopaminergic_cel_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c
+- from: dynamic_dopamine_4.state
+  to:
+  - state_compare_mon.state_d
+  - state_metrics_mon.state_d

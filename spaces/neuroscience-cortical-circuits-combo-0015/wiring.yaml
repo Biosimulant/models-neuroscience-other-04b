@@ -1,0 +1,28 @@
+modules:
+  channel_paramete_1:
+    class: src.model_54154_54154_model:Model5415454154Model
+    args:
+      model_path: data/repo
+  cholinergic_modu_2:
+    class: src.model_2016670_2016670_model:Model20166702016670Model
+    args:
+      model_path: data/repo
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: channel_paramete_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: cholinergic_modu_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

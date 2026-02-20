@@ -1,0 +1,28 @@
+modules:
+  dentate_granule_1:
+    class: src.dentate_granule_cell_mahp_and_sahp_sk_and_kv7_m_169240_model:DentateGranuleCellMahpAndSahpSkAndKv7M169240Model
+    args:
+      model_path: data/169240.zip
+  dentate_gyrus_2:
+    class: src.dentate_gyrus_feed_forward_inhibition_ferrante_e_124291_model:DentateGyrusFeedForwardInhibitionFerranteE124291Model
+    args:
+      model_path: data/124291.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: dentate_granule_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: dentate_gyrus_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b

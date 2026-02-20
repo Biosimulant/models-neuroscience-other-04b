@@ -1,0 +1,36 @@
+modules:
+  combination_sens_1:
+    class: src.model_83521_83521_model:Model8352183521Model
+    args:
+      model_path: data/repo
+  combination_sens_2:
+    class: src.combination_sensitivity_and_active_conductances_83521_model:CombinationSensitivityAndActiveConductances83521Model
+    args:
+      model_path: data/83521.zip
+  combining_modeli_3:
+    class: src.combining_modeling_deep_learning_for_mea_neuron_266518_model:CombiningModelingDeepLearningForMeaNeuron266518Model
+    args:
+      model_path: data/266518.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: combination_sens_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: combination_sens_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
+- from: combining_modeli_3.state
+  to:
+  - state_compare_mon.state_c
+  - state_metrics_mon.state_c

@@ -1,0 +1,28 @@
+modules:
+  crayfish_hybrid_1:
+    class: src.crayfish_hybrid_experimental_model_chung_et_al_2_150697_model:CrayfishHybridExperimentalModelChungEtAl2150697Model
+    args:
+      model_path: data/150697.zip
+  crayfish_hybrid_2:
+    class: src.crayfish_hybrid_simulation_model_bacque_cazenave_150698_model:CrayfishHybridSimulationModelBacqueCazenave150698Model
+    args:
+      model_path: data/150698.zip
+  state_compare_mon:
+    class: src.state_comparison_monitor:StateComparisonMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+  state_metrics_mon:
+    class: src.state_metrics_monitor:StateMetricsMonitor
+    args:
+      max_points: 2000
+      min_dt: 1.0
+wiring:
+- from: crayfish_hybrid_1.state
+  to:
+  - state_compare_mon.state_a
+  - state_metrics_mon.state_a
+- from: crayfish_hybrid_2.state
+  to:
+  - state_compare_mon.state_b
+  - state_metrics_mon.state_b
