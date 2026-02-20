@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/82392
   download_url: https://modeldb.science/download/82392
   license: ''
-bsim:
+biosim:
   entrypoint: src.computational_aspects_of_feedback_in_neural_circ_82392_model:ComputationalAspectsOfFeedbackInNeuralCirc82392Model
   init_kwargs:
     model_path: data/82392.zip

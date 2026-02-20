@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/120910
   download_url: https://modeldb.science/download/120910
   license: ''
-bsim:
+biosim:
   entrypoint: src.electrically_coupled_retzius_neurons_vazquez_et_120910_model:ElectricallyCoupledRetziusNeuronsVazquezEt120910Model
   init_kwargs:
     model_path: data/120910.zip

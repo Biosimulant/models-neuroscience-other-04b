@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/114108
   download_url: https://modeldb.science/download/114108
   license: ''
-bsim:
+biosim:
   entrypoint: src.effect_of_slowly_inactivating_ikdr_to_delayed_fi_114108_model:EffectOfSlowlyInactivatingIkdrToDelayedFi114108Model
   init_kwargs:
     model_path: data/114108.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/147578
   download_url: https://modeldb.science/download/147578
   license: ''
-bsim:
+biosim:
   entrypoint: src.chirp_stimulus_responses_in_a_morphologically_re_147578_model:ChirpStimulusResponsesInAMorphologicallyRe147578Model
   init_kwargs:
     model_path: data/147578.zip

@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/DynaSimShowcase
   download_url: https://github.com/OpenSourceBrain/DynaSimShowcase.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.dynasimshowcase_dynasimshowcase_model:DynasimshowcaseDynasimshowcaseModel
   init_kwargs:
     model_path: data/repo

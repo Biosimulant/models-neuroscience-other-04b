@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/116981
   download_url: https://modeldb.science/download/116981
   license: ''
-bsim:
+biosim:
   entrypoint: src.effects_of_synaptic_location_and_timing_on_synap_116981_model:EffectsOfSynapticLocationAndTimingOnSynap116981Model
   init_kwargs:
     model_path: data/116981.zip

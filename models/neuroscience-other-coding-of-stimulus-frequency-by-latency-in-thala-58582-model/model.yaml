@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/58582
   download_url: https://modeldb.science/download/58582
   license: ''
-bsim:
+biosim:
   entrypoint: src.coding_of_stimulus_frequency_by_latency_in_thala_58582_model:CodingOfStimulusFrequencyByLatencyInThala58582Model
   init_kwargs:
     model_path: data/58582.zip

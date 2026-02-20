@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/59582
   download_url: https://modeldb.science/download/59582
   license: ''
-bsim:
+biosim:
   entrypoint: src.compartmental_models_of_growing_neurites_graham_59582_model:CompartmentalModelsOfGrowingNeuritesGraham59582Model
   init_kwargs:
     model_path: data/59582.zip

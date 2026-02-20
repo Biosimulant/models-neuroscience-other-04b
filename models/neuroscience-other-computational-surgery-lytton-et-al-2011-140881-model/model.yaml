@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/140881
   download_url: https://modeldb.science/download/140881
   license: ''
-bsim:
+biosim:
   entrypoint: src.computational_surgery_lytton_et_al_2011_140881_model:ComputationalSurgeryLyttonEtAl2011140881Model
   init_kwargs:
     model_path: data/140881.zip

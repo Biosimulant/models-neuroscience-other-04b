@@ -19,7 +19,7 @@ upstream:
   original_url: https://modeldb.science/267599
   download_url: https://modeldb.science/download/267599
   license: ''
-bsim:
+biosim:
   entrypoint: src.cholinergic_modulation_shifts_the_response_of_ca_267599_model:CholinergicModulationShiftsTheResponseOfCa267599Model
   init_kwargs:
     model_path: data/267599.zip

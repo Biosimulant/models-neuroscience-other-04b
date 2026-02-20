@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/144560
   download_url: https://modeldb.science/download/144560
   license: ''
-bsim:
+biosim:
   entrypoint: src.computing_with_neural_synchrony_brette_2012_144560_model:ComputingWithNeuralSynchronyBrette2012144560Model
   init_kwargs:
     model_path: data/144560.zip

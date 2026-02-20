@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/53435
   download_url: https://modeldb.science/download/53435
   license: ''
-bsim:
+biosim:
   entrypoint: src.compartmental_model_of_a_mitral_cell_popovic_et_53435_model:CompartmentalModelOfAMitralCellPopovicEt53435Model
   init_kwargs:
     model_path: data/53435.zip

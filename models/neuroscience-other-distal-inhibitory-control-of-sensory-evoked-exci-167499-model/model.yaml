@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/167499
   download_url: https://modeldb.science/download/167499
   license: ''
-bsim:
+biosim:
   entrypoint: src.distal_inhibitory_control_of_sensory_evoked_exci_167499_model:DistalInhibitoryControlOfSensoryEvokedExci167499Model
   init_kwargs:
     model_path: data/167499.zip

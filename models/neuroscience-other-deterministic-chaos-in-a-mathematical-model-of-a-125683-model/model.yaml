@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/125683
   download_url: https://modeldb.science/download/125683
   license: ''
-bsim:
+biosim:
   entrypoint: src.deterministic_chaos_in_a_mathematical_model_of_a_125683_model:DeterministicChaosInAMathematicalModelOfA125683Model
   init_kwargs:
     model_path: data/125683.zip

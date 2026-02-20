@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/127728
   download_url: https://modeldb.science/download/127728
   license: ''
-bsim:
+biosim:
   entrypoint: src.comparison_of_full_and_reduced_globus_pallidus_m_127728_model:ComparisonOfFullAndReducedGlobusPallidusM127728Model
   init_kwargs:
     model_path: data/127728.zip

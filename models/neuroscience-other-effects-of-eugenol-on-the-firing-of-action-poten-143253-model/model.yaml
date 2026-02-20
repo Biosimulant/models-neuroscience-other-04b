@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/143253
   download_url: https://modeldb.science/download/143253
   license: ''
-bsim:
+biosim:
   entrypoint: src.effects_of_eugenol_on_the_firing_of_action_poten_143253_model:EffectsOfEugenolOnTheFiringOfActionPoten143253Model
   init_kwargs:
     model_path: data/143253.zip

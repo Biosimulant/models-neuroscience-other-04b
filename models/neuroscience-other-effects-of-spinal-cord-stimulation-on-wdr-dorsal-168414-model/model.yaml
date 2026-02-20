@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/168414
   download_url: https://modeldb.science/download/168414
   license: ''
-bsim:
+biosim:
   entrypoint: src.effects_of_spinal_cord_stimulation_on_wdr_dorsal_168414_model:EffectsOfSpinalCordStimulationOnWdrDorsal168414Model
   init_kwargs:
     model_path: data/168414.zip

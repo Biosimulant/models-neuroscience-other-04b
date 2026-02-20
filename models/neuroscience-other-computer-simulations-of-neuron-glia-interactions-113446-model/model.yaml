@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/113446
   download_url: https://modeldb.science/download/113446
   license: ''
-bsim:
+biosim:
   entrypoint: src.computer_simulations_of_neuron_glia_interactions_113446_model:ComputerSimulationsOfNeuronGliaInteractions113446Model
   init_kwargs:
     model_path: data/113446.zip

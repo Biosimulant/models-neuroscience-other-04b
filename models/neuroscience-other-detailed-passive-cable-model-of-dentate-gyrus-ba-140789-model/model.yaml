@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/140789
   download_url: https://modeldb.science/download/140789
   license: ''
-bsim:
+biosim:
   entrypoint: src.detailed_passive_cable_model_of_dentate_gyrus_ba_140789_model:DetailedPassiveCableModelOfDentateGyrusBa140789Model
   init_kwargs:
     model_path: data/140789.zip

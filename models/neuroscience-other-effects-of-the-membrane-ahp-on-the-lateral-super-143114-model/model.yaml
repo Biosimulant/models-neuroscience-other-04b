@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/143114
   download_url: https://modeldb.science/download/143114
   license: ''
-bsim:
+biosim:
   entrypoint: src.effects_of_the_membrane_ahp_on_the_lateral_super_143114_model:EffectsOfTheMembraneAhpOnTheLateralSuper143114Model
   init_kwargs:
     model_path: data/143114.zip

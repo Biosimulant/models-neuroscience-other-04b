@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/116606
   download_url: https://modeldb.science/download/116606
   license: ''
-bsim:
+biosim:
   entrypoint: src.currents_contributing_to_decision_making_in_neur_116606_model:CurrentsContributingToDecisionMakingInNeur116606Model
   init_kwargs:
     model_path: data/116606.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/147460
   download_url: https://modeldb.science/download/147460
   license: ''
-bsim:
+biosim:
   entrypoint: src.direct_recruitment_of_s1_pyramidal_cells_and_int_147460_model:DirectRecruitmentOfS1PyramidalCellsAndInt147460Model
   init_kwargs:
     model_path: data/147460.zip

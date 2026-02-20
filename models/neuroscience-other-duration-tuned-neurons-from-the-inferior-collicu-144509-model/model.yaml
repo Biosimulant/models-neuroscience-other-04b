@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/144509
   download_url: https://modeldb.science/download/144509
   license: ''
-bsim:
+biosim:
   entrypoint: src.duration_tuned_neurons_from_the_inferior_collicu_144509_model:DurationTunedNeuronsFromTheInferiorCollicu144509Model
   init_kwargs:
     model_path: data/144509.zip

@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/Drosophila_Projection_Neuron
   download_url: https://github.com/OpenSourceBrain/Drosophila_Projection_Neuron.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.drosophila_projection_neuron_drosophilaprojectionneuron_model:DrosophilaProjectionNeuronDrosophilaprojectionneuronModel
   init_kwargs:
     model_path: data/repo

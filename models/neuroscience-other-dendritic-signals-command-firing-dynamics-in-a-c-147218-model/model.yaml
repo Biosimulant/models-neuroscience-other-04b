@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/147218
   download_url: https://modeldb.science/download/147218
   license: ''
-bsim:
+biosim:
   entrypoint: src.dendritic_signals_command_firing_dynamics_in_a_c_147218_model:DendriticSignalsCommandFiringDynamicsInAC147218Model
   init_kwargs:
     model_path: data/147218.zip

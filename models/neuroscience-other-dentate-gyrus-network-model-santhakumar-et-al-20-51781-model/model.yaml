@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/51781
   download_url: https://modeldb.science/download/51781
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentate_gyrus_network_model_santhakumar_et_al_20_51781_model:DentateGyrusNetworkModelSanthakumarEtAl2051781Model
   init_kwargs:
     model_path: data/51781.zip

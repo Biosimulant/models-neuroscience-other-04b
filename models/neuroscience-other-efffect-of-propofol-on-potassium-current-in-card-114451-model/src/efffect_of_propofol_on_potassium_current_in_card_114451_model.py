@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherEfffectOfPropofolOnPotassiumCurrentInCardiacH9c2(bsim.BioModule):
+class OtherEfffectOfPropofolOnPotassiumCurrentInCardiacH9c2(biosim.BioModule):
     """Placeholder BioModule wrapper for: Efffect of propofol on potassium current in cardiac H9c2 cells (Liu et al. 2008).
 
     This model's original format is not directly supported by the auto-generator.

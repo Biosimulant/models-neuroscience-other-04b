@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/206310
   download_url: https://modeldb.science/download/206310
   license: ''
-bsim:
+biosim:
   entrypoint: src.comparing_correlation_responses_to_motion_estima_206310_model:ComparingCorrelationResponsesToMotionEstima206310Model
   init_kwargs:
     model_path: data/206310.zip

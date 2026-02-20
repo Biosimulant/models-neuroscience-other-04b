@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/151685
   download_url: https://modeldb.science/download/151685
   license: ''
-bsim:
+biosim:
   entrypoint: src.current_dipole_in_laminar_neocortex_lee_et_al_20_151685_model:CurrentDipoleInLaminarNeocortexLeeEtAl20151685Model
   init_kwargs:
     model_path: data/151685.zip

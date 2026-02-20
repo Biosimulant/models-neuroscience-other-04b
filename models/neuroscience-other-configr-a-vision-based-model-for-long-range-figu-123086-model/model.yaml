@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/123086
   download_url: https://modeldb.science/download/123086
   license: ''
-bsim:
+biosim:
   entrypoint: src.configr_a_vision_based_model_for_long_range_figu_123086_model:ConfigrAVisionBasedModelForLongRangeFigu123086Model
   init_kwargs:
     model_path: data/123086.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/120243
   download_url: https://modeldb.science/download/120243
   license: ''
-bsim:
+biosim:
   entrypoint: src.contribution_of_atp_sensitive_potassium_channels_120243_model:ContributionOfAtpSensitivePotassiumChannels120243Model
   init_kwargs:
     model_path: data/120243.zip

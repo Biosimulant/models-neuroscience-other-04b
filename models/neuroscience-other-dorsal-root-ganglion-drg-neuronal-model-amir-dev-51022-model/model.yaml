@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/51022
   download_url: https://modeldb.science/download/51022
   license: ''
-bsim:
+biosim:
   entrypoint: src.dorsal_root_ganglion_drg_neuronal_model_amir_dev_51022_model:DorsalRootGanglionDrgNeuronalModelAmirDev51022Model
   init_kwargs:
     model_path: data/51022.zip

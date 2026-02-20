@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/144372
   download_url: https://modeldb.science/download/144372
   license: ''
-bsim:
+biosim:
   entrypoint: src.cortical_pyramidal_neuron_phase_response_curve_s_144372_model:CorticalPyramidalNeuronPhaseResponseCurveS144372Model
   init_kwargs:
     model_path: data/144372.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/64167
   download_url: https://modeldb.science/download/64167
   license: ''
-bsim:
+biosim:
   entrypoint: src.dichotomy_of_action_potential_backpropagation_in_64167_model:DichotomyOfActionPotentialBackpropagationIn64167Model
   init_kwargs:
     model_path: data/64167.zip

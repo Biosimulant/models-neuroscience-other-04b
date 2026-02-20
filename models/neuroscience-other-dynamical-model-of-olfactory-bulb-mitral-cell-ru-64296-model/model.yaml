@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/64296
   download_url: https://modeldb.science/download/64296
   license: ''
-bsim:
+biosim:
   entrypoint: src.dynamical_model_of_olfactory_bulb_mitral_cell_ru_64296_model:DynamicalModelOfOlfactoryBulbMitralCellRu64296Model
   init_kwargs:
     model_path: data/64296.zip

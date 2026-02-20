@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/195731
   download_url: https://modeldb.science/download/195731
   license: ''
-bsim:
+biosim:
   entrypoint: src.cognitive_and_motor_cortico_basal_ganglia_intera_195731_model:CognitiveAndMotorCorticoBasalGangliaIntera195731Model
   init_kwargs:
     model_path: data/195731.zip

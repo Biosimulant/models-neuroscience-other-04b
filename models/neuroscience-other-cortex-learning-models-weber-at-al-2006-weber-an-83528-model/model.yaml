@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/83528
   download_url: https://modeldb.science/download/83528
   license: ''
-bsim:
+biosim:
   entrypoint: src.cortex_learning_models_weber_at_al_2006_weber_an_83528_model:CortexLearningModelsWeberAtAl2006WeberAn83528Model
   init_kwargs:
     model_path: data/83528.zip

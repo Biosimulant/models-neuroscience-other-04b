@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/146950
   download_url: https://modeldb.science/download/146950
   license: ''
-bsim:
+biosim:
   entrypoint: src.constructed_tessellated_neuronal_geometries_ctng_146950_model:ConstructedTessellatedNeuronalGeometriesCtng146950Model
   init_kwargs:
     model_path: data/146950.zip

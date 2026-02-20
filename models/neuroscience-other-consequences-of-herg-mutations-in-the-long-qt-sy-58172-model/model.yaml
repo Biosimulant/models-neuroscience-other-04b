@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/58172
   download_url: https://modeldb.science/download/58172
   license: ''
-bsim:
+biosim:
   entrypoint: src.consequences_of_herg_mutations_in_the_long_qt_sy_58172_model:ConsequencesOfHergMutationsInTheLongQtSy58172Model
   init_kwargs:
     model_path: data/58172.zip

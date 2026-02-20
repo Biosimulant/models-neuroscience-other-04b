@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/105528
   download_url: https://modeldb.science/download/105528
   license: ''
-bsim:
+biosim:
   entrypoint: src.effect_of_riluzole_on_action_potential_in_cultur_105528_model:EffectOfRiluzoleOnActionPotentialInCultur105528Model
   init_kwargs:
     model_path: data/105528.zip

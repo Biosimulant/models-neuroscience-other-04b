@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/127022
   download_url: https://modeldb.science/download/127022
   license: ''
-bsim:
+biosim:
   entrypoint: src.control_of_vibrissa_motoneuron_firing_harish_and_127022_model:ControlOfVibrissaMotoneuronFiringHarishAnd127022Model
   init_kwargs:
     model_path: data/127022.zip

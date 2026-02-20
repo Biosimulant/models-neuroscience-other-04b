@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherD2DopamineReceptorModulationOfInterneuronalActivity(bsim.BioModule):
+class OtherD2DopamineReceptorModulationOfInterneuronalActivity(biosim.BioModule):
     """Placeholder BioModule wrapper for: D2 dopamine receptor modulation of interneuronal activity (Maurice et al. 2004).
 
     This model's original format is not directly supported by the auto-generator.

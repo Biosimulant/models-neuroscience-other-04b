@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherCholinergicModulationShiftsTheResponseOfCa1Pyramidal(bsim.BioModule):
+class OtherCholinergicModulationShiftsTheResponseOfCa1Pyramidal(biosim.BioModule):
     """Placeholder BioModule wrapper for: Cholinergic Modulation Shifts the Response of CA1 Pyramidal Cells to Depolarizing Ramps via TRPM4 Channels with Potential Implications for Place Cell Firing (Combe et al., 2023).
 
     This model's original format is not directly supported by the auto-generator.

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/124513
   download_url: https://modeldb.science/download/124513
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentate_gyrus_morgan_et_al_2007_2008_santhakumar_124513_model:DentateGyrusMorganEtAl20072008Santhakumar124513Model
   init_kwargs:
     model_path: data/124513.zip

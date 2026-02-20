@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherDynamicDopamineModulationInTheBasalGangliaLearning(bsim.BioModule):
+class OtherDynamicDopamineModulationInTheBasalGangliaLearning(biosim.BioModule):
     """Placeholder BioModule wrapper for: Dynamic dopamine modulation in the basal ganglia: Learning in Parkinson (Frank et al 2004,2005).
 
     This model's original format is not directly supported by the auto-generator.

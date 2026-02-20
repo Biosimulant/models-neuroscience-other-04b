@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/CommunityModellingCA1
   download_url: https://github.com/OpenSourceBrain/CommunityModellingCA1.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.communitymodellingca1_communitymodellingca1_model:Communitymodellingca1Communitymodellingca1Model
   init_kwargs:
     model_path: data/repo

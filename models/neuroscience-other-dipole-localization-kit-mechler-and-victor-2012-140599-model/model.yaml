@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/140599
   download_url: https://modeldb.science/download/140599
   license: ''
-bsim:
+biosim:
   entrypoint: src.dipole_localization_kit_mechler_and_victor_2012_140599_model:DipoleLocalizationKitMechlerAndVictor2012140599Model
   init_kwargs:
     model_path: data/140599.zip

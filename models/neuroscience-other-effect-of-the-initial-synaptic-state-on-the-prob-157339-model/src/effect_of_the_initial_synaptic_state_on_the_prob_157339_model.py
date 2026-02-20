@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherEffectOfTheInitialSynapticStateOnTheProbabilityTo(bsim.BioModule):
+class OtherEffectOfTheInitialSynapticStateOnTheProbabilityTo(biosim.BioModule):
     """Placeholder BioModule wrapper for: Effect of the initial synaptic state on the probability to induce LTP and LTD (Migliore et al. 2015).
 
     This model's original format is not directly supported by the auto-generator.

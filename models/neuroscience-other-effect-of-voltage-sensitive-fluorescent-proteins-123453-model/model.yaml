@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/123453
   download_url: https://modeldb.science/download/123453
   license: ''
-bsim:
+biosim:
   entrypoint: src.effect_of_voltage_sensitive_fluorescent_proteins_123453_model:EffectOfVoltageSensitiveFluorescentProteins123453Model
   init_kwargs:
     model_path: data/123453.zip

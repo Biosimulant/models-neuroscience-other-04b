@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/98005
   download_url: https://modeldb.science/download/98005
   license: ''
-bsim:
+biosim:
   entrypoint: src.d2_dopamine_receptor_modulation_of_interneuronal_98005_model:D2DopamineReceptorModulationOfInterneuronal98005Model
   init_kwargs:
     model_path: data/98005.zip

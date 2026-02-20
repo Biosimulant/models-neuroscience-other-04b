@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/114451
   download_url: https://modeldb.science/download/114451
   license: ''
-bsim:
+biosim:
   entrypoint: src.efffect_of_propofol_on_potassium_current_in_card_114451_model:EfffectOfPropofolOnPotassiumCurrentInCard114451Model
   init_kwargs:
     model_path: data/114451.zip

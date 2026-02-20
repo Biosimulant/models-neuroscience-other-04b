@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/147740
   download_url: https://modeldb.science/download/147740
   license: ''
-bsim:
+biosim:
   entrypoint: src.cytoplasmic_electric_fields_and_electroosmosis_a_147740_model:CytoplasmicElectricFieldsAndElectroosmosisA147740Model
   init_kwargs:
     model_path: data/147740.zip

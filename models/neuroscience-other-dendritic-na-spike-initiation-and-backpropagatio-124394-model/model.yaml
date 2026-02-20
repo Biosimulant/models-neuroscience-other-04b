@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/124394
   download_url: https://modeldb.science/download/124394
   license: ''
-bsim:
+biosim:
   entrypoint: src.dendritic_na_spike_initiation_and_backpropagatio_124394_model:DendriticNaSpikeInitiationAndBackpropagatio124394Model
   init_kwargs:
     model_path: data/124394.zip

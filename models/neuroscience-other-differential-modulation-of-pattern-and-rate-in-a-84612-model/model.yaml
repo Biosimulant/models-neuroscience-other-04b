@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/84612
   download_url: https://modeldb.science/download/84612
   license: ''
-bsim:
+biosim:
   entrypoint: src.differential_modulation_of_pattern_and_rate_in_a_84612_model:DifferentialModulationOfPatternAndRateInA84612Model
   init_kwargs:
     model_path: data/84612.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/150067
   download_url: https://modeldb.science/download/150067
   license: ''
-bsim:
+biosim:
   entrypoint: src.distributed_cerebellar_plasticity_implements_ada_150067_model:DistributedCerebellarPlasticityImplementsAda150067Model
   init_kwargs:
     model_path: data/150067.zip

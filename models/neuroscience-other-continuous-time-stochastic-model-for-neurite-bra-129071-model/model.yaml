@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/129071
   download_url: https://modeldb.science/download/129071
   license: ''
-bsim:
+biosim:
   entrypoint: src.continuous_time_stochastic_model_for_neurite_bra_129071_model:ContinuousTimeStochasticModelForNeuriteBra129071Model
   init_kwargs:
     model_path: data/129071.zip

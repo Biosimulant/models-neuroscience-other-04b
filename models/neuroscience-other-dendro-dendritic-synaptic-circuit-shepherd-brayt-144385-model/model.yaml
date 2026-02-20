@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/144385
   download_url: https://modeldb.science/download/144385
   license: ''
-bsim:
+biosim:
   entrypoint: src.dendro_dendritic_synaptic_circuit_shepherd_brayt_144385_model:DendroDendriticSynapticCircuitShepherdBrayt144385Model
   init_kwargs:
     model_path: data/144385.zip

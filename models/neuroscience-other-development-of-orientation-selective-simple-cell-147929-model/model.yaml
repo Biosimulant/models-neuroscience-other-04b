@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/147929
   download_url: https://modeldb.science/download/147929
   license: ''
-bsim:
+biosim:
   entrypoint: src.development_of_orientation_selective_simple_cell_147929_model:DevelopmentOfOrientationSelectiveSimpleCell147929Model
   init_kwargs:
     model_path: data/147929.zip

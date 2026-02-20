@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/65412
   download_url: https://modeldb.science/download/65412
   license: ''
-bsim:
+biosim:
   entrypoint: src.computational_model_of_a_central_pattern_generat_65412_model:ComputationalModelOfACentralPatternGenerat65412Model
   init_kwargs:
     model_path: data/65412.zip

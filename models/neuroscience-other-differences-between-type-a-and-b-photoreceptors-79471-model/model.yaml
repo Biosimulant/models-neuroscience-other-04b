@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/79471
   download_url: https://modeldb.science/download/79471
   license: ''
-bsim:
+biosim:
   entrypoint: src.differences_between_type_a_and_b_photoreceptors_79471_model:DifferencesBetweenTypeAAndBPhotoreceptors79471Model
   init_kwargs:
     model_path: data/79471.zip

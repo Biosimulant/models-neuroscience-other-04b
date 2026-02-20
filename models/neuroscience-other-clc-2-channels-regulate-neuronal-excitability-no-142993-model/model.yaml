@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/142993
   download_url: https://modeldb.science/download/142993
   license: ''
-bsim:
+biosim:
   entrypoint: src.clc_2_channels_regulate_neuronal_excitability_no_142993_model:Clc2ChannelsRegulateNeuronalExcitabilityNo142993Model
   init_kwargs:
     model_path: data/142993.zip

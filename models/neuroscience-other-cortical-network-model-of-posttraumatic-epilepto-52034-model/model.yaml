@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/52034
   download_url: https://modeldb.science/download/52034
   license: ''
-bsim:
+biosim:
   entrypoint: src.cortical_network_model_of_posttraumatic_epilepto_52034_model:CorticalNetworkModelOfPosttraumaticEpilepto52034Model
   init_kwargs:
     model_path: data/52034.zip

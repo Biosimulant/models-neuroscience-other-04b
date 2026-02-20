@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/137263
   download_url: https://modeldb.science/download/137263
   license: ''
-bsim:
+biosim:
   entrypoint: src.effect_of_trp_like_current_on_aps_during_exposur_137263_model:EffectOfTrpLikeCurrentOnApsDuringExposur137263Model
   init_kwargs:
     model_path: data/137263.zip

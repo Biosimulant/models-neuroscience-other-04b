@@ -19,7 +19,7 @@ upstream:
   original_url: https://modeldb.science/126899
   download_url: https://modeldb.science/download/126899
   license: ''
-bsim:
+biosim:
   entrypoint: src.cn_bushy_stellate_neurons_rothman_manis_2003_bri_126899_model:CnBushyStellateNeuronsRothmanManis2003Bri126899Model
   init_kwargs:
     model_path: data/126899.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/116086
   download_url: https://modeldb.science/download/116086
   license: ''
-bsim:
+biosim:
   entrypoint: src.code_to_calc_spike_trig_ave_sta_conduct_from_vm_116086_model:CodeToCalcSpikeTrigAveStaConductFromVm116086Model
   init_kwargs:
     model_path: data/116086.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/150698
   download_url: https://modeldb.science/download/150698
   license: ''
-bsim:
+biosim:
   entrypoint: src.crayfish_hybrid_simulation_model_bacque_cazenave_150698_model:CrayfishHybridSimulationModelBacqueCazenave150698Model
   init_kwargs:
     model_path: data/150698.zip

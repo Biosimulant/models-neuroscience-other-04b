@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/123927
   download_url: https://modeldb.science/download/123927
   license: ''
-bsim:
+biosim:
   entrypoint: src.complex_ca1_neuron_to_study_ap_initiation_wimmer_123927_model:ComplexCa1NeuronToStudyApInitiationWimmer123927Model
   init_kwargs:
     model_path: data/123927.zip

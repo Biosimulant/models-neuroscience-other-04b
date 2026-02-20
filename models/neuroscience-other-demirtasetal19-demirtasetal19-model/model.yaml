@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/DemirtasEtAl19
   download_url: https://github.com/OpenSourceBrain/DemirtasEtAl19.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.demirtasetal19_demirtasetal19_model:Demirtasetal19Demirtasetal19Model
   init_kwargs:
     model_path: data/repo

@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/DANDIArchiveShowcase
   download_url: https://github.com/OpenSourceBrain/DANDIArchiveShowcase.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.dandiarchiveshowcase_dandiarchiveshowcase_model:DandiarchiveshowcaseDandiarchiveshowcaseModel
   init_kwargs:
     model_path: data/repo

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/167772
   download_url: https://modeldb.science/download/167772
   license: ''
-bsim:
+biosim:
   entrypoint: src.comparison_of_da_based_stochastic_algorithms_pez_167772_model:ComparisonOfDaBasedStochasticAlgorithmsPez167772Model
   init_kwargs:
     model_path: data/167772.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/245529
   download_url: https://modeldb.science/download/245529
   license: ''
-bsim:
+biosim:
   entrypoint: src.compartmental_differences_in_camp_signaling_path_245529_model:CompartmentalDifferencesInCampSignalingPath245529Model
   init_kwargs:
     model_path: data/245529.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/83521
   download_url: https://modeldb.science/download/83521
   license: ''
-bsim:
+biosim:
   entrypoint: src.combination_sensitivity_and_active_conductances_83521_model:CombinationSensitivityAndActiveConductances83521Model
   init_kwargs:
     model_path: data/83521.zip

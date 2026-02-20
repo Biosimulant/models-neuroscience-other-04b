@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/257027
   download_url: https://modeldb.science/download/257027
   license: ''
-bsim:
+biosim:
   entrypoint: src.circadian_rhythmicity_shapes_astrocyte_morpholog_257027_model:CircadianRhythmicityShapesAstrocyteMorpholog257027Model
   init_kwargs:
     model_path: data/257027.zip

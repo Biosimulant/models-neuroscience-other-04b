@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/119283
   download_url: https://modeldb.science/download/119283
   license: ''
-bsim:
+biosim:
   entrypoint: src.computational_neuropharmacology_of_ca1_pyramidal_119283_model:ComputationalNeuropharmacologyOfCa1Pyramidal119283Model
   init_kwargs:
     model_path: data/119283.zip

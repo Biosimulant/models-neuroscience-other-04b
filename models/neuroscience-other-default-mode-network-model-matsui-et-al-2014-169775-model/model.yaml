@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/169775
   download_url: https://modeldb.science/download/169775
   license: ''
-bsim:
+biosim:
   entrypoint: src.default_mode_network_model_matsui_et_al_2014_169775_model:DefaultModeNetworkModelMatsuiEtAl2014169775Model
   init_kwargs:
     model_path: data/169775.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/117459
   download_url: https://modeldb.science/download/117459
   license: ''
-bsim:
+biosim:
   entrypoint: src.competition_for_ap_initiation_sites_in_a_circuit_117459_model:CompetitionForApInitiationSitesInACircuit117459Model
   init_kwargs:
     model_path: data/117459.zip

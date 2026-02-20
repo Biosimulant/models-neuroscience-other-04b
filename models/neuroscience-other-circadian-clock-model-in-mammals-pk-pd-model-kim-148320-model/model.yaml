@@ -19,7 +19,7 @@ upstream:
   original_url: https://modeldb.science/148320
   download_url: https://modeldb.science/download/148320
   license: ''
-bsim:
+biosim:
   entrypoint: src.circadian_clock_model_in_mammals_pk_pd_model_kim_148320_model:CircadianClockModelInMammalsPkPdModelKim148320Model
   init_kwargs:
     model_path: data/148320.zip

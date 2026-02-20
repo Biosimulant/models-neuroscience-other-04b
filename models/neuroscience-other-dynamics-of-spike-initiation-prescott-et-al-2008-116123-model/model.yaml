@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/116123
   download_url: https://modeldb.science/download/116123
   license: ''
-bsim:
+biosim:
   entrypoint: src.dynamics_of_spike_initiation_prescott_et_al_2008_116123_model:DynamicsOfSpikeInitiationPrescottEtAl2008116123Model
   init_kwargs:
     model_path: data/116123.zip

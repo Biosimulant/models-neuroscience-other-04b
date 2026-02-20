@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/262456
   download_url: https://modeldb.science/download/262456
   license: ''
-bsim:
+biosim:
   entrypoint: src.complex_dynamics_reproducing_golgi_cell_electror_262456_model:ComplexDynamicsReproducingGolgiCellElectror262456Model
   init_kwargs:
     model_path: data/262456.zip

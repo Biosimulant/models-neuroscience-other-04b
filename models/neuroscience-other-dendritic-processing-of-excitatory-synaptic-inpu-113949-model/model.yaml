@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/113949
   download_url: https://modeldb.science/download/113949
   license: ''
-bsim:
+biosim:
   entrypoint: src.dendritic_processing_of_excitatory_synaptic_inpu_113949_model:DendriticProcessingOfExcitatorySynapticInpu113949Model
   init_kwargs:
     model_path: data/113949.zip

@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherDirectRecruitmentOfS1PyramidalCellsAndInterneurons(bsim.BioModule):
+class OtherDirectRecruitmentOfS1PyramidalCellsAndInterneurons(biosim.BioModule):
     """Placeholder BioModule wrapper for: Direct recruitment of S1 pyramidal cells and interneurons via ICMS (Overstreet et al., 2013).
 
     This model's original format is not directly supported by the auto-generator.

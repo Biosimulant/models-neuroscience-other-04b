@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/116740
   download_url: https://modeldb.science/download/116740
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentate_gyrus_granule_cell_calcium_and_calcium_d_116740_model:DentateGyrusGranuleCellCalciumAndCalciumD116740Model
   init_kwargs:
     model_path: data/116740.zip

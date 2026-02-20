@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/150697
   download_url: https://modeldb.science/download/150697
   license: ''
-bsim:
+biosim:
   entrypoint: src.crayfish_hybrid_experimental_model_chung_et_al_2_150697_model:CrayfishHybridExperimentalModelChungEtAl2150697Model
   init_kwargs:
     model_path: data/150697.zip

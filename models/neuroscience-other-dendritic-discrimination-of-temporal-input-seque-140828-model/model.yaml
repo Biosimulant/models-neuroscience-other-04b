@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/140828
   download_url: https://modeldb.science/download/140828
   license: ''
-bsim:
+biosim:
   entrypoint: src.dendritic_discrimination_of_temporal_input_seque_140828_model:DendriticDiscriminationOfTemporalInputSeque140828Model
   init_kwargs:
     model_path: data/140828.zip

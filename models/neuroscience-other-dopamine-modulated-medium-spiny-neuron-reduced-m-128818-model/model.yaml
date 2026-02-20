@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/128818
   download_url: https://modeldb.science/download/128818
   license: ''
-bsim:
+biosim:
   entrypoint: src.dopamine_modulated_medium_spiny_neuron_reduced_m_128818_model:DopamineModulatedMediumSpinyNeuronReducedM128818Model
   init_kwargs:
     model_path: data/128818.zip

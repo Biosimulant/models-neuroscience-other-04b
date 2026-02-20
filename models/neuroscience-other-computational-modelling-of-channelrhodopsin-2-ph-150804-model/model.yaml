@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/150804
   download_url: https://modeldb.science/download/150804
   license: ''
-bsim:
+biosim:
   entrypoint: src.computational_modelling_of_channelrhodopsin_2_ph_150804_model:ComputationalModellingOfChannelrhodopsin2Ph150804Model
   init_kwargs:
     model_path: data/150804.zip

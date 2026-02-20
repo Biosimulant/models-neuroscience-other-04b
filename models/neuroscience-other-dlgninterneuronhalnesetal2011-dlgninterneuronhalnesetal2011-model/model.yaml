@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/dLGNinterneuronHalnesEtAl2011
   download_url: https://github.com/OpenSourceBrain/dLGNinterneuronHalnesEtAl2011.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.dlgninterneuronhalnesetal2011_dlgninterneuronhalnesetal2011_model:Dlgninterneuronhalnesetal2011Dlgninterneuronhalnesetal2011Model
   init_kwargs:
     model_path: data/repo

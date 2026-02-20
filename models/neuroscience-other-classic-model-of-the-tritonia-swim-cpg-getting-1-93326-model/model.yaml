@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/93326
   download_url: https://modeldb.science/download/93326
   license: ''
-bsim:
+biosim:
   entrypoint: src.classic_model_of_the_tritonia_swim_cpg_getting_1_93326_model:ClassicModelOfTheTritoniaSwimCpgGetting193326Model
   init_kwargs:
     model_path: data/93326.zip

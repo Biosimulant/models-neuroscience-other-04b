@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/154968
   download_url: https://modeldb.science/download/154968
   license: ''
-bsim:
+biosim:
   entrypoint: src.dopamine_activation_of_signaling_pathways_in_a_m_154968_model:DopamineActivationOfSignalingPathwaysInAM154968Model
   init_kwargs:
     model_path: data/154968.zip

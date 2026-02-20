@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/DentateGyrus2005
   download_url: https://github.com/OpenSourceBrain/DentateGyrus2005.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentategyrus2005_dentategyrus2005_model:Dentategyrus2005Dentategyrus2005Model
   init_kwargs:
     model_path: data/repo

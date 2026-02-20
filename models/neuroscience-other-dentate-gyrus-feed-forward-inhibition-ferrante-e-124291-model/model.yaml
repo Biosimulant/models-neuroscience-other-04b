@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/124291
   download_url: https://modeldb.science/download/124291
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentate_gyrus_feed_forward_inhibition_ferrante_e_124291_model:DentateGyrusFeedForwardInhibitionFerranteE124291Model
   init_kwargs:
     model_path: data/124291.zip

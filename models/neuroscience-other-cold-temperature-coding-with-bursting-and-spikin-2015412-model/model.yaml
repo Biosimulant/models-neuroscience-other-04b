@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/2015412
   download_url: https://modeldb.science/download/2015412
   license: ''
-bsim:
+biosim:
   entrypoint: src.cold_temperature_coding_with_bursting_and_spikin_2015412_model:ColdTemperatureCodingWithBurstingAndSpikin2015412Model
   init_kwargs:
     model_path: data/2015412.zip

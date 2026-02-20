@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/113459
   download_url: https://modeldb.science/download/113459
   license: ''
-bsim:
+biosim:
   entrypoint: src.distributed_representation_of_perceptual_categor_113459_model:DistributedRepresentationOfPerceptualCategor113459Model
   init_kwargs:
     model_path: data/113459.zip

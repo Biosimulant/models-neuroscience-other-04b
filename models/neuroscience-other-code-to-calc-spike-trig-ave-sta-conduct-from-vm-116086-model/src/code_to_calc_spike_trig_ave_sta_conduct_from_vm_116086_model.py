@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherCodeToCalcSpikeTrigAveStaConductFromVmPospischil(bsim.BioModule):
+class OtherCodeToCalcSpikeTrigAveStaConductFromVmPospischil(biosim.BioModule):
     """Placeholder BioModule wrapper for: Code to calc. spike-trig. ave (STA) conduct. from Vm (Pospischil et al. 2007, Rudolph et al. 2007).
 
     This model's original format is not directly supported by the auto-generator.

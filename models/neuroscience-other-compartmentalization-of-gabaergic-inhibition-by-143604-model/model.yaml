@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/143604
   download_url: https://modeldb.science/download/143604
   license: ''
-bsim:
+biosim:
   entrypoint: src.compartmentalization_of_gabaergic_inhibition_by_143604_model:CompartmentalizationOfGabaergicInhibitionBy143604Model
   init_kwargs:
     model_path: data/143604.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/151126
   download_url: https://modeldb.science/download/151126
   license: ''
-bsim:
+biosim:
   entrypoint: src.effects_of_increasing_creb_on_storage_and_recall_151126_model:EffectsOfIncreasingCrebOnStorageAndRecall151126Model
   init_kwargs:
     model_path: data/151126.zip

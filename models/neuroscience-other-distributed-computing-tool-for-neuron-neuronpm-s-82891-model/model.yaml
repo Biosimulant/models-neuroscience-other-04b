@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/82891
   download_url: https://modeldb.science/download/82891
   license: ''
-bsim:
+biosim:
   entrypoint: src.distributed_computing_tool_for_neuron_neuronpm_s_82891_model:DistributedComputingToolForNeuronNeuronpmS82891Model
   init_kwargs:
     model_path: data/82891.zip

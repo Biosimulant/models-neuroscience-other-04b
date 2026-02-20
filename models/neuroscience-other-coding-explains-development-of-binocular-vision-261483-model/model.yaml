@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/261483
   download_url: https://modeldb.science/download/261483
   license: ''
-bsim:
+biosim:
   entrypoint: src.coding_explains_development_of_binocular_vision_261483_model:CodingExplainsDevelopmentOfBinocularVision261483Model
   init_kwargs:
     model_path: data/261483.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/93390
   download_url: https://modeldb.science/download/93390
   license: ''
-bsim:
+biosim:
   entrypoint: src.efficient_estimation_of_detailed_single_neuron_m_93390_model:EfficientEstimationOfDetailedSingleNeuronM93390Model
   init_kwargs:
     model_path: data/93390.zip

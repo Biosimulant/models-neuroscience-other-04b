@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/151949
   download_url: https://modeldb.science/download/151949
   license: ''
-bsim:
+biosim:
   entrypoint: src.drt_neuron_model_sousa_et_al_2014_151949_model:DrtNeuronModelSousaEtAl2014151949Model
   init_kwargs:
     model_path: data/151949.zip

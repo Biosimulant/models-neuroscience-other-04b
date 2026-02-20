@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/54154
   download_url: https://modeldb.science/download/54154
   license: ''
-bsim:
+biosim:
   entrypoint: src.channel_parameter_estimation_from_current_clamp_54154_model:ChannelParameterEstimationFromCurrentClamp54154Model
   init_kwargs:
     model_path: data/54154.zip

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/53437
   download_url: https://modeldb.science/download/53437
   license: ''
-bsim:
+biosim:
   entrypoint: src.discrete_event_simulation_in_the_neuron_environm_53437_model:DiscreteEventSimulationInTheNeuronEnvironm53437Model
   init_kwargs:
     model_path: data/53437.zip

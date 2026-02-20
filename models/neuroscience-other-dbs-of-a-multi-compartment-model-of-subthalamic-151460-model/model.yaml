@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/151460
   download_url: https://modeldb.science/download/151460
   license: ''
-bsim:
+biosim:
   entrypoint: src.dbs_of_a_multi_compartment_model_of_subthalamic_151460_model:DbsOfAMultiCompartmentModelOfSubthalamic151460Model
   init_kwargs:
     model_path: data/151460.zip

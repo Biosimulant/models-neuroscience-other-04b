@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/157339
   download_url: https://modeldb.science/download/157339
   license: ''
-bsim:
+biosim:
   entrypoint: src.effect_of_the_initial_synaptic_state_on_the_prob_157339_model:EffectOfTheInitialSynapticStateOnTheProb157339Model
   init_kwargs:
     model_path: data/157339.zip

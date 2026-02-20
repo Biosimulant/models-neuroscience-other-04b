@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/169240
   download_url: https://modeldb.science/download/169240
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentate_granule_cell_mahp_and_sahp_sk_and_kv7_m_169240_model:DentateGranuleCellMahpAndSahpSkAndKv7M169240Model
   init_kwargs:
     model_path: data/169240.zip

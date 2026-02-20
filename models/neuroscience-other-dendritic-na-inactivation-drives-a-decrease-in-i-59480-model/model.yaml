@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/59480
   download_url: https://modeldb.science/download/59480
   license: ''
-bsim:
+biosim:
   entrypoint: src.dendritic_na_inactivation_drives_a_decrease_in_i_59480_model:DendriticNaInactivationDrivesADecreaseInI59480Model
   init_kwargs:
     model_path: data/59480.zip

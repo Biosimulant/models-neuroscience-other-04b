@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/CNOShowcase
   download_url: https://github.com/OpenSourceBrain/CNOShowcase.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.cnoshowcase_cnoshowcase_model:CnoshowcaseCnoshowcaseModel
   init_kwargs:
     model_path: data/repo

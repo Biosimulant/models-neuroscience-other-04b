@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/142062
   download_url: https://modeldb.science/download/142062
   license: ''
-bsim:
+biosim:
   entrypoint: src.efficient_simulation_environment_for_modeling_la_142062_model:EfficientSimulationEnvironmentForModelingLa142062Model
   init_kwargs:
     model_path: data/142062.zip

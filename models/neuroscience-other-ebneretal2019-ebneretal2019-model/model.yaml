@@ -18,7 +18,7 @@ upstream:
   original_url: https://github.com/OpenSourceBrain/EbnerEtAl2019
   download_url: https://github.com/OpenSourceBrain/EbnerEtAl2019.git
   license: ''
-bsim:
+biosim:
   entrypoint: src.ebneretal2019_ebneretal2019_model:Ebneretal2019Ebneretal2019Model
   init_kwargs:
     model_path: data/repo

@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/181032
   download_url: https://modeldb.science/download/181032
   license: ''
-bsim:
+biosim:
   entrypoint: src.effect_of_polysynaptic_facilitaiton_between_piri_181032_model:EffectOfPolysynapticFacilitaitonBetweenPiri181032Model
   init_kwargs:
     model_path: data/181032.zip

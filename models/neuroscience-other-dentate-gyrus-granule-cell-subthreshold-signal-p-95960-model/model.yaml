@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/95960
   download_url: https://modeldb.science/download/95960
   license: ''
-bsim:
+biosim:
   entrypoint: src.dentate_gyrus_granule_cell_subthreshold_signal_p_95960_model:DentateGyrusGranuleCellSubthresholdSignalP95960Model
   init_kwargs:
     model_path: data/95960.zip

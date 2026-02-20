@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/2016670
   download_url: https://modeldb.science/download/2016670
   license: ''
-bsim:
+biosim:
   entrypoint: src.cholinergic_modulation_of_resting_state_networks_2016670_model:CholinergicModulationOfRestingStateNetworks2016670Model
   init_kwargs:
     model_path: data/2016670.zip

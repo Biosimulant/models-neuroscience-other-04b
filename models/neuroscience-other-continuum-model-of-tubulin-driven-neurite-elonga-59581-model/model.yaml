@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/59581
   download_url: https://modeldb.science/download/59581
   license: ''
-bsim:
+biosim:
   entrypoint: src.continuum_model_of_tubulin_driven_neurite_elonga_59581_model:ContinuumModelOfTubulinDrivenNeuriteElonga59581Model
   init_kwargs:
     model_path: data/59581.zip

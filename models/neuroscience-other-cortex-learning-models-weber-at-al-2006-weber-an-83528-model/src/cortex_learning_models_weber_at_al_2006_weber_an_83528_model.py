@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherCortexLearningModelsWeberAtAl2006WeberAndTriesch(bsim.BioModule):
+class OtherCortexLearningModelsWeberAtAl2006WeberAndTriesch(biosim.BioModule):
     """Placeholder BioModule wrapper for: Cortex learning models (Weber at al. 2006, Weber and Triesch, 2006, Weber and Wermter 2006/7).
 
     This model's original format is not directly supported by the auto-generator.

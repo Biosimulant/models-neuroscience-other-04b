@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/64285
   download_url: https://modeldb.science/download/64285
   license: ''
-bsim:
+biosim:
   entrypoint: src.dopaminergic_cell_bursting_model_kuznetsov_et_al_64285_model:DopaminergicCellBurstingModelKuznetsovEtAl64285Model
   init_kwargs:
     model_path: data/64285.zip

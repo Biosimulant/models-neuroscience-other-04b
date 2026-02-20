@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from bsim import BioWorld
+    from biosim import BioWorld
 
-import bsim
-from bsim.signals import BioSignal, SignalMetadata
+import biosim
+from biosim.signals import BioSignal, SignalMetadata
 
 
-class OtherDendriticNaSpikeInitiationAndBackpropagationOfApsIn(bsim.BioModule):
+class OtherDendriticNaSpikeInitiationAndBackpropagationOfApsIn(biosim.BioModule):
     """Placeholder BioModule wrapper for: Dendritic Na+ spike initiation and backpropagation of APs in active dendrites (Nevian et al. 2007).
 
     This model's original format is not directly supported by the auto-generator.

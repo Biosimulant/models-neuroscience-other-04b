@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/83508
   download_url: https://modeldb.science/download/83508
   license: ''
-bsim:
+biosim:
   entrypoint: src.contibutions_of_input_and_history_to_motoneuron_83508_model:ContibutionsOfInputAndHistoryToMotoneuron83508Model
   init_kwargs:
     model_path: data/83508.zip

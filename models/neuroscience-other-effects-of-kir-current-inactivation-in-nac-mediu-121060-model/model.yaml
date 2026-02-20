@@ -20,7 +20,7 @@ upstream:
   original_url: https://modeldb.science/121060
   download_url: https://modeldb.science/download/121060
   license: ''
-bsim:
+biosim:
   entrypoint: src.effects_of_kir_current_inactivation_in_nac_mediu_121060_model:EffectsOfKirCurrentInactivationInNacMediu121060Model
   init_kwargs:
     model_path: data/121060.zip
