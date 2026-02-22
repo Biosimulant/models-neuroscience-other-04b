@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CombiningModelingDeepLearningForMeaNeuron266518Model'
-description: '{"value": "\"Neural circuits typically consist of many different types
-  of neurons, and one faces a challenge in disentangling their individual contributions
-  in measured neural activity. Classification'
+description: "{\"value\": \"\\\"Neural circuits typically consist of many different types of neurons, and one faces a challenge in disentangling their individual contributions in measured neural activity. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

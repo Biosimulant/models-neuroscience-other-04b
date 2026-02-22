@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DiscreteEventSimulationInTheNeuronEnvironm53437Model'
-description: '{"value": "A short introduction to how \"integrate and fire\" cells
-  are implemented in NEURON. Network simulations that use only artificial spiking
-  cells are extremely efficient, with runtimes '
+description: "{\"value\": \"A short introduction to how \\\"integrate and fire\\\" cells are implemented in NEURON. Network simulations that use only artificial spiking cells are extremely efficient, with runtimes."
 standard: other
 tags:
 - neuroscience

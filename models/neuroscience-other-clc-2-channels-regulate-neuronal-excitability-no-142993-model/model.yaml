@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Clc2ChannelsRegulateNeuronalExcitabilityNo142993Model'
-description: '{"value": "\"The model is for a generic, single compartment neuron with
-  multiple ion currents. The most notable mechanisms include ClC-2 (a rectifying chloride-leak
-  channel) and KCC2 (potassium chlori'
+description: "{\"value\": \"\\\"The model is for a generic, single compartment neuron with multiple ion currents. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

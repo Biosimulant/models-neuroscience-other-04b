@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DynamicsOfSpikeInitiationPrescottEtAl2008116123Model'
-description: '{"value": "\"Transduction of graded synaptic input into trains of all-or-none
-  action potentials (spikes) is a crucial step in neural coding.\r\n\r\nHodgkin identified
-  three classes of neurons with qua'
+description: "{\"value\": \"\\\"Transduction of graded synaptic input into trains of all-or-none action potentials (spikes) is a crucial step in neural coding.\\r\\n\\r\\nHodgkin identified three classes of neurons with qua. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

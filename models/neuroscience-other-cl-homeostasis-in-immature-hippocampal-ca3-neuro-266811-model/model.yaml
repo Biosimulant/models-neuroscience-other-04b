@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ClHomeostasisInImmatureHippocampalCa3Neuro266811Model'
-description: '{"value": "Model used for the revision of the manuscript.\r\nInsertion
-  of a passive Cl- flux and an active Cl-accumulation. Parameters adapted to match
-  the properties of [Cl-]i determined in immature '
+description: "{\"value\": \"Model used for the revision of the manuscript.\\r\\nInsertion of a passive Cl- flux and an active Cl-accumulation. Parameters adapted to match the properties of [Cl-]i determined in immature."
 standard: other
 tags:
 - neuroscience

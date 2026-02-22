@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model3785737857Model'
-description: CN bushy, stellate neurons (Rothman, Manis 2003)
+description: "Neuroscience Model3785737857Model represents neuroscience cn bushy stellate neurons osb37857 mechanisms from opensourcebrain reference opensourcebrain:37857. When you run it, you can inspect state and compare temporal behavior between baseline and adjusted inputs."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompositeSpikingNetworkNeuralFieldModelOf147366Model'
-description: '{"value": "This code implements a composite model of Parkinson''s disease
-  (PD). The\r\ncomposite model consists of a leaky integrate-and-fire spiking neuronal\r\nnetwork
-  model being driven by output fr'
+description: "{\"value\": \"This code implements a composite model of Parkinson's disease (PD). The\\r\\ncomposite model consists of a leaky integrate-and-fire spiking neuronal\\r\\nnetwork model being driven by output fr."
 standard: other
 tags:
 - neuroscience

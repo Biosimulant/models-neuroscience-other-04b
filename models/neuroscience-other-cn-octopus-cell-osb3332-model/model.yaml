@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model33323332Model'
-description: 'CN Octopus Cell: Ih current (Bal, Oertel 2000)'
+description: "Neuroscience Model33323332Model models neuroscience cn octopus cell osb3332 dynamics as a OTHER simulation curated from opensourcebrain (opensourcebrain:3332), focused on neuroscience, opensourcebrain, cn. When you run it, you can track state over time and compare response patterns across parameter settings."
 standard: other
 tags:
 - neuroscience

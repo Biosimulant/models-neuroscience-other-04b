@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DrtNeuronModelSousaEtAl2014151949Model'
-description: '{"value": "Despite the importance and significant clinical impact of
-  understanding information processing in the nociceptive system, the functional properties
-  of neurons in many parts of this system a'
+description: "{\"value\": \"Despite the importance and significant clinical impact of understanding information processing in the nociceptive system, the functional properties of neurons in many parts of this system a. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

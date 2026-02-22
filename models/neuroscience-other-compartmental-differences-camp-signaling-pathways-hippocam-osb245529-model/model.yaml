@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model245529245529Model'
-description: Compartmental differences in cAMP signaling pathways in hippocam. CA1
-  pyr. cells (Luczak et al 2017)
+description: "Compartmental differences in cAMP signaling pathways in hippocam. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

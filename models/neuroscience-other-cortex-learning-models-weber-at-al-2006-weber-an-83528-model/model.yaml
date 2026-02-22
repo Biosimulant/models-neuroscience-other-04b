@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CortexLearningModelsWeberAtAl2006WeberAn83528Model'
-description: '{"value": "A simulator and the configuration files for three publications
-  are\r\nprovided. First, \"A hybrid generative and predictive model of the motor\r\ncortex\"
-  (Weber at al. 2006) which uses rei'
+description: "{\"value\": \"A simulator and the configuration files for three publications are\\r\\nprovided. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

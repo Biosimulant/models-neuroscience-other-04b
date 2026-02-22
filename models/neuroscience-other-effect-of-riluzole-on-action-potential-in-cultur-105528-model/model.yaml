@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectOfRiluzoleOnActionPotentialInCultur105528Model'
-description: "{'value': 'Simulation studies also unraveled that both decreased conductance\
-  \ of I(Na) and increased conductance of I(K(Ca)) utilized to mimic riluzole\r\n\
-  actions in skeletal muscle cells could combine"
+description: "{'value': 'Simulation studies also unraveled that both decreased conductance of I(Na) and increased conductance of I(K(Ca)) utilized to mimic riluzole actions in skeletal muscle cells could combine. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

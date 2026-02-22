@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompetitionForApInitiationSitesInACircuit117459Model'
-description: '{"value": "\"The spatial and temporal patterns of action potential initiations
-  were studied in a behaving leech preparation to determine the basis of increased
-  firing that accompanies sensitization, a'
+description: "{\"value\": \"\\\"The spatial and temporal patterns of action potential initiations were studied in a behaving leech preparation to determine the basis of increased firing that accompanies sensitization, a. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

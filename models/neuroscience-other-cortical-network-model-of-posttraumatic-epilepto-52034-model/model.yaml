@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CorticalNetworkModelOfPosttraumaticEpilepto52034Model'
-description: "{'value': 'This simulation from Bush, Prince, and Miller 1999 shows\
-  \ the epileptiform response (Fig. 6C) to a brief single stimulation in a 500 cell\r\
-  \nnetwork of multicompartment models, some of which"
+description: "{'value': 'This simulation from Bush, Prince, and Miller 1999 shows the epileptiform response (Fig. 6C) to a brief single stimulation in a 500 cell network of multicompartment models, some of which."
 standard: other
 tags:
 - neuroscience

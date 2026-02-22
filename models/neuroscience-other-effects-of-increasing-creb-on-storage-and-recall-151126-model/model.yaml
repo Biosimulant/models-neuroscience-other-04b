@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectsOfIncreasingCrebOnStorageAndRecall151126Model'
-description: '{"value": "Several recent results suggest that boosting the CREB pathway
-  improves hippocampal-dependent memory in healthy rodents and restores this type
-  of\r\nmemory in an AD mouse model. However, not'
+description: "{\"value\": \"Several recent results suggest that boosting the CREB pathway improves hippocampal-dependent memory in healthy rodents and restores this type of\\r\\nmemory in an AD mouse model. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model123927123927Model'
-description: Complex CA1-neuron to study AP initiation (Wimmer et al. 2010)
+description: "Complex CA1-neuron to study AP initiation (Wimmer et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

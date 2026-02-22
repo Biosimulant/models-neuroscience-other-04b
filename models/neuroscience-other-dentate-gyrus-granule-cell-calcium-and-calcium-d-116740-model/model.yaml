@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DentateGyrusGranuleCellCalciumAndCalciumD116740Model'
-description: '{"value": "We have constructed a detailed model of a hippocampal dentate
-  granule (DG) cell that includes nine different channel types. \r\nChannel densities
-  and distributions were chosen to reproduce '
+description: "{\"value\": \"We have constructed a detailed model of a hippocampal dentate granule (DG) cell that includes nine different channel types. \\r\\nChannel densities and distributions were chosen to reproduce."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ContrastInvarianceByLgnSynapticDepressionB114637Model'
-description: '{"value": "\"Simple cells in layer 4 of the primary visual cortex of
-  the cat show contrast-invariant orientation tuning, in which the amplitude of the\r\npeak
-  response is proportional to the stimulus '
+description: "{\"value\": \"\\\"Simple cells in layer 4 of the primary visual cortex of the cat show contrast-invariant orientation tuning, in which the amplitude of the\\r\\npeak response is proportional to the stimulus. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DandiarchiveshowcaseDandiarchiveshowcaseModel'
-description: Scripts for interacting with the DANDI Archive
+description: "Neuroscience Dandiarchiveshowcase Dandiarchiveshowcase Model models neuroscience dandiarchiveshowcase dandiarchiveshowcase dynamics as a OTHER simulation curated from opensourcebrain (opensourcebrain:DANDIArchi. When you run it, you can track state over time and compare response patterns across parameter settings."
 standard: other
 tags:
 - neuroscience

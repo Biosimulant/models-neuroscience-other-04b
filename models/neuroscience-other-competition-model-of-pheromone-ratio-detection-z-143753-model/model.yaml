@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompetitionModelOfPheromoneRatioDetectionZ143753Model'
-description: '{"value": "For some closely related sympatric moth species, recognizing
-  a specific pheromone component concentration ratio is essential for mating success.
-  We propose and test a minimalist competition'
+description: "{\"value\": \"For some closely related sympatric moth species, recognizing a specific pheromone component concentration ratio is essential for mating success. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

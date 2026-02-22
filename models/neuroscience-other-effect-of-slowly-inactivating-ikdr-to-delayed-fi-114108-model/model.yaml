@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectOfSlowlyInactivatingIkdrToDelayedFi114108Model'
-description: '{"value": "\"The properties of slowly inactivating delayed-rectifier
-  K+ current (IKdr) were investigated in NG108-15 neuronal cells differentiated with
-  long-term exposure to dibutyryl cyclic AMP. \r\n'
+description: "{\"value\": \"\\\"The properties of slowly inactivating delayed-rectifier K+ current (IKdr) were investigated in NG108-15 neuronal cells differentiated with long-term exposure to dibutyryl cyclic AMP. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

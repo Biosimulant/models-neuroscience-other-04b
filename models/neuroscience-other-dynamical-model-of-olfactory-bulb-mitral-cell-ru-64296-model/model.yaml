@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DynamicalModelOfOlfactoryBulbMitralCellRu64296Model'
-description: '{''value'': ''This four-compartment mitral cell exhibits endogenous
-  subthreshold oscillations, phase resetting, and evoked spike phasing properties
-  as described in electrophysiological studies of mitral '
+description: "{'value': 'This four-compartment mitral cell exhibits endogenous subthreshold oscillations, phase resetting, and evoked spike phasing properties as described in electrophysiological studies of mitral. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

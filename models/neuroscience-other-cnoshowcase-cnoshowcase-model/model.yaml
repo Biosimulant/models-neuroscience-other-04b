@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CnoshowcaseCnoshowcaseModel'
-description: Scripts for interacting with the Computational Neuroscience Ontology
+description: "Scripts for interacting with the Computational Neuroscience Ontology. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

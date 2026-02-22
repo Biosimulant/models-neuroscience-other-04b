@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DeterministicChaosInAMathematicalModelOfA125683Model'
-description: '{"value": "\"Chaotic regimes in a mathematical model of pacemaker activity
-  in the bursting neurons of a snail Helix pomatia, have been investigated.\r\n\r\nThe
-  model includes a slow-wave generating me'
+description: "{\"value\": \"\\\"Chaotic regimes in a mathematical model of pacemaker activity in the bursting neurons of a snail Helix pomatia, have been investigated.\\r\\n\\r\\nThe model includes a slow-wave generating me. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

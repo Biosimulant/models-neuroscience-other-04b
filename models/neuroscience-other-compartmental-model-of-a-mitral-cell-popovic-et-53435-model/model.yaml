@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompartmentalModelOfAMitralCellPopovicEt53435Model'
-description: '{''value'': ''Usage of a morphologically realistic compartmental model
-  of a mitral cell and data obtained from whole-cell patch-clamp and voltage-imaging
-  experiments in order to explore passive parameter'
+description: "{'value': 'Usage of a morphologically realistic compartmental model of a mitral cell and data obtained from whole-cell patch-clamp and voltage-imaging experiments in order to explore passive parameter. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

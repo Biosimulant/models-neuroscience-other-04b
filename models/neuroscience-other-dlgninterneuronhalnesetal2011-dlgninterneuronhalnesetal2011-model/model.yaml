@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Dlgninterneuronhalnesetal2011Dlgninterneuronhalnesetal2011Model'
-description: dLGNinterneuronHalnesEtAl2011
+description: "Neuroscience Dlgninterneuronhalnesetal2011Dlgninterneuronhalnesetal2011Model represents core biological mechanisms from opensourcebrain reference opensourcebrain:dLGNinterneuronHalnesEtAl2011. When you run it, you can inspect state and compare temporal behavior between baseline and adjusted inputs."
 standard: other
 tags:
 - neuroscience

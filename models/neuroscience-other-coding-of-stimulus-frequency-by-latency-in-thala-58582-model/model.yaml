@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CodingOfStimulusFrequencyByLatencyInThala58582Model'
-description: "{'value': 'The paper presents models of the rat vibrissa processing\
-  \ system including the\r\nposterior medial (POm) thalamus, ventroposterior medial\
-  \ (VPm) thalamus, and GABAB-\r\nmediated feedback inhi"
+description: "{'value': 'The paper presents models of the rat vibrissa processing system including the posterior medial (POm) thalamus, ventroposterior medial (VPm) thalamus, and GABAB- mediated feedback inhi. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

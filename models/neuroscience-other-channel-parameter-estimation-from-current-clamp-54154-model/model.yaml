@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ChannelParameterEstimationFromCurrentClamp54154Model'
-description: '{''value'': ''In this paper, we present a method by which the activation
-  and kinetic properties of INa, IK can be estimated from current-clamp data, more
-  precisely from the time course of the action pote'
+description: "{'value': 'In this paper, we present a method by which the activation and kinetic properties of INa, IK can be estimated from current-clamp data, more precisely from the time course of the action pote. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

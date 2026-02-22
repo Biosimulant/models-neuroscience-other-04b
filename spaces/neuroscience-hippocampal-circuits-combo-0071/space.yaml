@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Hippocampal Circuits (COMBO_0071)'
-description: Neuroscience hippocampal circuits comparative space with 4 models, configured
-  as non-causal co-simulation.
+description: "Neuroscience Hippocampal Circuits (COMBO_0071) brings together cholinergic_modu_1, circadian_rhythm_2, circadian_rhythm_3 in a comparative space to examine how recurrent hippocampal motifs shape network dynamics over tim. When you run it, you can compare participant trajectories through shared runtime settings and routed output streams."
 models:
 - repo: Biosimulant/models-neuroscience-other-04b
   alias: cholinergic_modu_1

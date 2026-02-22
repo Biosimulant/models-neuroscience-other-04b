@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompartmentalModelsOfGrowingNeuritesGraham59582Model'
-description: '{''value'': ''Simulator for models of neurite outgrowth. The principle
-  model is a biophysical model of neurite outgrowth described in Graham and van Ooyen
-  (2004). In the model, branching depends on the c'
+description: "{'value': 'Simulator for models of neurite outgrowth. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

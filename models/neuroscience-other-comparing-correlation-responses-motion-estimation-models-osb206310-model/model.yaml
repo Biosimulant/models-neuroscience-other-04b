@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model206310206310Model'
-description: Comparing correlation responses to motion estimation models (Salazar-Gatzimas
-  et al. 2016)
+description: "Comparing correlation responses to motion estimation models (Salazar-Gatzimas et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

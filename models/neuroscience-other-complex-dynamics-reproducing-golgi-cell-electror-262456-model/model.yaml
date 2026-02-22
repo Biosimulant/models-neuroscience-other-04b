@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ComplexDynamicsReproducingGolgiCellElectror262456Model'
-description: '{"value": "Excerpts from three papers abstracts: \"Brain neurons exhibit
-  complex electroresponsive properties \u2013 including intrinsic subthreshold oscillations
-  and pacemaking, resonance and phase-r'
+description: "{\"value\": \"Excerpts from three papers abstracts: \\\"Brain neurons exhibit complex electroresponsive properties \\u2013 including intrinsic subthreshold oscillations and pacemaking, resonance and phase-r. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

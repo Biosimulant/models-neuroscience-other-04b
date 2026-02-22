@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CombinationSensitivityAndActiveConductances83521Model'
-description: '{"value": "\"... The weakly electric fish Gymnarchus discriminates the\r\nsign
-  of the frequency difference (Df) between a neighbor\u2019s electric\r\norgan discharge
-  (EOD) and its own EOD by comparing'
+description: "{\"value\": \"\\\"... The weakly electric fish Gymnarchus discriminates the\\r\\nsign of the frequency difference (Df) between a neighbor\\u2019s electric\\r\\norgan discharge (EOD) and its own EOD by comparing."
 standard: other
 tags:
 - neuroscience

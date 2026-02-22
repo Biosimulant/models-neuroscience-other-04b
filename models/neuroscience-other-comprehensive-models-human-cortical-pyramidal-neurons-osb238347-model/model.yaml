@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model238347238347Model'
-description: Comprehensive models of human cortical pyramidal neurons (Eyal et al
-  2018)
+description: "Comprehensive models of human cortical pyramidal neurons (Eyal et al 2018). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CnBushyStellateNeuronsRothmanManis2003Bri126899Model'
-description: '{"value": "Cochlear neuron model of Rothman & Manis (2003). Adapted
-  from the Neuron implementation.", "attr_id": 24}'
+description: "Cochlear neuron model of Rothman & Manis (2003). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

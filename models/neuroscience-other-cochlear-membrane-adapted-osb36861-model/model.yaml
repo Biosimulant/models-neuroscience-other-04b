@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model3686136861Model'
-description: Model of cochlear membrane adapted (Peterson, Bogert 1950)
+description: "Model of cochlear membrane adapted (Peterson, Bogert 1950). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

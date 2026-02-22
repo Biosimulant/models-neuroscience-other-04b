@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DistributedSynapticPlasticityAndSpikeTiming149913Model'
-description: '{"value": "Here we have used a computational model to simulate the impact
-  of multiple distributed synaptic weights in the cerebellar granular layer network.
-  In response to mossy fiber bursts, synaptic'
+description: "{\"value\": \"Here we have used a computational model to simulate the impact of multiple distributed synaptic weights in the cerebellar granular layer network. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DemocraticPopulationDecisionsResultInRobust136807Model'
-description: '{"value": "This model demonstrates the use of GPU programming (with
-  CUDA) to simulate a two-layer network of Integrate-and-Fire neurons with varying
-  degrees of recurrent connectivity and to investigat'
+description: "{\"value\": \"This model demonstrates the use of GPU programming (with CUDA) to simulate a two-layer network of Integrate-and-Fire neurons with varying degrees of recurrent connectivity and to investigat. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model126899126899Model'
-description: CN bushy, stellate neurons (Rothman, Manis 2003) (Brian)
+description: "CN bushy, stellate neurons (Rothman, Manis 2003) (Brian). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

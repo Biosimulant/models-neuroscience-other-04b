@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model267599267599Model'
-description: Cholinergic Modulation Shifts the Response of CA1 Pyramidal Cells to
-  Depolarizing Ramps via TRPM4 Channels with Potential Implications for Place Cell
-  Firing (Combe et al., 2023)
+description: "Cholinergic Modulation Shifts the Response of CA1 Pyramidal Cells to Depolarizing Ramps via TRPM4 Channels with Potential Implications for Place Cell Firing (Combe et al., 2023). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

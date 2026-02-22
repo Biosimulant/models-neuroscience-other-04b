@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CrayfishHybridExperimentalModelChungEtAl2150697Model'
-description: '{"value": "The Crayfish hybrid experimental model is an AnimatLab v1
-  neuromechanical model of the crayfish thorax and 5th walking leg that provides a
-  virtual periphery to the live crayfish central ner'
+description: "{\"value\": \"The Crayfish hybrid experimental model is an AnimatLab v1 neuromechanical model of the crayfish thorax and 5th walking leg that provides a virtual periphery to the live crayfish central ner. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

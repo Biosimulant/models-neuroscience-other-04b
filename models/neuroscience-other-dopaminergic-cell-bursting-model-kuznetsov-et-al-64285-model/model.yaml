@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DopaminergicCellBurstingModelKuznetsovEtAl64285Model'
-description: '{"value": "Dopaminergic neurons of the midbrain fire spontaneously at
-  rates\r\n<10/s and ordinarily will not exceed this range even when driven with\r\nsomatic
-  current injection. During spontaneous\r\'
+description: "{\"value\": \"Dopaminergic neurons of the midbrain fire spontaneously at rates\\r\\n<10/s and ordinarily will not exceed this range even when driven with\\r\\nsomatic current injection. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

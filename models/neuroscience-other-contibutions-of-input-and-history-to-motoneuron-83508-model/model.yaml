@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ContibutionsOfInputAndHistoryToMotoneuron83508Model'
-description: '{"value": "\"The present study presents results based\r\non recordings
-  of noise-driven discharge in rat hypoglossal motoneurones ... First, we show that
-  the hyperpolarizing trough is larger in Average'
+description: "{\"value\": \"\\\"The present study presents results based\\r\\non recordings of noise-driven discharge in rat hypoglossal motoneurones ... First, we show that the hyperpolarizing trough is larger in Average."
 standard: other
 tags:
 - neuroscience

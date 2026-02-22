@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model149910149910Model'
-description: Competing oscillator 5-cell circuit and Parameterscape plotting (Gutierrez
-  et al. 2013)
+description: "Competing oscillator 5-cell circuit and Parameterscape plotting (Gutierrez et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

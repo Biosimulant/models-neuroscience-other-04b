@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectsOfTheMembraneAhpOnTheLateralSuper143114Model'
-description: '{"value": "This simulation study investigated how membrane afterhyperpolarization
-  (AHP) influences spiking activity of neurons in the Lateral Superior Olive (LSO).
-  The model incorporates a general int'
+description: "{\"value\": \"This simulation study investigated how membrane afterhyperpolarization (AHP) influences spiking activity of neurons in the Lateral Superior Olive (LSO). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

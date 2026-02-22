@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model148320148320Model'
-description: Circadian clock model in mammals (PK/PD model) (Kim & Forger 2013)
+description: "Circadian clock model in mammals (PK/PD model) (Kim & Forger 2013). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

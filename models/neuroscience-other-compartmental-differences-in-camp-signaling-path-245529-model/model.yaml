@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompartmentalDifferencesInCampSignalingPath245529Model'
-description: '{"value": "Model of cAMP signaling pathways in hippocampal CA1 pyramidal
-  neurons investigate mechanisms underlying the experimentally observed difference
-  in cAMP and PKA FRET between proximal and dist'
+description: "{\"value\": \"Model of cAMP signaling pathways in hippocampal CA1 pyramidal neurons investigate mechanisms underlying the experimentally observed difference in cAMP and PKA FRET between proximal and dist. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

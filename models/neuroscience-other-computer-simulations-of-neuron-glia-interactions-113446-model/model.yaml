@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ComputerSimulationsOfNeuronGliaInteractions113446Model'
-description: '{"value": "\"...\r\nTo examine the effect of glial K+ uptake, we used
-  a model neuron equipped with Na+, K+, Ca2+ and Cl&#8722;\r\nconductances, ion pumps
-  and ion exchangers, surrounded by interstitial'
+description: "{\"value\": \"\\\"...\\r\\nTo examine the effect of glial K+ uptake, we used a model neuron equipped with Na+, K+, Ca2+ and Cl&#8722;\\r\\nconductances, ion pumps and ion exchangers, surrounded by interstitial. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

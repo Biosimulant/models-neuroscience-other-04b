@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DynasimshowcaseDynasimshowcaseModel'
-description: Faithful wrapper of upstream OTHER model.
+description: "Neuroscience Dynasimshowcase Dynasimshowcase Model models neuroscience dynasimshowcase dynasimshowcase dynamics as a OTHER simulation curated from opensourcebrain (opensourcebrain:DynaSimShowcase), focused on n. When you run it, you can track state over time and compare response patterns across parameter settings."
 standard: other
 tags:
 - neuroscience

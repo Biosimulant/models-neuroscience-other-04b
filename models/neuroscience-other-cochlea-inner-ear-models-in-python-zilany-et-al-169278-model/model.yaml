@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CochleaInnerEarModelsInPythonZilanyEtAl169278Model'
-description: '{"value": "Collection of inner ear models in Python.", "attr_id": 24}'
+description: "Neuroscience Cochlea Inner Ear Models In Python Zilany Et Al169278Model models core biological dynamics as a OTHER simulation curated from modeldb (modeldb:169278), focused on neuroscience, modeldb, cochlea. When you run it, you can track state over time and compare response patterns across parameter settings."
 standard: other
 tags:
 - neuroscience

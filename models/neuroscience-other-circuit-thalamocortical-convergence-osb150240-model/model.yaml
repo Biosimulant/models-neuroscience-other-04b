@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model150240150240Model'
-description: A Model Circuit of Thalamocortical Convergence (Behuret et al. 2013)
+description: "A Model Circuit of Thalamocortical Convergence (Behuret et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

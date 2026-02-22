@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CrayfishHybridSimulationModelBacqueCazenave150698Model'
-description: '{"value": "A neuromechanical model of the crayfish leg and thorax and
-  the postural and locomotor circuitry built and run in AnimatLab v1. The model simulates
-  experiments run with the BCI preparation m'
+description: "{\"value\": \"A neuromechanical model of the crayfish leg and thorax and the postural and locomotor circuitry built and run in AnimatLab v1. The model simulates experiments run with the BCI preparation m."
 standard: other
 tags:
 - neuroscience

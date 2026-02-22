@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DurationTunedNeuronsFromTheInferiorCollicu144509Model'
-description: '{"value": "dtnet is a generalized neural network simulator written in
-  C++ with an easy to use XML description language to generate arbitrary neural networks
-  and then run simulations covering many diff'
+description: "{\"value\": \"dtnet is a generalized neural network simulator written in C++ with an easy to use XML description language to generate arbitrary neural networks and then run simulations covering many diff. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

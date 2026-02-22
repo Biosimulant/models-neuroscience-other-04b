@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ContinuousTimeStochasticModelForNeuriteBra129071Model'
-description: '{"value": "\"In this paper we introduce a continuous time stochastic
-  neurite branching model closely related to the discrete time stochastic BES-model.
-  The discrete time BES-model is underlying curren'
+description: "{\"value\": \"\\\"In this paper we introduce a continuous time stochastic neurite branching model closely related to the discrete time stochastic BES-model. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model142993142993Model'
-description: ClC-2 channels regulate neuronal excitability, not intracellular Cl-
-  levels (Ratte & Prescott 2011)
+description: "ClC-2 channels regulate neuronal excitability, not intracellular Cl- levels (Ratte & Prescott 2011). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

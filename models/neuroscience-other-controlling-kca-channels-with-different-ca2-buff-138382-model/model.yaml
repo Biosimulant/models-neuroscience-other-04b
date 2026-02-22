@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ControllingKcaChannelsWithDifferentCa2Buff138382Model'
-description: '{"value": "In this work, we compare the dynamics of different buffering
-  models during generation of a dendritic Ca2+ spike in a single compartment model
-  of a Purkinje cell dendrite. The Ca2+ buffering'
+description: "{\"value\": \"In this work, we compare the dynamics of different buffering models during generation of a dendritic Ca2+ spike in a single compartment model of a Purkinje cell dendrite. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

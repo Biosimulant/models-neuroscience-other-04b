@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model145800145800Model'
-description: Circadian clock model based on protein sequestration (simple version)
-  (Kim & Forger 2012)
+description: "Circadian clock model based on protein sequestration (simple version) (Kim & Forger 2012). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

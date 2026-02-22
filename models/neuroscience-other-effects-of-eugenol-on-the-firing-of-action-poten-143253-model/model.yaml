@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectsOfEugenolOnTheFiringOfActionPoten143253Model'
-description: '{"value": "\"Rationale: Eugenol (EUG, 4-allyl-2-methoxyphenol), the
-  main component of essential oil extracted from cloves, has various uses in medicine
-  because of its potential to modulate neuronal ex'
+description: "{\"value\": \"\\\"Rationale: Eugenol (EUG, 4-allyl-2-methoxyphenol), the main component of essential oil extracted from cloves, has various uses in medicine because of its potential to modulate neuronal ex. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

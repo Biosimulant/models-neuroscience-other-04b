@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DorsalRootGanglionDrgNeuronalModelAmirDev51022Model'
-description: '{''value'': ''The model shows that an electrically excitable soma is
-  not necessary for spike through-conduction in the t-shaped geometry of a dorsal
-  root ganglion neuron axon. Electrical excitability of '
+description: "{'value': 'The model shows that an electrically excitable soma is not necessary for spike through-conduction in the t-shaped geometry of a dorsal root ganglion neuron axon. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

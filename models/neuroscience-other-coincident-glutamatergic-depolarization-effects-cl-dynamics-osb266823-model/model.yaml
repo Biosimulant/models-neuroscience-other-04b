@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model266823266823Model'
-description: Coincident glutamatergic depolarization effects on Cl- dynamics (Lombardi
-  et al, 2021)
+description: "Coincident glutamatergic depolarization effects on Cl- dynamics (Lombardi et al, 2021). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

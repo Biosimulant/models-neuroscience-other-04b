@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model5958259582Model'
-description: Compartmental models of growing neurites (Graham and van Ooyen 2004)
+description: "Compartmental models of growing neurites (Graham and van Ooyen 2004). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

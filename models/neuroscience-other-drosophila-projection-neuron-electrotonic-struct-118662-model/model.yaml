@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DrosophilaProjectionNeuronElectrotonicStruct118662Model'
-description: '{"value": "We address the issue of how electrical signals propagate
-  in Drosophila neurons by modeling the electrotonic structure of the antennal lobe
-  projection neurons innervating glomerulus DM1. The'
+description: "{\"value\": \"We address the issue of how electrical signals propagate in Drosophila neurons by modeling the electrotonic structure of the antennal lobe projection neurons innervating glomerulus DM1. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

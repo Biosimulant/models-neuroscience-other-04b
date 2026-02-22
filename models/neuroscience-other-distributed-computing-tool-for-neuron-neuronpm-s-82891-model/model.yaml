@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DistributedComputingToolForNeuronNeuronpmS82891Model'
-description: '{"value": "\"... To lower the barrier for large-scale model analysis,
-  we have developedNeuronPM,\r\na client/server application that creates a \u201cscreen-saver\u201d
-  cluster\r\nfor running simulatio'
+description: "{\"value\": \"\\\"... To lower the barrier for large-scale model analysis, we have developedNeuronPM,\\r\\na client/server application that creates a \\u201cscreen-saver\\u201d cluster\\r\\nfor running simulatio."
 standard: other
 tags:
 - neuroscience

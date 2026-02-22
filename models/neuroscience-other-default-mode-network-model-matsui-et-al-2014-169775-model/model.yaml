@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DefaultModeNetworkModelMatsuiEtAl2014169775Model'
-description: '{"value": "Default mode network (DMN) shows intrinsic, high-level activity
-  at rest. We tested a hypothesis proposed for its role in sensory information processing:
-  Intrinsic DMN activity facilitates n'
+description: "{\"value\": \"Default mode network (DMN) shows intrinsic, high-level activity at rest. We tested a hypothesis proposed for its role in sensory information processing: Intrinsic DMN activity facilitates n."
 standard: other
 tags:
 - neuroscience

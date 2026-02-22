@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DopamineModulatedMediumSpinyNeuronReducedM128818Model'
-description: '{"value": "We extended Izhikevich''s reduced model of the striatal medium
-  spiny neuron (MSN) to account for dopaminergic modulation of its intrinsic ion channels
-  and synaptic inputs. We tuned our D1 an'
+description: "{\"value\": \"We extended Izhikevich's reduced model of the striatal medium spiny neuron (MSN) to account for dopaminergic modulation of its intrinsic ion channels and synaptic inputs. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

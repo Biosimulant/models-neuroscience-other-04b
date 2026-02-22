@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DataDrivenHhTypeModelOfTheLateralPyloric116957Model'
-description: '{"value": "This model was developed using voltage clamp data and existing
-  LP models to assemble an initial set of currents which were then adjusted by extensive
-  fitting to a long data set of an isolat'
+description: "{\"value\": \"This model was developed using voltage clamp data and existing LP models to assemble an initial set of currents which were then adjusted by extensive fitting to a long data set of an isolat. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

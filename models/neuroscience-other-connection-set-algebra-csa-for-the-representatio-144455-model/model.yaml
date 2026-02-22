@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ConnectionSetAlgebraCsaForTheRepresentatio144455Model'
-description: '{"value": "\"The connection-set algebra (CSA) is a novel\r\nand general
-  formalism for the description of connectivity\r\nin neuronal network models, from
-  small-scale to\r\nlarge-scale structure. ... T'
+description: "{\"value\": \"\\\"The connection-set algebra (CSA) is a novel\\r\\nand general formalism for the description of connectivity\\r\\nin neuronal network models, from small-scale to\\r\\nlarge-scale structure. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

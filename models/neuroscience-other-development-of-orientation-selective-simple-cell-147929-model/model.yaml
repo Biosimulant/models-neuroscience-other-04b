@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DevelopmentOfOrientationSelectiveSimpleCell147929Model'
-description: '{"value": "Implementation of a computational model for the development
-  of\r\nsimple-cell receptive fields spanning the regimes before and after eye-opening.
-  The before eye-opening period is governed b'
+description: "{\"value\": \"Implementation of a computational model for the development of\\r\\nsimple-cell receptive fields spanning the regimes before and after eye-opening. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DentateGyrusNetworkModelSanthakumarEtAl2051781Model'
-description: "{'value': 'Mossy cell loss and mossy fiber sprouting are two characteristic\
-  \ \r\n\r\nconsequences of repeated seizures and head trauma. However, their \r\n\
-  \r\nprecise contributions to the hyperexcitabl"
+description: "{'value': 'Mossy cell loss and mossy fiber sprouting are two characteristic consequences of repeated seizures and head trauma. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

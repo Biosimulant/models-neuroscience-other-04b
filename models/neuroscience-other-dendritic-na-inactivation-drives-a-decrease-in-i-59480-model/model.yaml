@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DendriticNaInactivationDrivesADecreaseInI59480Model'
-description: '{''value'': ''We use a combination of dynamical analysis and electrophysiological
-  recordings to demonstrate that spike broadening in dendrites is primarily caused
-  by a cumulative inactivation of dendriti'
+description: "{'value': 'We use a combination of dynamical analysis and electrophysiological recordings to demonstrate that spike broadening in dendrites is primarily caused by a cumulative inactivation of dendriti. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

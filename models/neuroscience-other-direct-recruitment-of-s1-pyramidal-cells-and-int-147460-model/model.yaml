@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DirectRecruitmentOfS1PyramidalCellsAndInt147460Model'
-description: '{"value": "Study of the pyramidal cells and interneurons recruited by
-  intracortical microstimulation in primary somatosensory cortex. Code includes morphological
-  models for seven types of pyramidal ce'
+description: "{\"value\": \"Study of the pyramidal cells and interneurons recruited by intracortical microstimulation in primary somatosensory cortex. Code includes morphological models for seven types of pyramidal ce."
 standard: other
 tags:
 - neuroscience

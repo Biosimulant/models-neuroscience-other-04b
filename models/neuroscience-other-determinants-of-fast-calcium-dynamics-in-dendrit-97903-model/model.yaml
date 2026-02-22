@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DeterminantsOfFastCalciumDynamicsInDendrit97903Model'
-description: '{"value": "\"... Calcium influx time course and calcium extrusion rate
-  were both in the same range for spines and dendrites when fitted with a dynamic
-  multi-compartment model that included calcium bin'
+description: "{\"value\": \"\\\"... Calcium influx time course and calcium extrusion rate were both in the same range for spines and dendrites when fitted with a dynamic multi-compartment model that included calcium bin."
 standard: other
 tags:
 - neuroscience

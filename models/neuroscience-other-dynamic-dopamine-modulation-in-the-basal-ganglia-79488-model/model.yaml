@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DynamicDopamineModulationInTheBasalGanglia79488Model'
-description: '{''value'': ''See README file for all info on how to run models under
-  different tasks and simulated Parkinson''s and medication conditions.'', ''attr_id'':
-  24}'
+description: "{'value': 'See README file for all info on how to run models under different tasks and simulated Parkinson's and medication conditions.', 'attr_id': 24}. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

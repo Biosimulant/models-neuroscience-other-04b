@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model147366147366Model'
-description: Composite spiking network/neural field model of Parkinsons (Kerr et al
-  2013)
+description: "Composite spiking network/neural field model of Parkinsons (Kerr et al 2013). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

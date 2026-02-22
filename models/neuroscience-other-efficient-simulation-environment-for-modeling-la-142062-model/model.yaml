@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EfficientSimulationEnvironmentForModelingLa142062Model'
-description: '{"value": "\"We have developed a spiking neural network simulator, which
-  is both easy to use and computationally efficient, for the generation of large-scale
-  computational neuroscience models. The sim'
+description: "{\"value\": \"\\\"We have developed a spiking neural network simulator, which is both easy to use and computationally efficient, for the generation of large-scale computational neuroscience models. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

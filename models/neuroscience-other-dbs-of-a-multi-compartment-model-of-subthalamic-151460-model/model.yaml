@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DbsOfAMultiCompartmentModelOfSubthalamic151460Model'
-description: '{"value": "We built a comprehensive computational model of subthalamic
-  nucleus (STN) deep brain stimulation (DBS) in parkinsonian macaques to study the
-  effects of stimulation in a controlled environme'
+description: "{\"value\": \"We built a comprehensive computational model of subthalamic nucleus (STN) deep brain stimulation (DBS) in parkinsonian macaques to study the effects of stimulation in a controlled environme. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

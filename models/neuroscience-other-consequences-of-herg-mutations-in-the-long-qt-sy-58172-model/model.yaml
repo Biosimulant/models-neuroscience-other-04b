@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ConsequencesOfHergMutationsInTheLongQtSy58172Model'
-description: "{'value': 'This study demonstrates which mutations can prolong APD sufficiently\
-  \ to generate early \r\nafterdepolarizations (EADs), which may trigger life-threatening\
-  \ arrhythmias. The severity of the p"
+description: "{'value': 'This study demonstrates which mutations can prolong APD sufficiently to generate early afterdepolarizations (EADs), which may trigger life-threatening arrhythmias. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompetingOscillator5CellCircuitAndParamete149910Model'
-description: '{"value": "Our 5-cell model consists of competing fast and slow oscillators
-  connected to a hub neuron with electrical and inhibitory synapses. Motivated by
-  the Stomatogastric Ganglion (STG) circuit in'
+description: "{\"value\": \"Our 5-cell model consists of competing fast and slow oscillators connected to a hub neuron with electrical and inhibitory synapses. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

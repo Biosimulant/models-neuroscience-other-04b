@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CochlearImplantModelsBruceEtAl1999aBC2087760Model'
-description: '{"value": "\"In a recent set of modeling studies we have developed a
-  stochastic threshold model of auditory nerve response to single biphasic electrical
-  pulses (Bruce et al., 1999c) and moderate rate '
+description: "{\"value\": \"\\\"In a recent set of modeling studies we have developed a stochastic threshold model of auditory nerve response to single biphasic electrical pulses (Bruce et al., 1999c) and moderate rate. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

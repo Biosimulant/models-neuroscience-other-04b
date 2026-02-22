@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DurationTunedNeuronsFromTheInferiorCollicu144511Model'
-description: '{"value": "These models reproduce the responses of duration-tuned neurons
-  in the auditory midbrain of the big brown bat, the rat, the mouse and the frog (Aubie
-  et al. 2012). They are written in the Py'
+description: "{\"value\": \"These models reproduce the responses of duration-tuned neurons in the auditory midbrain of the big brown bat, the rat, the mouse and the frog (Aubie et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

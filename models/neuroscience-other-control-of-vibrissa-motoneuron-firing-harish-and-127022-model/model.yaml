@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ControlOfVibrissaMotoneuronFiringHarishAnd127022Model'
-description: '{"value": "We construct and analyze a single-compartment, conductance-based
-  model of vibrissa motoneurons. Low firing rates are supported in extended regimes
-  by adaptation currents and the minimal fir'
+description: "{\"value\": \"We construct and analyze a single-compartment, conductance-based model of vibrissa motoneurons. Low firing rates are supported in extended regimes by adaptation currents and the minimal fir."
 standard: other
 tags:
 - neuroscience

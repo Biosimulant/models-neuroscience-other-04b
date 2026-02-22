@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model225428225428Model'
-description: A comparison of mathematical models of mood in bipolar disorder (Cochran
-  et al. 2017)
+description: "A comparison of mathematical models of mood in bipolar disorder (Cochran et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

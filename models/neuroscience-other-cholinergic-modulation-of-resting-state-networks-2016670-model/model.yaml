@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CholinergicModulationOfRestingStateNetworks2016670Model'
-description: '{"value": "Brain activity during the resting state is widely used to
-  examine brain organization, cognition and alterations in disease states. While it
-  is known that neuromodulation and the state of al'
+description: "{\"value\": \"Brain activity during the resting state is widely used to examine brain organization, cognition and alterations in disease states. While it is known that neuromodulation and the state of al."
 standard: other
 tags:
 - neuroscience

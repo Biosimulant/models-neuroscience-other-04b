@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectOfVoltageSensitiveFluorescentProteins123453Model'
-description: '{"value": "\"Fluorescent protein voltage sensors are recombinant proteins
-  that are designed as genetically encoded cellular\r\nprobes of membrane potential
-  using mechanisms of voltage-dependent modula'
+description: "{\"value\": \"\\\"Fluorescent protein voltage sensors are recombinant proteins that are designed as genetically encoded cellular\\r\\nprobes of membrane potential using mechanisms of voltage-dependent modula. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

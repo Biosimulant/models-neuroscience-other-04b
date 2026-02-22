@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CnBushyStellateNeuronsRothmanManis2003Bri231238Model'
-description: '{"value": "This model is an updated version of Romain Brette''s adaptation
-  of Rothman & Manis (2003). The model now uses Brian 2 instead of Brian 1 and can
-  be configured to use n cells instead of a sin'
+description: "{\"value\": \"This model is an updated version of Romain Brette's adaptation of Rothman & Manis (2003). The model now uses Brian 2 instead of Brian 1 and can be configured to use n cells instead of a sin."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CholinergicAndNicotinicRegulationOfDaNeuro266419Model'
-description: '{"value": "The model describes the modulation of firing properties of
-  DA neurons by acetylcholine (ACh) and nicotine in 5 cases: knock-out of \u00df2-containing
-  nAChRs, \u00df2-containing nAChRs only '
+description: "{\"value\": \"The model describes the modulation of firing properties of DA neurons by acetylcholine (ACh) and nicotine in 5 cases: knock-out of \\u00df2-containing nAChRs, \\u00df2-containing nAChRs only. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

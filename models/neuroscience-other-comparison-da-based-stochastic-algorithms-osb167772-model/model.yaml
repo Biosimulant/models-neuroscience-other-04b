@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model167772167772Model'
-description: Comparison of DA-based Stochastic Algorithms (Pezo et al. 2014)
+description: "Comparison of DA-based Stochastic Algorithms (Pezo et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DifferencesBetweenTypeAAndBPhotoreceptors79471Model'
-description: "{'value': 'In Hermissenda crassicornis, the memory of light associated\
-  \ with turbulence\r\nis stored as changes in intrinsic and synaptic currents in\
-  \ both\r\ntype A and type B photoreceptors. These pho"
+description: "{'value': 'In Hermissenda crassicornis, the memory of light associated with turbulence is stored as changes in intrinsic and synaptic currents in both type A and type B photoreceptors. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

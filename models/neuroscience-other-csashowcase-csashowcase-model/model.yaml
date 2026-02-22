@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CsashowcaseCsashowcaseModel'
-description: Showcase project for Connection Set Algebra examples
+description: "Showcase project for Connection Set Algebra examples. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

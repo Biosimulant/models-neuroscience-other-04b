@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DipoleLocalizationKitMechlerAndVictor2012140599Model'
-description: '{"value": "We localize a single neuron from the spatial sample of its
-  EAP\r\namplitudes recorded with a multisite probe (with 6 or more independent\r\nmeasurement
-  sites or channels, e.g., a silicon po'
+description: "{\"value\": \"We localize a single neuron from the spatial sample of its EAP\\r\\namplitudes recorded with a multisite probe (with 6 or more independent\\r\\nmeasurement sites or channels, e.g., a silicon po. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

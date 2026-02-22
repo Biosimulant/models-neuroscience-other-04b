@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model117459117459Model'
-description: Competition for AP initiation sites in a circuit controlling simple learning
-  (Cruz et al. 2007)
+description: "Competition for AP initiation sites in a circuit controlling simple learning (Cruz et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

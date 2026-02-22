@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model143604143604Model'
-description: Compartmentalization of GABAergic inhibition by dendritic spines (Chiu
-  et al. 2013)
+description: "Compartmentalization of GABAergic inhibition by dendritic spines (Chiu et al. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

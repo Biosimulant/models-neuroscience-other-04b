@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CurrentDipoleInLaminarNeocortexLeeEtAl20151685Model'
-description: '{"value": "Laminar neocortical model in NEURON/Python, adapted from
-  Jones et al 2009.\r\n\r\nhttps://bitbucket.org/jonescompneurolab/corticaldipole",
-  "attr_id": 24}'
+description: "Laminar neocortical model in NEURON/Python, adapted from Jones et al 2009. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

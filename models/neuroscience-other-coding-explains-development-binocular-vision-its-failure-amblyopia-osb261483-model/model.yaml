@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model261483261483Model'
-description: Coding explains development of binocular vision and its failure in Amblyopia
-  (Eckmann et al 2020)
+description: "Coding explains development of binocular vision and its failure in Amblyopia (Eckmann et al 2020). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

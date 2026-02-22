@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectsOfKirCurrentInactivationInNacMediu121060Model'
-description: '{"value": "\"Inward rectifying potassium (KIR) currents in medium spiny
-  (MS) neurons of nucleus accumbens inactivate significantly in ~40% of the neurons
-  but not in the rest, which may lead to differe'
+description: "{\"value\": \"\\\"Inward rectifying potassium (KIR) currents in medium spiny (MS) neurons of nucleus accumbens inactivate significantly in ~40% of the neurons but not in the rest, which may lead to differe. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

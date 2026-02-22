@@ -1,6 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model20166702016670Model'
-description: Cholinergic modulation of resting state networks (Sanda et al., accepted)
+description: "Cholinergic modulation of resting state networks (Sanda et al., accepted). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CodeToCalcSpikeTrigAveStaConductFromVm116086Model'
-description: '{"value": "PYTHON code to calculate spike-triggered average (STA) conductances
-  from intracellular recordings, according to the method published by Pospischil et
-  al., J Neurophysiol, 2007. The method c'
+description: "{\"value\": \"PYTHON code to calculate spike-triggered average (STA) conductances from intracellular recordings, according to the method published by Pospischil et al., J Neurophysiol, 2007. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

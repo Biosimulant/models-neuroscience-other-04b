@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DentateGyrusMorganEtAl20072008Santhakumar124513Model'
-description: '{"value": "This model was implemented by Rob Morgan in the Soltesz lab
-  at UC Irvine. It is a scaleable model of the rat dentate gyrus including four cell
-  types. This model runs in serial (on a single '
+description: "{\"value\": \"This model was implemented by Rob Morgan in the Soltesz lab at UC Irvine. It is a scaleable model of the rat dentate gyrus including four cell types."
 standard: other
 tags:
 - neuroscience

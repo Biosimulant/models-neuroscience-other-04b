@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DorsalRootGanglionDrgNeuronalModelKovalsky140038Model'
-description: '{"value": "This model, diverged from oscillatory parameters seen in
-  live cells and failed to produce characteristic ectopic discharge patterns. Here
-  we show that use of a more complete set of Na+ cond'
+description: "{\"value\": \"This model, diverged from oscillatory parameters seen in live cells and failed to produce characteristic ectopic discharge patterns. Here we show that use of a more complete set of Na+ cond."
 standard: other
 tags:
 - neuroscience

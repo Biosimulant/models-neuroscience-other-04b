@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ComputationalNeuropharmacologyOfCa1Pyramidal119283Model'
-description: '{"value": "In this paper, the model was used to show how neuroactive
-  drugs targeting different neuronal mechanisms affect the signal integration in CA1
-  pyramidal neuron. Ferrante M, Blackwell KT, Migl'
+description: "{\"value\": \"In this paper, the model was used to show how neuroactive drugs targeting different neuronal mechanisms affect the signal integration in CA1 pyramidal neuron. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

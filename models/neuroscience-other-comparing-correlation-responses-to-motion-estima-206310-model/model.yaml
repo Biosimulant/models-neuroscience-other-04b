@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ComparingCorrelationResponsesToMotionEstima206310Model'
-description: '{"value": "Code to generate responses of HRC-like and BL-like model
-  elementary motion detectors to correlated noise stimuli, including two models with
-  more realistic temporal filtering.", "attr_id": 2'
+description: "{\"value\": \"Code to generate responses of HRC-like and BL-like model elementary motion detectors to correlated noise stimuli, including two models with more realistic temporal filtering.\", \"attr_id\": 2. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

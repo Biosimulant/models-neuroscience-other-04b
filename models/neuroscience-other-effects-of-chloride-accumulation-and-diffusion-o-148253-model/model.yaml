@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectsOfChlorideAccumulationAndDiffusionO148253Model'
-description: '{"value": "\"In the CNS, prolonged activation of GABA(A) receptors (GABA(A)Rs)
-  has been shown to evoke biphasic postsynaptic responses, consisting of an initial
-  hyperpolarization followed by a depolar'
+description: "{\"value\": \"\\\"In the CNS, prolonged activation of GABA(A) receptors (GABA(A)Rs) has been shown to evoke biphasic postsynaptic responses, consisting of an initial hyperpolarization followed by a depolar. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

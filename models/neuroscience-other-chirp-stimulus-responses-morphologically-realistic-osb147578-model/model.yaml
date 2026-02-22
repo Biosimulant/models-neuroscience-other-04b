@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model147578147578Model'
-description: Chirp stimulus responses in a morphologically realistic model (Narayanan
-  and Johnston, 2007)
+description: "Chirp stimulus responses in a morphologically realistic model (Narayanan and Johnston, 2007). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

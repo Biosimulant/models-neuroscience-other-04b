@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DopamineActivationOfSignalingPathwaysInAM154968Model'
-description: '{"value": "Large scale stochastic reaction-diffusion model of signaling
-  pathways in a medium spiny projection neuron dendrite with spines to investigate
-  whether the critical function of anchoring is t'
+description: "{\"value\": \"Large scale stochastic reaction-diffusion model of signaling pathways in a medium spiny projection neuron dendrite with spines to investigate whether the critical function of anchoring is t. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

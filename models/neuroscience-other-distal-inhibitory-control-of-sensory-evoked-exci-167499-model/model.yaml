@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: DistalInhibitoryControlOfSensoryEvokedExci167499Model'
-description: '{"value": "Model of a cortical layer (L) 2 pyramidal neuron embedded
-  in an anatomically realistic network of two barrel columns in rat vibrissal cortex.
-  This model is used to investigate the effects o'
+description: "{\"value\": \"Model of a cortical layer (L) 2 pyramidal neuron embedded in an anatomically realistic network of two barrel columns in rat vibrissal cortex. This model is used to investigate the effects o."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EffectsOfSynapticLocationAndTimingOnSynap116981Model'
-description: '{"value": "Reproduces figures 5 - 8 from \r\nRall, W.\r\nTheoretical
-  significance of dendritic trees for neuronal input-output relations.\r\nIn: Neural
-  Theory and Modeling, ed. Reiss, R.F., Palo Alto:'
+description: "{\"value\": \"Reproduces figures 5 - 8 from \\r\\nRall, W.\\r\\nTheoretical significance of dendritic trees for neuronal input-output relations.\\r\\nIn: Neural Theory and Modeling, ed. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

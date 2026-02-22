@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model116086116086Model'
-description: Code to calc. spike-trig. ave (STA) conduct. from Vm (Pospischil et al.
-  2007, Rudolph et al. 2007)
+description: "Code to calc. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

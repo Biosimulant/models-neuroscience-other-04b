@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CorticalPyramidalNeuronPhaseResponseCurveS144372Model'
-description: '{"value": "Three models of increasing complexity all showing a switch
-  from type II (biphasic) to type I (monophasic) phase response curves with a cholinergic
-  down-modulation of K+ conductances.", "att'
+description: "{\"value\": \"Three models of increasing complexity all showing a switch from type II (biphasic) to type I (monophasic) phase response curves with a cholinergic down-modulation of K+ conductances.\", \"att. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

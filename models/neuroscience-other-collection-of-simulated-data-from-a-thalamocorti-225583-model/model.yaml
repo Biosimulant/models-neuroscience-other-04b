@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CollectionOfSimulatedDataFromAThalamocorti225583Model'
-description: '{"value": "\"A major challenge in experimental data analysis\r\nis the
-  validation of analytical methods in a fully controlled\r\nscenario where the justification
-  of the interpretation can\r\nbe made d'
+description: "{\"value\": \"\\\"A major challenge in experimental data analysis\\r\\nis the validation of analytical methods in a fully controlled\\r\\nscenario where the justification of the interpretation can\\r\\nbe made d. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

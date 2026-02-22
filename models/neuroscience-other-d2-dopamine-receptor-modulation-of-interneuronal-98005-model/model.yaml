@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: D2DopamineReceptorModulationOfInterneuronal98005Model'
-description: '{"value": "\"... Using a combination of electrophysiological, molecular,
-  and computational approaches, the studies reported here show that D2 dopamine receptor
-  modulation of Na+ currents underlying au'
+description: "{\"value\": \"\\\"... Using a combination of electrophysiological, molecular, and computational approaches, the studies reported here show that D2 dopamine receptor modulation of Na+ currents underlying au."
 standard: other
 tags:
 - neuroscience

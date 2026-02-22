@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EarlyOnsetEpilepticEncephalopathyMiceliEtA170030Model'
-description: '{"value": "Model files from the paper \"Early-Onset Epileptic Encephalopathy
-  Caused by \r\nGain-of-Function Mutations in the Voltage Sensor of Kv7.2 and Kv7.3\r\nPotassium
-  Channel Subunits\" by France'
+description: "{\"value\": \"Model files from the paper \\\"Early-Onset Epileptic Encephalopathy Caused by \\r\\nGain-of-Function Mutations in the Voltage Sensor of Kv7.2 and Kv7.3\\r\\nPotassium Channel Subunits\\\" by France. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

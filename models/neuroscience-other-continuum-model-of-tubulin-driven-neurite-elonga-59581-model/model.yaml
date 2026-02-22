@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ContinuumModelOfTubulinDrivenNeuriteElonga59581Model'
-description: '{''value'': ''This model investigates the elongation over time of a
-  single developing neurite (axon or dendrite). Our neurite growth model describes
-  the elongation of a single,unbranched neurite in terms'
+description: "{'value': 'This model investigates the elongation over time of a single developing neurite (axon or dendrite). Our neurite growth model describes the elongation of a single,unbranched neurite in terms."
 standard: other
 tags:
 - neuroscience

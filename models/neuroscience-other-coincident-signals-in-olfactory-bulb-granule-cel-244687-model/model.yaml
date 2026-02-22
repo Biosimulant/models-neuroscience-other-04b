@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CoincidentSignalsInOlfactoryBulbGranuleCel244687Model'
-description: '{"value": "\"In the mammalian olfactory bulb, the inhibitory axonless
-  granule cells (GCs) feature reciprocal synapses that interconnect them with the
-  principal neurons of the bulb, mitral, and tufted '
+description: "{\"value\": \"\\\"In the mammalian olfactory bulb, the inhibitory axonless granule cells (GCs) feature reciprocal synapses that interconnect them with the principal neurons of the bulb, mitral, and tufted. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

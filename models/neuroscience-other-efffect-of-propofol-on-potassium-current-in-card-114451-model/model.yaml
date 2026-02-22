@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: EfffectOfPropofolOnPotassiumCurrentInCard114451Model'
-description: '{"value": "\"...\r\nThe effects \r\nof propofol, an intravenous anesthetic
-  agent with a distinct chemical structure, \r\non ion currents of differentiated
-  clonal cardiac (H9c2) cells were investigated'
+description: "{\"value\": \"\\\"...\\r\\nThe effects \\r\\nof propofol, an intravenous anesthetic agent with a distinct chemical structure, \\r\\non ion currents of differentiated clonal cardiac (H9c2) cells were investigated. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

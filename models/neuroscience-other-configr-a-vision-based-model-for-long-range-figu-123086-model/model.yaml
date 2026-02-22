@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: ConfigrAVisionBasedModelForLongRangeFigu123086Model'
-description: '{"value": "\"CONFIGR (CONtour FIgure GRound) is a computational model
-  based on\r\nprinciples of\r\nbiological vision that completes sparse and noisy image
-  figures.\r\n\r\nWithin an integrated\r\nvisio'
+description: "{\"value\": \"\\\"CONFIGR (CONtour FIgure GRound) is a computational model based on\\r\\nprinciples of\\r\\nbiological vision that completes sparse and noisy image figures.\\r\\n\\r\\nWithin an integrated\\r\\nvisio. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

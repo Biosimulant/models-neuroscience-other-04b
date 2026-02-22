@@ -1,7 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: Model266732266732Model'
-description: A model of closed-loop motor unit including muscle spindle feedback (Kim,
-  2020)
+description: "A model of closed-loop motor unit including muscle spindle feedback (Kim, 2020). It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

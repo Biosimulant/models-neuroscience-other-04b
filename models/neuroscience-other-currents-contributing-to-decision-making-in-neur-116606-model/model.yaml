@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CurrentsContributingToDecisionMakingInNeur116606Model'
-description: '{"value": "\"Biophysical properties of neurons contributing to the ability
-  of an animal to decide whether or not to respond were examined. \r\n\r\nB31/B32,
-  two pairs of bilaterally symmetrical Aplysia'
+description: "{\"value\": \"\\\"Biophysical properties of neurons contributing to the ability of an animal to decide whether or not to respond were examined. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CompartmentalizationOfGabaergicInhibitionBy143604Model'
-description: '{"value": "A spiny dendrite model supports the hypothesis that only
-  inhibitory inputs on spine heads, not shafts, compartmentalizes inhibition of calcium
-  signals to spine heads as seen in paired inhib'
+description: "{\"value\": \"A spiny dendrite model supports the hypothesis that only inhibitory inputs on spine heads, not shafts, compartmentalizes inhibition of calcium signals to spine heads as seen in paired inhib. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience

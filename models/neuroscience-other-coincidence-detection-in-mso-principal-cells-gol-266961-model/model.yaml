@@ -1,8 +1,6 @@
 schema_version: '2.0'
 title: 'Neuroscience: CoincidenceDetectionInMsoPrincipalCellsGol266961Model'
-description: '{"value": "How a particular combination of anatomical and biophysical
-  properties results in a short integration window (good for detection of closely-coincident
-  inputs) while also enabling efficient a'
+description: "{\"value\": \"How a particular combination of anatomical and biophysical properties results in a short integration window (good for detection of closely-coincident inputs) while also enabling efficient a. It can be used to explore neural activity dynamics and compare response patterns across conditions."
 standard: other
 tags:
 - neuroscience
