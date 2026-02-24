@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherDentateGyrusMorganEtAl20072008SanthakumarEtAl2005(biosim.BioModule):
-    """BioModule wrapper for: Dentate gyrus (Morgan et al. 2007, 2008, Santhakumar et al. 2005, Dyhrfjeld-Johnsen et al. 2007).""""""
+    """BioModule wrapper for: Dentate gyrus (Morgan et al. 2007, 2008, Santhakumar et al. 2005, Dyhrfjeld-Johnsen et al. 2007)."""
 
     def __init__(self, model_path: str = "data/124513.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherDentateGyrusMorganEtAl20072008SanthakumarEtAl2005(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

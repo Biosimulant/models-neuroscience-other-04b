@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherEfffectOfPropofolOnPotassiumCurrentInCardiacH9c2(biosim.BioModule):
-    """BioModule wrapper for: Efffect of propofol on potassium current in cardiac H9c2 cells (Liu et al. 2008).""""""
+    """BioModule wrapper for: Efffect of propofol on potassium current in cardiac H9c2 cells (Liu et al. 2008)."""
 
     def __init__(self, model_path: str = "data/114451.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherEfffectOfPropofolOnPotassiumCurrentInCardiacH9c2(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

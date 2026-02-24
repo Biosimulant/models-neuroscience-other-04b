@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherCompetingOscillator5CellCircuitAndParameterscape(biosim.BioModule):
-    """BioModule wrapper for: Competing oscillator 5-cell circuit and Parameterscape plotting (Gutierrez et al. 2013).""""""
+    """BioModule wrapper for: Competing oscillator 5-cell circuit and Parameterscape plotting (Gutierrez et al. 2013)."""
 
     def __init__(self, model_path: str = "data/149910.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherCompetingOscillator5CellCircuitAndParameterscape(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

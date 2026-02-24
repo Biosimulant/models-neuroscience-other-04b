@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherCoincidentSignalsInOlfactoryBulbGranuleCellSpines(biosim.BioModule):
-    """BioModule wrapper for: Coincident signals in Olfactory Bulb Granule Cell spines (Aghvami et al 2019).""""""
+    """BioModule wrapper for: Coincident signals in Olfactory Bulb Granule Cell spines (Aghvami et al 2019)."""
 
     def __init__(self, model_path: str = "data/244687.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherCoincidentSignalsInOlfactoryBulbGranuleCellSpines(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

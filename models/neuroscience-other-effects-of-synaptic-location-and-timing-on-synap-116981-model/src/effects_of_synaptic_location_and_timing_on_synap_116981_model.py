@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherEffectsOfSynapticLocationAndTimingOnSynaptic(biosim.BioModule):
-    """BioModule wrapper for: Effects of synaptic location and timing on synaptic integration (Rall 1964).""""""
+    """BioModule wrapper for: Effects of synaptic location and timing on synaptic integration (Rall 1964)."""
 
     def __init__(self, model_path: str = "data/116981.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherEffectsOfSynapticLocationAndTimingOnSynaptic(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

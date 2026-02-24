@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherCochleaInnerEarModelsInPythonZilanyEtAl20092014(biosim.BioModule):
-    """BioModule wrapper for: Cochlea: inner ear models in Python (Zilany et al 2009, 2014; Holmberg M 2007).""""""
+    """BioModule wrapper for: Cochlea: inner ear models in Python (Zilany et al 2009, 2014; Holmberg M 2007)."""
 
     def __init__(self, model_path: str = "data/169278.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherCochleaInnerEarModelsInPythonZilanyEtAl20092014(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

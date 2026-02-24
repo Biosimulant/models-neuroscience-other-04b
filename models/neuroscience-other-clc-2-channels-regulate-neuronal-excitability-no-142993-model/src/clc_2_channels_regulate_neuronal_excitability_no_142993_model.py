@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherClc2ChannelsRegulateNeuronalExcitabilityNot(biosim.BioModule):
-    """BioModule wrapper for: ClC-2 channels regulate neuronal excitability, not intracellular Cl- levels (Ratte & Prescott 2011).""""""
+    """BioModule wrapper for: ClC-2 channels regulate neuronal excitability, not intracellular Cl- levels (Ratte & Prescott 2011)."""
 
     def __init__(self, model_path: str = "data/142993.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherClc2ChannelsRegulateNeuronalExcitabilityNot(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

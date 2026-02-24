@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherComplexDynamicsReproducingGolgiCell(biosim.BioModule):
-    """BioModule wrapper for: Complex dynamics: reproducing Golgi cell electroresponsiveness (Geminiani et al 2018, 2019ab).""""""
+    """BioModule wrapper for: Complex dynamics: reproducing Golgi cell electroresponsiveness (Geminiani et al 2018, 2019ab)."""
 
     def __init__(self, model_path: str = "data/262456.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherComplexDynamicsReproducingGolgiCell(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherCholinergicModulationOfRestingStateNetworksSandaEt(biosim.BioModule):
-    """BioModule wrapper for: Cholinergic modulation of resting state networks (Sanda et al., 2024).""""""
+    """BioModule wrapper for: Cholinergic modulation of resting state networks (Sanda et al., 2024)."""
 
     def __init__(self, model_path: str = "data/2016670.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherCholinergicModulationOfRestingStateNetworksSandaEt(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

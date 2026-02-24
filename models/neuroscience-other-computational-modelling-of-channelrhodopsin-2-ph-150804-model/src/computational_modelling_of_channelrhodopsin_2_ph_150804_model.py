@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherComputationalModellingOfChannelrhodopsin2Photocurrent(biosim.BioModule):
-    """BioModule wrapper for: Computational modelling of channelrhodopsin-2 photocurrent characteristics (Stefanescu et al. 2013).""""""
+    """BioModule wrapper for: Computational modelling of channelrhodopsin-2 photocurrent characteristics (Stefanescu et al. 2013)."""
 
     def __init__(self, model_path: str = "data/150804.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherComputationalModellingOfChannelrhodopsin2Photocurrent(biosim.BioModul
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

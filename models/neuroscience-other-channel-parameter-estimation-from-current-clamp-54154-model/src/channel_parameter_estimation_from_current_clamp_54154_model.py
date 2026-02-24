@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherChannelParameterEstimationFromCurrentClampAnd(biosim.BioModule):
-    """BioModule wrapper for: Channel parameter estimation from current clamp and neuronal properties (Toth, Crunelli 2001).""""""
+    """BioModule wrapper for: Channel parameter estimation from current clamp and neuronal properties (Toth, Crunelli 2001)."""
 
     def __init__(self, model_path: str = "data/54154.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherChannelParameterEstimationFromCurrentClampAnd(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

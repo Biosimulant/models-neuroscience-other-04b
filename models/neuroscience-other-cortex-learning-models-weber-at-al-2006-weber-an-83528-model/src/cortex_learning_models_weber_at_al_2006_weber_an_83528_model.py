@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherCortexLearningModelsWeberAtAl2006WeberAndTriesch(biosim.BioModule):
-    """BioModule wrapper for: Cortex learning models (Weber at al. 2006, Weber and Triesch, 2006, Weber and Wermter 2006/7).""""""
+    """BioModule wrapper for: Cortex learning models (Weber at al. 2006, Weber and Triesch, 2006, Weber and Wermter 2006/7)."""
 
     def __init__(self, model_path: str = "data/83528.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherCortexLearningModelsWeberAtAl2006WeberAndTriesch(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 

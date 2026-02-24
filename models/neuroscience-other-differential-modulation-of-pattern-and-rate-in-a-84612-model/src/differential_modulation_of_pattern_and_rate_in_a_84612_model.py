@@ -20,7 +20,7 @@ import biosim
 from biosim.signals import BioSignal, SignalMetadata
 
 class OtherDifferentialModulationOfPatternAndRateInADopamine(biosim.BioModule):
-    """BioModule wrapper for: Differential modulation of pattern and rate in a dopamine neuron model (Canavier and Landry 2006).""""""
+    """BioModule wrapper for: Differential modulation of pattern and rate in a dopamine neuron model (Canavier and Landry 2006)."""
 
     def __init__(self, model_path: str = "data/84612.zip", min_dt: float = 0.01) -> None:
         self.min_dt = min_dt
@@ -87,7 +87,7 @@ class OtherDifferentialModulationOfPatternAndRateInADopamine(biosim.BioModule):
         return {"state"}
 
     def advance_to(self, t: float) -> None:
-        """Advance simulation — dispatches to detected simulator."""
+        """Advance simulation - dispatches to detected simulator."""
         if self._extracted_dir is None:
             self.setup()
 
