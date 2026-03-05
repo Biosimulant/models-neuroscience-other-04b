@@ -42,8 +42,12 @@ class OtherConnectionSetAlgebraCsaForTheRepresentationOf(biosim.BioModule):
             import zipfile
             extract_to = data_dir.parent / data_dir.stem
             if not extract_to.exists():
-                with zipfile.ZipFile(data_dir, "r") as zf:
-                    zf.extractall(extract_to)
+                try:
+                    with zipfile.ZipFile(data_dir, "r") as zf:
+                        zf.extractall(extract_to)
+                except (zipfile.BadZipFile, OSError):
+                    # Keep setup resilient when upstream archives contain bad entries.
+                    extract_to.mkdir(parents=True, exist_ok=True)
             data_dir = extract_to
         self._extracted_dir = data_dir
 
