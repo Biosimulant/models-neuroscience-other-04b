@@ -16,9 +16,8 @@ This model was auto-generated from the modeldb repository.
 ```yaml
 # In a space.yaml wiring file:
 models:
-  - repo: Biosimulant/models
+  - path: ../../models/neuroscience-other-competition-model-of-pheromone-ratio-detection-z-143753-model
     alias: model
-    manifest_path: models/neuroscience-other-competition-model-of-pheromone-ratio-detection-z-143753-model/model.yaml
 ```
 
 ## Tags
